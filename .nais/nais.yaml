@@ -1,0 +1,35 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: "dp-dagpenger"
+  namespace: "teamdagpenger"
+  labels:
+    "team": "teamdagpenger"
+spec:
+  image: {{image}}
+  port: 3000
+  liveness:
+    path: "/api/isalive"
+    initialDelay: 3
+  readiness:
+    path: "/api/isready"
+    initialDelay: 3
+  replicas:
+    min: 2
+    max: 2
+    cpuThresholdPercentage: 50
+  prometheus:
+    enabled: false
+  limits:
+    cpu: "200m"
+    memory: "256Mi"
+  requests:
+    cpu: "200m"
+    memory: "256Mi"
+  env:
+    - name: DEKORATOR_URL
+      value: {{dekoratorUrl}}
+  ingresses:
+    {{#each ingresses as |url|}}
+     - {{url}}
+    {{/each}}
