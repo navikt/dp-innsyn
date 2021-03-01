@@ -58,10 +58,10 @@ tasks.named("compileKotlin") {
 
 tasks.withType<Jar> {
     manifest {
-        attributes(mapOf("Main-Class" to application.mainClass))
+        attributes(mapOf("Main-Class" to application.mainClass.get()))
     }
 
-    from(configurations.compile.get().map { if (it.isDirectory) it else zipTree(it) })
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
 }
 
 tasks.withType<Test> {
