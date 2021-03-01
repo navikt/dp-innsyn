@@ -8,7 +8,7 @@ import no.nav.helse.rapids_rivers.River
 internal class StatusDings(rapidsConnection: RapidsConnection) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate { it.demandKey("@behov") }
+            validate { it.demandAll("@behov", listOf("Status")) }
             validate { it.rejectKey("@løsning") }
             validate { it.requireKey("fødselsnummer") }
         }.register(this)
@@ -18,7 +18,7 @@ internal class StatusDings(rapidsConnection: RapidsConnection) : River.PacketLis
         val fnr = packet["fødselsnummer"].asText()
 
         packet["@løsning"] = mapOf(
-            "Journalposter" to "$fnr har ingen journalposter"
+            "Status" to "$fnr har ingen status"
         )
 
         context.send(packet.toJson())

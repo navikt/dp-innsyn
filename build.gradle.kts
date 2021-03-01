@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version Kotlin.version
     application
     id(Spotless.spotless) version Spotless.version
+    id(Shadow.shadow) version Shadow.version
 }
 
 apply {
@@ -18,6 +19,7 @@ repositories {
 
 application {
     mainClass.set("no.nav.dagpenger.innsyn.AppKt")
+    mainClassName = "no.nav.dagpenger.innsyn.AppKt"
 }
 
 dependencies {
@@ -54,6 +56,10 @@ spotless {
 
 tasks.named("compileKotlin") {
     dependsOn("spotlessApply")
+}
+
+tasks.named("shadowJar") {
+    dependsOn("test")
 }
 
 tasks.withType<Test> {

@@ -1,3 +1,2 @@
 ingresses:
-  - "https://dp-dagpenger.dev.intern.nav.no"
-dekoratorUrl: https://dekoratoren.dev.nav.no/
+  - "https://dp-innsyn.dev.intern.nav.no"

@@ -1,7 +1,7 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: "dp-dagpenger"
+  name: "dp-innsyn"
   namespace: "teamdagpenger"
   labels:
     "team": "teamdagpenger"
@@ -9,17 +9,15 @@ spec:
   image: {{image}}
   port: 3000
   liveness:
-    path: "/api/isalive"
-    initialDelay: 3
+    path: "/isalive"
   readiness:
-    path: "/api/isready"
-    initialDelay: 3
+    path: "/isready"
   replicas:
-    min: 2
+    min: 1
     max: 2
     cpuThresholdPercentage: 50
   prometheus:
-    enabled: false
+    enabled: true
   limits:
     cpu: "200m"
     memory: "256Mi"
@@ -27,8 +25,14 @@ spec:
     cpu: "200m"
     memory: "256Mi"
   env:
-    - name: DEKORATOR_URL
-      value: {{dekoratorUrl}}
+    KAFKA_RAPID_TOPIC: private-dagpenger-behov-v2
+    KAFKA_CONSUMER_GROUP_ID: dp-innsyn
+    KAFKA_RESET_POLICY: earliest
+  envFrom:
+    - configmap: kafka-bootstrap-servers
+  filesFrom:
+    - secret: serviceuser-srvdp-innsyn
+      mountPath: "/var/run/secrets/nais.io/service_user"
   ingresses:
     {{#each ingresses as |url|}}
      - {{url}}
