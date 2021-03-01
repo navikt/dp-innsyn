@@ -26,11 +26,11 @@ spec:
     memory: "256Mi"
   env:
     - name: KAFKA_RAPID_TOPIC
-      value: private-dagpenger-behov-v2
+      value: privat-dagpenger-behov-v2
     - name: KAFKA_CONSUMER_GROUP_ID
       value: dp-innsyn
     - name: KAFKA_RESET_POLICY
-      value: earliest
+      value: latest
   envFrom:
     - configmap: kafka-bootstrap-servers
   filesFrom:
