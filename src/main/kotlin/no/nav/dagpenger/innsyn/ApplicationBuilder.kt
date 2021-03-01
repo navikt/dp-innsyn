@@ -11,7 +11,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     }.build()
     private val mediator: Mediator
         get() = Mediator(rapidsConnection)
-    private val dings: StatusDings = StatusDings(rapidsConnection)
+    private val løsningService: StatusLøsningService = StatusLøsningService(rapidsConnection)
 
     init {
         rapidsConnection.register(this)

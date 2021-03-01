@@ -1,11 +1,14 @@
 package no.nav.dagpenger.innsyn
 
+import mu.KotlinLogging
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-internal class StatusDings(rapidsConnection: RapidsConnection) : River.PacketListener {
+private val logger = KotlinLogging.logger { }
+
+internal class StatusLøsningService(rapidsConnection: RapidsConnection) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
             validate { it.demandAll("@behov", listOf("Status")) }
@@ -25,10 +28,6 @@ internal class StatusDings(rapidsConnection: RapidsConnection) : River.PacketLis
     }
 
     override fun onError(problems: MessageProblems, context: RapidsConnection.MessageContext) {
-        println(problems)
-    }
-
-    override fun onSevere(error: MessageProblems.MessageException, context: RapidsConnection.MessageContext) {
-        println(error)
+        logger.error { problems }
     }
 }
