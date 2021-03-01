@@ -42,7 +42,7 @@ jobs:
         env:
           DOCKER_BUILDKIT: 1
         run: |
-          docker build mediator -t ${{ env.IMAGE }}
+          docker build . -t ${{ env.IMAGE }}
           docker push ${{ env.IMAGE }}
 
       - name: Archive NAIS yaml
