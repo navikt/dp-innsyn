@@ -31,7 +31,7 @@ internal class InnsynApiTest {
         @Language("JSON")
         val behov =
             """{
-          "@behov": "Søknader",
+          "@behov": ["Søknader"],
           "session": "5A0FEE87-50FA-48B4-B0A5-A973DBB1AAD3",
           "fødselsnummer": "123123123"
         }
@@ -40,7 +40,7 @@ internal class InnsynApiTest {
         @Language("JSON")
         fun løstBehov(sessionId: String) =
             """{
-          "@behov": "Søknader",
+          "@behov": ["Søknader"],
           "fødselsnummer": "123123123",
           "session": "$sessionId",
           "@løsning": {
