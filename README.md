@@ -6,7 +6,16 @@ Gir deg svar på alt du lurer på
 
 Gradle brukes som byggverktøy og er bundlet inn.
 
-`./gradlew build`
+```
+./gradlew build
+```
+
+## For å kjøre applikasjonen lokalt:
+
+```
+docker-compose up -d
+./gradlew run
+```
 
 ---
 
