@@ -12,7 +12,7 @@ internal class ØnskerStatusMelding(private val uuid: UUID, private val fødsels
 
     fun toJson() = JsonMessage.newMessage(
         mutableMapOf(
-            "@behov" to navn,
+            "@behov" to listOf(navn),
             "@opprettet" to opprettet,
             "@id" to id,
             "session" to uuid.toString(),
