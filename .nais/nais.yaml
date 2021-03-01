@@ -25,9 +25,12 @@ spec:
     cpu: "200m"
     memory: "256Mi"
   env:
-    KAFKA_RAPID_TOPIC: private-dagpenger-behov-v2
-    KAFKA_CONSUMER_GROUP_ID: dp-innsyn
-    KAFKA_RESET_POLICY: earliest
+    - name: KAFKA_RAPID_TOPIC
+      value: private-dagpenger-behov-v2
+    - name: KAFKA_CONSUMER_GROUP_ID
+      value: dp-innsyn
+    - name: KAFKA_RESET_POLICY
+      value: earliest
   envFrom:
     - configmap: kafka-bootstrap-servers
   filesFrom:
