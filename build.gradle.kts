@@ -5,7 +5,6 @@ plugins {
     kotlin("jvm") version Kotlin.version
     application
     id(Spotless.spotless) version Spotless.version
-    id(Shadow.shadow) version Shadow.version
 }
 
 apply {
@@ -19,7 +18,6 @@ repositories {
 
 application {
     mainClass.set("no.nav.dagpenger.innsyn.AppKt")
-    mainClassName = "no.nav.dagpenger.innsyn.AppKt"
 }
 
 dependencies {
@@ -58,8 +56,12 @@ tasks.named("compileKotlin") {
     dependsOn("spotlessApply")
 }
 
-tasks.named("shadowJar") {
-    dependsOn("test")
+tasks.withType<Jar> {
+    manifest {
+        attributes(mapOf("Main-Class" to application.mainClass))
+    }
+
+    from(configurations.compile.get().map { if (it.isDirectory) it else zipTree(it) })
 }
 
 tasks.withType<Test> {
@@ -71,7 +73,6 @@ tasks.withType<Test> {
         events = setOf(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
     }
 }
-
 // Gjør det mulig å kjøre docker-compose up && ./gradlew run
 tasks.withType<JavaExec> {
     environment(
