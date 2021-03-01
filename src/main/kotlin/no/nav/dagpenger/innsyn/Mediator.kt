@@ -1,6 +1,8 @@
 package no.nav.dagpenger.innsyn
 
 import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
+import mu.withLoggingContext
 import no.nav.dagpenger.innsyn.meldinger.ØnskerStatusMelding
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -8,6 +10,8 @@ import no.nav.helse.rapids_rivers.River
 import java.util.UUID
 
 typealias Fødselsnummer = String
+
+private val logger = KotlinLogging.logger { }
 
 internal class Mediator(private val rapidsConnection: RapidsConnection) : River.PacketListener {
     private val observers = mutableMapOf<UUID, StatusObserver>()
@@ -30,11 +34,21 @@ internal class Mediator(private val rapidsConnection: RapidsConnection) : River.
         rapidsConnection.publish(ØnskerStatusMelding(uuid, fødselsnummer).toJson())
     }
 
-    override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) =
-        runBlocking {
-            val sessionId = UUID.fromString(packet["session"].asText())
-            observers.filterKeys { it == sessionId }.values.forEach { it.statusOppdatert(packet.toJson()) }
+    override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext): Unit = runBlocking {
+        val sessionId = UUID.fromString(packet["session"].asText())
+        val behov = packet["@behov"].joinToString { it.asText() }
+
+        withLoggingContext(
+            "sessionId" to sessionId.toString(),
+            "behov" to behov
+        ) {
+            logger.info { "Har fått løsning på pakke" }
+            observers.filterKeys { it == sessionId }.values.onEach {
+                logger.info { "Svarer på riktig session" }
+                it.statusOppdatert(packet.toJson())
+            }.ifEmpty { logger.info { "Fant ikke noen session som venter på svar" } }
         }
+    }
 }
 
 internal interface StatusObserver {
