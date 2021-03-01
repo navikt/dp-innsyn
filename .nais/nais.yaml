@@ -40,3 +40,7 @@ spec:
     {{#each ingresses as |url|}}
      - {{url}}
     {{/each}}
+  accessPolicy:
+    inbound:
+      rules:
+        - application: dp-dagpenger
