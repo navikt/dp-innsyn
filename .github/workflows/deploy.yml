@@ -46,7 +46,7 @@ jobs:
           docker push ${{ env.IMAGE }}
 
       - name: Archive NAIS yaml
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v1
         with:
           name: nais-yaml
