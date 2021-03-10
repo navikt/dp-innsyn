@@ -15,5 +15,9 @@ tasks.withType<Jar>().configureEach {
         attributes(mapOf("Main-Class" to application.mainClass.get()))
     }
 
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    from(
+        configurations.runtimeClasspath.get().map {
+            if (it.isDirectory) it else zipTree(it)
+        }
+    )
 }

@@ -11,8 +11,8 @@ internal class Vedlegg(private val id: String, frist: LocalDate = LocalDate.now(
     var tilstand: Tilstand = Tilstand.IkkeInnsendt()
     val frist: LocalDate = frist
 
-    fun håndter(ettersending: Ettersending){
-        if(this in ettersending){
+    fun håndter(ettersending: Ettersending) {
+        if (this in ettersending) {
             tilstand = Tilstand.Innsendt()
         }
     }

@@ -12,11 +12,11 @@ internal class Person(fnr: String) {
 
     fun håndter(vedtak: Vedtak) {
         this.vedtak.add(vedtak)
-        søknader.forEach{it.håndter(vedtak)}
+        søknader.forEach { it.håndter(vedtak) }
     }
 
-    fun håndter(ettersending: Ettersending){
-        søknader.forEach{it.håndter(ettersending)}
+    fun håndter(ettersending: Ettersending) {
+        søknader.forEach { it.håndter(ettersending) }
     }
 
     fun harSøknadUnderBehandling() = søknader.any { it.tilstand is Innsendt }

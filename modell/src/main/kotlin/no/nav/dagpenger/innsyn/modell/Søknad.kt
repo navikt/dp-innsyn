@@ -6,10 +6,10 @@ internal class Søknad(private val id: String, vedlegg: List<Vedlegg> = emptyLis
     var tilstand: Tilstand = Tilstand.Innsendt()
     private val vedlegg: MutableList<Vedlegg> = vedlegg.toMutableList()
     val erKomplett: Boolean
-        get() = vedlegg.none{ it.tilstand is IkkeInnsendt }
+        get() = vedlegg.none { it.tilstand is IkkeInnsendt }
 
     fun håndter(ettersending: Ettersending) {
-        if(ettersending.id != id) return
+        if (ettersending.id != id) return
         vedlegg.håndter(ettersending)
     }
 
@@ -26,9 +26,7 @@ internal class Søknad(private val id: String, vedlegg: List<Vedlegg> = emptyLis
 
 private fun List<Vedlegg>.håndter(ettersending: Ettersending) {
     this.forEach {
-        //if (it !in ettersending)
+        // if (it !in ettersending)
         it.håndter(ettersending)
     }
 }
-
-

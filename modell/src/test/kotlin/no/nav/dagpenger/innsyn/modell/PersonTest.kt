@@ -25,7 +25,7 @@ internal class PersonTest {
     }
 
     @Test
-    fun `søknad markeres som behandlet etter vedtak`(){
+    fun `søknad markeres som behandlet etter vedtak`() {
         Person("ident").also { person ->
             person.håndter(Søknad("id"))
             assertTrue(person.harSøknadUnderBehandling())
@@ -65,4 +65,3 @@ internal class PersonTest {
         }
     }
 }
-
