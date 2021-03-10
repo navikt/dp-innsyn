@@ -3,11 +3,11 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     kotlin("jvm")
+    id("dagpenger.spotless")
 }
 
 repositories {
-    jcenter()
-    maven("https://jitpack.io")
+    mavenCentral()
 }
 
 dependencies {

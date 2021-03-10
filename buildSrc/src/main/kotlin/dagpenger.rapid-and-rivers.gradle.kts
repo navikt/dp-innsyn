@@ -3,6 +3,10 @@ plugins {
     application
 }
 
+repositories {
+    maven("https://jitpack.io")
+}
+
 dependencies {
     implementation(RapidAndRivers)
 
