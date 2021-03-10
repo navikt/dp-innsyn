@@ -12,6 +12,7 @@ internal class Person(fnr: String) {
 
     fun håndter(vedtak: Vedtak) {
         this.vedtak.add(vedtak)
+        søknader.forEach{it.håndter(vedtak)}
     }
 
     fun håndter(ettersending: Ettersending){
