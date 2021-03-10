@@ -7,11 +7,12 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
     ).withKtorModule {
-        innsynApi(mediator = mediator) // AuthFactory.jwkProvider, AuthFactory.issuer, AuthFactory.clientId)
-    }.build()
+        innsynApi(mediator) // AuthFactory.jwkProvider, AuthFactory.issuer, AuthFactory.clientId)
+    }.build().apply {
+        StatusLøsningService(this)
+    }
     private val mediator: Mediator
         get() = Mediator(rapidsConnection)
-    private val løsningService: StatusLøsningService = StatusLøsningService(rapidsConnection)
 
     init {
         rapidsConnection.register(this)

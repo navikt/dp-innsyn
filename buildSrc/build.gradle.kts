@@ -3,5 +3,13 @@ plugins {
 }
 
 repositories {
-    jcenter()
+    gradlePluginPortal()
+}
+
+dependencies {
+    implementation(kotlin("gradle-plugin"))
+}
+
+kotlinDslPluginOptions {
+    experimentalWarning.set(false)
 }
