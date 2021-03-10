@@ -1,4 +1,4 @@
-plugins {
+/*plugins {
     id(Spotless.spotless) version Spotless.version
 }
 
@@ -21,8 +21,9 @@ spotless {
 }
 
 subprojects {
-tasks.named("compileKotlin") {
-    println(this)
-    dependsOn("spotlessApply")
+    tasks.named("compileKotlin") {
+        println(this)
+        dependsOn("spotlessApply")
+    }
 }
-}
+*/
