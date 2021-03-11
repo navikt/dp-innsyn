@@ -3,11 +3,29 @@ package no.nav.dagpenger.innsyn.modell
 import no.nav.dagpenger.innsyn.modell.Søknad.Tilstand.Innsendt
 
 internal class Person(fnr: String) {
+
+    val tidslinje: Tidslinje
+
+    init {
+        tidslinje = Tidslinje()
+    }
+
     private val søknader: MutableList<Søknad> = mutableListOf()
     private val vedtak: MutableList<Vedtak> = mutableListOf()
 
     fun håndter(søknad: Søknad) {
         søknader.add(søknad)
+    }
+
+
+    fun håndter(søknadHendelse: SøknadHendelse) {
+        søknader.add(Søknad(søknadHendelse.id))
+        tidslinje.leggTilSøknadsHendelse(søknadHendelse)
+    }
+
+    fun håndter(vedtakHendelse: VedtakHendelse) {
+        vedtak.add(Vedtak(vedtakHendelse.id, "", Vedtak.Status.INNVILGET))
+        tidslinje.leggTilVedtakHendelse(vedtakHendelse)
     }
 
     fun håndter(vedtak: Vedtak) {
