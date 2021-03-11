@@ -1,27 +1,51 @@
 package no.nav.dagpenger.innsyn.modell
 
-import no.nav.dagpenger.innsyn.modell.Vedlegg.Tilstand.IkkeInnsendt
+import no.nav.dagpenger.innsyn.modell.Vedlegg.Companion.erInnsendt as erVedleggInnsendt
 
-internal class Søknad(private val id: String, vedlegg: List<Vedlegg> = emptyList()) {
-    var tilstand: Tilstand = Tilstand.Innsendt()
-    private val vedlegg: MutableList<Vedlegg> = vedlegg.toMutableList()
-    val erKomplett: Boolean
-        get() = vedlegg.none { it.tilstand is IkkeInnsendt }
+internal class Søknad private constructor(
+    private val id: String,
+    private val vedlegg: MutableList<Vedlegg>,
+    private var tilstand: Tilstand
+) {
+    constructor(id: String) : this(id, mutableListOf(), Innsendt)
+    constructor(id: String, vedlegg: List<Vedlegg>) : this(id, vedlegg.toMutableList(), Innsendt)
 
-    fun håndter(ettersending: Ettersending) {
-        if (ettersending.id != id) return
-        vedlegg.håndter(ettersending)
+    companion object {
+        fun erInnsendt(søknad: Søknad) = søknad.tilstand == Innsendt
+        fun erKomplett(søknad: Søknad) = søknad.vedlegg.all(::erVedleggInnsendt)
     }
 
-    fun håndter(vedtak: Vedtak) {
-        tilstand = Tilstand.FerdigBehandlet()
+    internal fun håndter(ettersending: Ettersending) {
+        tilstand.håndter(this, ettersending)
     }
 
-    abstract class Tilstand {
-        class Innsendt : Tilstand()
-        class UnderBehandling : Tilstand()
-        class FerdigBehandlet : Tilstand()
+    internal fun håndter(vedtak: Vedtak) {
+        tilstand.håndter(this, vedtak)
     }
+
+    internal interface Tilstand {
+        fun håndter(søknad: Søknad, ettersending: Ettersending) {}
+        fun håndter(søknad: Søknad, vedtak: Vedtak) {}
+    }
+
+    internal object Innsendt : Tilstand {
+        override fun håndter(søknad: Søknad, vedtak: Vedtak) {
+            søknad.tilstand = FerdigBehandlet
+        }
+    }
+
+    internal object UnderBehandling : Tilstand {
+        override fun håndter(søknad: Søknad, vedtak: Vedtak) {
+            søknad.tilstand = FerdigBehandlet
+        }
+
+        override fun håndter(søknad: Søknad, ettersending: Ettersending) {
+            if (ettersending.id != søknad.id) return
+            søknad.vedlegg.håndter(ettersending)
+        }
+    }
+
+    internal object FerdigBehandlet : Tilstand
 }
 
 private fun List<Vedlegg>.håndter(ettersending: Ettersending) {

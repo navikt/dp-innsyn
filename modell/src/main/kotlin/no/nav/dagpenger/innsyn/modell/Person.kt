@@ -1,6 +1,6 @@
 package no.nav.dagpenger.innsyn.modell
 
-import no.nav.dagpenger.innsyn.modell.Søknad.Tilstand.Innsendt
+import no.nav.dagpenger.innsyn.modell.Søknad.Companion.erInnsendt
 
 internal class Person private constructor(
     private val fnr: String,
@@ -17,12 +17,18 @@ internal class Person private constructor(
 
     fun håndter(vedtakHendelse: VedtakHendelse) {
         tidslinje.leggTil(vedtakHendelse)
-        vedtak.add(vedtakHendelse.vedtak())
+        vedtakHendelse.vedtak().also { vedtak ->
+            this.vedtak.add(vedtak)
+            søknader.forEach { it.håndter(vedtak) }
+        }
     }
 
     fun håndter(ettersendingHendelse: EttersendingHendelse) {
         tidslinje.leggTil(ettersendingHendelse)
+        ettersendingHendelse.ettersending().also { ettersending ->
+            søknader.forEach { it.håndter(ettersending) }
+        }
     }
 
-    fun harSøknadUnderBehandling() = søknader.any { it.tilstand is Innsendt }
+    fun harSøknadUnderBehandling() = søknader.any(::erInnsendt)
 }
