@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 
 internal class SøknadTest {
     @Test
-    fun `søknad kan være innsendt`() {
+    fun `søknad begynner i tilstanden innsendt`() {
         Søknad("id").also {
             assertTrue(it.tilstand is Innsendt)
         }
