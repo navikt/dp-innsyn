@@ -31,6 +31,8 @@ spec:
       value: dp-innsyn
     - name: KAFKA_RESET_POLICY
       value: latest
+    - name: KAFKA_PREFER_ON_PREM
+      value: "true"
   envFrom:
     - configmap: kafka-bootstrap-servers
   filesFrom:

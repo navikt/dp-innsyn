@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.innsyn.meldinger.ØnskerStatusMelding
 import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import java.util.UUID
@@ -34,7 +35,7 @@ internal class Mediator(private val rapidsConnection: RapidsConnection) : River.
         rapidsConnection.publish(ØnskerStatusMelding(uuid, fødselsnummer).toJson())
     }
 
-    override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext): Unit = runBlocking {
+    override fun onPacket(packet: JsonMessage, context: MessageContext): Unit = runBlocking {
         val sessionId = UUID.fromString(packet["session"].asText())
         val behov = packet["@behov"].joinToString { it.asText() }
 
