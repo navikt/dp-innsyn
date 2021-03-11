@@ -1,14 +1,10 @@
 package no.nav.dagpenger.innsyn.modell
 
-class Tidslinje {
+internal class Tidslinje {
 
-    var hendelser = mutableListOf<Any>()
+    var hendelser = mutableListOf<Hendelse>()
 
-    fun leggTilSøknadsHendelse(hendelse: SøknadHendelse) {
-        hendelser.add(hendelse)
-    }
-
-    fun leggTilVedtakHendelse(hendelse: VedtakHendelse) {
+    fun leggTilHendelse(hendelse: Hendelse) {
         hendelser.add(hendelse)
     }
 }

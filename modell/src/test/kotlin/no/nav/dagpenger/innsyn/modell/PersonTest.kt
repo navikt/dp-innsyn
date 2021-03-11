@@ -1,29 +1,29 @@
 package no.nav.dagpenger.innsyn.modell
 
-import no.nav.dagpenger.innsyn.modell.Vedtak.Status.INNVILGET
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class PersonTest {
     @Test
-    fun `Person kan motta ny søknad`() {
+    fun `Person kan motta søknadshendelse`() {
         Person("ident").also { person ->
-            person.håndter(Søknad("id"))
+            person.håndter(SøknadHendelse("id", "id"))
 
             assertTrue(person.harSøknadUnderBehandling())
         }
     }
 
     @Test
-    fun `Person kan få vedtak`() {
+    fun `Person motta vedtakhendelse`() {
         Person("ident").also { person ->
-            person.håndter(Vedtak("vedtakId", "søknadId", INNVILGET))
+            person.håndter(VedtakHendelse("vedtakId", "søknadId", "INNVILGET"))
 
             assertFalse(person.harSøknadUnderBehandling())
         }
     }
 
+    /*
     @Test
     fun `søknad markeres som behandlet etter vedtak`() {
         Person("ident").also { person ->
@@ -63,5 +63,5 @@ internal class PersonTest {
             person.håndter(Ettersending("id", listOf(Vedlegg("id"))))
             assertTrue(søknad.erKomplett)
         }
-    }
+    }*/
 }

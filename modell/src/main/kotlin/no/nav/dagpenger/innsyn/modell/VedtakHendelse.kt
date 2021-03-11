@@ -1,3 +1,6 @@
 package no.nav.dagpenger.innsyn.modell
 
-class VedtakHendelse(val id: String, utfall: String)
+internal class VedtakHendelse(val meldingsreferanseId: String, val id: String, utfall: String) : Hendelse(meldingsreferanseId) {
+
+    fun vedtak(): Vedtak = Vedtak(id, "", Vedtak.Status.INNVILGET)
+}

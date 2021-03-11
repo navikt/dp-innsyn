@@ -1,3 +1,6 @@
 package no.nav.dagpenger.innsyn.modell
 
-class SøknadHendelse(val id: String)
+internal class SøknadHendelse(val meldingsreferanseId: String, val id: String) : Hendelse(meldingsreferanseId) {
+
+    fun søknad(): Søknad = Søknad(id)
+}

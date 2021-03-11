@@ -13,27 +13,18 @@ internal class Person(fnr: String) {
     private val søknader: MutableList<Søknad> = mutableListOf()
     private val vedtak: MutableList<Vedtak> = mutableListOf()
 
-    fun håndter(søknad: Søknad) {
-        søknader.add(søknad)
-    }
-
     fun håndter(søknadHendelse: SøknadHendelse) {
-        søknader.add(Søknad(søknadHendelse.id))
-        tidslinje.leggTilSøknadsHendelse(søknadHendelse)
+        tidslinje.leggTilHendelse(søknadHendelse)
+        søknader.add(søknadHendelse.søknad())
     }
 
     fun håndter(vedtakHendelse: VedtakHendelse) {
-        vedtak.add(Vedtak(vedtakHendelse.id, "", Vedtak.Status.INNVILGET))
-        tidslinje.leggTilVedtakHendelse(vedtakHendelse)
+        tidslinje.leggTilHendelse(vedtakHendelse)
+        vedtak.add(vedtakHendelse.vedtak())
     }
 
-    fun håndter(vedtak: Vedtak) {
-        this.vedtak.add(vedtak)
-        søknader.forEach { it.håndter(vedtak) }
-    }
-
-    fun håndter(ettersending: Ettersending) {
-        søknader.forEach { it.håndter(ettersending) }
+    fun håndter(ettersendingHendelse: EttersendingHendelse) {
+        tidslinje.leggTilHendelse(ettersendingHendelse)
     }
 
     fun harSøknadUnderBehandling() = søknader.any { it.tilstand is Innsendt }
