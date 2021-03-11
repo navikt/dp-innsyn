@@ -17,7 +17,6 @@ internal class Person(fnr: String) {
         søknader.add(søknad)
     }
 
-
     fun håndter(søknadHendelse: SøknadHendelse) {
         søknader.add(Søknad(søknadHendelse.id))
         tidslinje.leggTilSøknadsHendelse(søknadHendelse)
