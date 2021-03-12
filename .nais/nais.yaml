@@ -24,20 +24,8 @@ spec:
   requests:
     cpu: "200m"
     memory: "256Mi"
-  env:
-    - name: KAFKA_RAPID_TOPIC
-      value: privat-dagpenger-behov-v2
-    - name: KAFKA_CONSUMER_GROUP_ID
-      value: dp-innsyn
-    - name: KAFKA_RESET_POLICY
-      value: latest
-    - name: KAFKA_PREFER_ON_PREM
-      value: "true"
-  envFrom:
-    - configmap: kafka-bootstrap-servers
-  filesFrom:
-    - secret: serviceuser-srvdp-innsyn
-      mountPath: "/var/run/secrets/nais.io/service_user"
+  kafka:
+    pool: {{ kafka_pool }}
   ingresses:
     {{#each ingresses as |url|}}
      - {{url}}

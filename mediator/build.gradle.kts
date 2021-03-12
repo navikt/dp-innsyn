@@ -17,13 +17,3 @@ dependencies {
 
     testImplementation(Ktor.library("server-test-host"))
 }
-
-// Gjør det mulig å kjøre docker-compose up && ./gradlew run
-tasks.withType<JavaExec> {
-    environment(
-        "KAFKA_RAPID_TOPIC" to "private-dagpenger-behov-v2",
-        "KAFKA_BOOTSTRAP_SERVERS" to "localhost:9092",
-        "KAFKA_CONSUMER_GROUP_ID" to "dp-innsyn",
-        "KAFKA_RESET_POLICY" to "earliest"
-    )
-}
