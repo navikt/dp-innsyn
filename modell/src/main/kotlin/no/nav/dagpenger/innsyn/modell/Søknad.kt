@@ -6,9 +6,13 @@ internal class Søknad private constructor(
     private val id: String,
     private val vedlegg: MutableList<Vedlegg>,
     private var tilstand: Tilstand
-) {
+) : Hendelse() {
     constructor(id: String) : this(id, mutableListOf(), Innsendt)
-    constructor(id: String, vedlegg: List<Vedlegg>) : this(id, vedlegg.toMutableList(), Innsendt)
+    constructor(id: String, vedlegg: List<Vedlegg>) : this(
+        id,
+        vedlegg.toMutableList(),
+        Innsendt
+    )
 
     companion object {
         fun erInnsendt(søknad: Søknad) = søknad.tilstand == Innsendt
@@ -32,6 +36,9 @@ internal class Søknad private constructor(
         override fun håndter(søknad: Søknad, vedtak: Vedtak) {
             søknad.tilstand = FerdigBehandlet
         }
+
+        override fun håndter(søknad: Søknad, ettersending: Ettersending) {
+        }
     }
 
     internal object UnderBehandling : Tilstand {
@@ -40,17 +47,12 @@ internal class Søknad private constructor(
         }
 
         override fun håndter(søknad: Søknad, ettersending: Ettersending) {
-            if (ettersending.id != søknad.id) return
-            søknad.vedlegg.håndter(ettersending)
+            if (ettersending.søknadId != søknad.id) return
+            søknad.vedlegg.forEach {
+                it.håndter(ettersending)
+            }
         }
     }
 
     internal object FerdigBehandlet : Tilstand
-}
-
-private fun List<Vedlegg>.håndter(ettersending: Ettersending) {
-    this.forEach {
-        // if (it !in ettersending)
-        it.håndter(ettersending)
-    }
 }

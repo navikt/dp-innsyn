@@ -8,7 +8,7 @@ internal class PersonTest {
     @Test
     fun `Person får søknad under behandling etter ny søknad`() {
         Person("ident").also { person ->
-            person.håndter(søknadHendelse())
+            person.håndter(søknad())
 
             assertTrue(person.harSøknadUnderBehandling())
         }
@@ -17,27 +17,24 @@ internal class PersonTest {
     @Test
     fun `Person skal ikke ha noen søknad under behandling etter vedtak`() {
         Person("ident").also { person ->
-            person.håndter(søknadHendelse())
+            person.håndter(søknad())
             assertTrue(person.harSøknadUnderBehandling())
 
-            person.håndter(vedtakHendelse())
+            person.håndter(vedtak())
             assertFalse(person.harSøknadUnderBehandling())
 
-            person.håndter(søknadHendelse())
-            person.håndter(søknadHendelse())
+            person.håndter(søknad())
+            person.håndter(søknad())
             assertTrue(person.harSøknadUnderBehandling())
 
-            person.håndter(vedtakHendelse())
+            person.håndter(vedtak())
             assertFalse(person.harSøknadUnderBehandling())
         }
     }
 
-    private fun vedtakHendelse() = VedtakHendelse("id", "vedtakId", "Innvilget")
-    private fun søknadHendelse() = SøknadHendelse("id", "id")
-/*
-    @Test
+    /*@Test
     fun `vedlegg skal ettersendes`() {
-        val søknad = Søknad("id", listOf(Vedlegg("id")))
+        val søknad = søknad(listOf("1","2"))
 
         Person("ident").also { person ->
             person.håndter(søknad)
@@ -57,4 +54,8 @@ internal class PersonTest {
             assertTrue(søknad.erKomplett)
         }
     }*/
+
+    private fun vedtak() = Vedtak("id", "vedtakId")
+    private fun søknad() = Søknad("id")
+    private fun søknad(vedlegg: List<String>) = Søknad("id", vedlegg.map { Vedlegg(it) })
 }

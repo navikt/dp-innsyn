@@ -4,30 +4,25 @@ import no.nav.dagpenger.innsyn.modell.Søknad.Companion.erInnsendt
 
 internal class Person private constructor(
     private val fnr: String,
-    private val tidslinje: Tidslinje,
-    private val søknader: MutableList<Søknad>,
-    private val vedtak: MutableList<Vedtak>
+    private val tidslinje: Tidslinje
 ) {
-    constructor(fnr: String) : this(fnr, Tidslinje(), mutableListOf(), mutableListOf())
+    constructor(fnr: String) : this(fnr, Tidslinje())
 
-    fun håndter(søknadHendelse: SøknadHendelse) {
-        tidslinje.leggTil(søknadHendelse)
-        søknader.add(søknadHendelse.søknad())
+    private val søknader get() = tidslinje.filterIsInstance<Søknad>()
+    private val vedtak get() = tidslinje.filterIsInstance<Vedtak>()
+
+    fun håndter(søknad: Søknad) {
+        tidslinje.leggTil(søknad)
     }
 
-    fun håndter(vedtakHendelse: VedtakHendelse) {
-        tidslinje.leggTil(vedtakHendelse)
-        vedtakHendelse.vedtak().also { vedtak ->
-            this.vedtak.add(vedtak)
-            søknader.forEach { it.håndter(vedtak) }
-        }
+    fun håndter(vedtak: Vedtak) {
+        tidslinje.leggTil(vedtak)
+        søknader.forEach { it.håndter(vedtak) }
     }
 
-    fun håndter(ettersendingHendelse: EttersendingHendelse) {
-        tidslinje.leggTil(ettersendingHendelse)
-        ettersendingHendelse.ettersending().also { ettersending ->
-            søknader.forEach { it.håndter(ettersending) }
-        }
+    fun håndter(ettersending: Ettersending) {
+        tidslinje.leggTil(ettersending)
+        søknader.forEach { it.håndter(ettersending) }
     }
 
     fun harSøknadUnderBehandling() = søknader.any(::erInnsendt)

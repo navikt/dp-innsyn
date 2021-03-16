@@ -5,7 +5,7 @@ internal class Tidslinje private constructor(
 ) : Iterable<Hendelse> by hendelser {
     constructor() : this(mutableListOf())
 
-    fun leggTil(hendelse: Hendelse) {
+    internal fun leggTil(hendelse: Hendelse) {
         hendelser.add(hendelse)
     }
 }

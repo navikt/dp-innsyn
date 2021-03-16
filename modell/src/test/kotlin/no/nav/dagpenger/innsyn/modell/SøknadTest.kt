@@ -20,4 +20,17 @@ internal class SøknadTest {
             assertFalse { erKomplett(it) }
         }
     }
+
+    @Test
+    fun `søknad skal bli komplett når mangled vedlegg ettersende`() {
+        Søknad("id", listOf(Vedlegg("id"))).also {
+            it.håndter(
+                Ettersending(
+                    "id",
+                    listOf(Vedlegg("id"))
+                )
+            )
+            assertTrue { erKomplett(it) }
+        }
+    }
 }
