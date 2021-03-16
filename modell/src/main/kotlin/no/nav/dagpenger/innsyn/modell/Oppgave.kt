@@ -1,3 +1,3 @@
 package no.nav.dagpenger.innsyn.modell
 
-internal abstract class Hendelse()
+class Oppgave(id: String)

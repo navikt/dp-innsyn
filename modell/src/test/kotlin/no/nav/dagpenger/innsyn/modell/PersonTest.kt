@@ -8,7 +8,7 @@ internal class PersonTest {
     @Test
     fun `Person får søknad under behandling etter ny søknad`() {
         Person("ident").also { person ->
-            person.håndter(søknad())
+            person.håndter(søknad("id"))
 
             assertTrue(person.harSøknadUnderBehandling())
         }
@@ -17,45 +17,28 @@ internal class PersonTest {
     @Test
     fun `Person skal ikke ha noen søknad under behandling etter vedtak`() {
         Person("ident").also { person ->
-            person.håndter(søknad())
+            person.håndter(søknad("id1"))
             assertTrue(person.harSøknadUnderBehandling())
 
-            person.håndter(vedtak())
+            person.håndter(vedtak("id1"))
             assertFalse(person.harSøknadUnderBehandling())
 
-            person.håndter(søknad())
-            person.håndter(søknad())
+            person.håndter(søknad("id2"))
+            person.håndter(søknad("id3"))
             assertTrue(person.harSøknadUnderBehandling())
 
-            person.håndter(vedtak())
+            person.håndter(vedtak("id2"))
+            assertTrue(person.harSøknadUnderBehandling())
+
+            person.håndter(vedtak("id4"))
+            assertTrue(person.harSøknadUnderBehandling())
+
+            person.håndter(vedtak("id3"))
             assertFalse(person.harSøknadUnderBehandling())
         }
     }
 
-    /*@Test
-    fun `vedlegg skal ettersendes`() {
-        val søknad = søknad(listOf("1","2"))
-
-        Person("ident").also { person ->
-            person.håndter(søknad)
-            assertFalse(søknad.erKomplett)
-            person.håndter(Ettersending("id", listOf(Vedlegg("id"))))
-            assertTrue(søknad.erKomplett)
-        }
-    }
-
-    @Test
-    fun `uforventede vedlegg skal kunne ettersendes`() {
-        val søknad = Søknad("id")
-
-        Person("ident").also { person ->
-            person.håndter(søknad)
-            person.håndter(Ettersending("id", listOf(Vedlegg("id"))))
-            assertTrue(søknad.erKomplett)
-        }
-    }*/
-
-    private fun vedtak() = Vedtak("id", "vedtakId")
-    private fun søknad() = Søknad("id")
-    private fun søknad(vedlegg: List<String>) = Søknad("id", vedlegg.map { Vedlegg(it) })
+    private fun vedtak(søknadId: String) = Vedtak("id", søknadId)
+    private fun søknad(id: String) = Søknad(id)
+    private fun søknad(vedlegg: List<String>) = Søknad("id", vedlegg.map { Vedlegg(it) }, emptyList())
 }
