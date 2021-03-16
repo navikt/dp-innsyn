@@ -11,8 +11,7 @@ import org.flywaydb.core.Flyway
 
 private val config = ConfigurationProperties.systemProperties() overriding EnvironmentVariables()
 
-internal class PostgresDataSourceBuilder {
-
+internal object PostgresDataSourceBuilder {
     internal object db : PropertyGroup() {
         val host by stringType
         val port by stringType

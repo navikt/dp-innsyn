@@ -13,7 +13,9 @@ dependencies {
     implementation(Ktor.library("client-jackson"))
     implementation(Ktor.library("jackson"))
     implementation(Ktor.library("server-cio"))
+
     implementation(project(":modell"))
+
     implementation(Database.Flyway)
     implementation(Database.HikariCP)
     implementation(Database.Postgres)

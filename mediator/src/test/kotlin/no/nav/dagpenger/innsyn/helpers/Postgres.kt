@@ -6,7 +6,6 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.PostgreSQLContainer.POSTGRESQL_PORT
 
 internal object Postgres {
-
     private val instance by lazy {
         PostgreSQLContainer<Nothing>("postgres:11.2").apply {
             start()
