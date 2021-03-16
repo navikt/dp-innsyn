@@ -1,6 +1,6 @@
 package no.nav.dagpenger.innsyn.modell
 
-internal class Søknad private constructor(
+class Søknad private constructor(
     private val id: String,
     private val vedlegg: MutableList<Vedlegg>,
     private val oppgaver: MutableList<Oppgave>,

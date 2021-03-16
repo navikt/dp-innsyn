@@ -1,6 +1,6 @@
 package no.nav.dagpenger.innsyn.modell
 
-internal class Vedtak private constructor(
+class Vedtak private constructor(
     private val vedtakId: String,
     val søknadId: String,
     private val status: Status

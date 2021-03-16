@@ -13,7 +13,12 @@ dependencies {
     implementation(Ktor.library("client-jackson"))
     implementation(Ktor.library("jackson"))
     implementation(Ktor.library("server-cio"))
-    implementation(Ktor.library("websockets"))
+    implementation(project(":modell"))
+    implementation(Database.Flyway)
+    implementation(Database.HikariCP)
+    implementation(Database.Postgres)
+    implementation(Database.Kotlinquery)
 
     testImplementation(Ktor.library("server-test-host"))
+    testImplementation(TestContainers.postgresql)
 }

@@ -1,6 +1,6 @@
 package no.nav.dagpenger.innsyn.modell
 
-internal class Person private constructor(
+class Person private constructor(
     private val fnr: String,
     private val søknader: MutableList<Søknad>
 ) {
