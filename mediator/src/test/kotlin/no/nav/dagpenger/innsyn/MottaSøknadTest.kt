@@ -5,8 +5,7 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-class MottaSøknadTest {
-
+internal class MottaSøknadTest {
     private val rapid = TestRapid()
     private val personRepository = TestPersonRepository()
 

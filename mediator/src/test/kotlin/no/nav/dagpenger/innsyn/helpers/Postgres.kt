@@ -19,7 +19,7 @@ internal object Postgres {
         }
     }
 
-    fun withCleanDb(block: () -> Unit) {
+    private fun withCleanDb(block: () -> Unit) {
         System.setProperty(db.host.name, instance.host)
         System.setProperty(db.port.name, instance.getMappedPort(POSTGRESQL_PORT).toString())
         System.setProperty(db.database.name, instance.databaseName)
