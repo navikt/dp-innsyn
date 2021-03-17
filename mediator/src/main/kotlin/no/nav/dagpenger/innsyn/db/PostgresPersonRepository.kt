@@ -1,11 +1,12 @@
 package no.nav.dagpenger.innsyn.db
 
+import kotliquery.Session
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
-import no.nav.dagpenger.innsyn.PersonRepository
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.innsyn.modell.Person
+import no.nav.dagpenger.innsyn.modell.Søknad
 
 class PostgresPersonRepository : PersonRepository {
     override fun person(fnr: String): Person = getPerson(fnr) ?: lagPerson(fnr)
@@ -13,7 +14,7 @@ class PostgresPersonRepository : PersonRepository {
     override fun lagre(person: Person): Boolean =
         using(sessionOf(dataSource)) { session ->
             session.transaction { tx ->
-                tx.run(
+                val personId = tx.run(
                     queryOf(
                         //language=PostgreSQL
                         "INSERT INTO person (fnr) VALUES (:fnr) ON CONFLICT (fnr) DO UPDATE SET fnr = :fnr",
@@ -23,8 +24,9 @@ class PostgresPersonRepository : PersonRepository {
                 tx.run(
                     queryOf(
                         //language=PostgreSQL
-                        "INSERT INTO søknad (person_id, ekstern_id) VALUES (:fnr) ON CONFLICT (fnr) DO UPDATE SET fnr = :fnr",
-                        mapOf("fnr" to person.fnr)
+                        "INSERT INTO søknad (person_id, ekstern_id) VALUES (?, ?) ON CONFLICT (person_id, ekstern_id) DO NOTHING",
+                        personId,
+                        "123"
                     ).asUpdate
                 )
             }
@@ -33,8 +35,25 @@ class PostgresPersonRepository : PersonRepository {
     private fun lagPerson(fnr: String): Person = Person(fnr).also { lagre(it) }
 
     private fun getPerson(fnr: String): Person? =
-        using(sessionOf(dataSource)) { session -> session.run(selectPerson(fnr)) }
+        using(sessionOf(dataSource)) { session ->
+            session.run(selectPerson(fnr))?.let {
+                val søknader = hentSøknader(session, it)
+                Person(fnr, søknader.toMutableList())
+            }
+        }
+
+    private fun hentSøknader(session: Session, personId: Int): List<Søknad> = session.run(
+        queryOf(
+            //language=PostgreSQL
+            "SELECT ekstern_id FROM søknad WHERE person_id=?",
+            personId
+        ).map { row ->
+            Søknad(row.string(1))
+        }.asList
+    )
 
     private fun selectPerson(fnr: String) = //language=PostgreSQL
-        queryOf("SELECT * FROM person WHERE fnr = ?", fnr).map { Person(fnr) }.asSingle
+        queryOf(
+            "SELECT person_id FROM person WHERE fnr = ?", fnr
+        ).map { it.int(1) }.asSingle
 }

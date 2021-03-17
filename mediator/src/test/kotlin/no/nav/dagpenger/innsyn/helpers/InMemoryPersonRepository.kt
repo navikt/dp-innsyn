@@ -1,6 +1,6 @@
 package no.nav.dagpenger.innsyn.helpers
 
-import no.nav.dagpenger.innsyn.PersonRepository
+import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.modell.Person
 
 internal class InMemoryPersonRepository : PersonRepository {

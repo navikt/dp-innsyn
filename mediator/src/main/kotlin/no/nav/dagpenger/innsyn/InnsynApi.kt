@@ -1,18 +1,22 @@
 package no.nav.dagpenger.innsyn
 
 import io.ktor.application.Application
+import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.UserIdPrincipal
 import io.ktor.auth.basic
 import io.ktor.features.CallLogging
 import io.ktor.request.document
+import io.ktor.response.respond
+import io.ktor.routing.post
 import io.ktor.routing.routing
 import mu.KotlinLogging
+import no.nav.dagpenger.innsyn.db.PersonRepository
 import org.slf4j.event.Level
 
 private val logger = KotlinLogging.logger { }
-private val sikkerLogg = KotlinLogging.logger("tjenestekall")
+private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 internal fun Application.innsynApi(
     personRepository: PersonRepository
@@ -50,15 +54,13 @@ internal fun Application.innsynApi(
             }
         }
     }*/
-    install(Authentication) {
-        basic {
-            realm = "ktor"
-            validate { credentials ->
-                UserIdPrincipal(credentials.name)
-            }
-        }
-    }
 
     routing {
+        post("/søknad/{fnr}") {
+            val fnr = call.parameters["fnr"].toString()
+            val person = personRepository.person(fnr)
+            sikkerlogg.info { "Hentet person $fnr. Person har søknad: (${person.harSøknadUnderBehandling()}). Person: $person" }
+            call.respond("OK")
+        }
     }
 }

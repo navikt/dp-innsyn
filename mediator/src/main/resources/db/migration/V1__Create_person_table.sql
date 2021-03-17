@@ -16,3 +16,4 @@ CREATE TABLE søknad
         FOREIGN KEY (person_id)
             REFERENCES person (person_id)
 );
+CREATE UNIQUE INDEX IF NOT EXISTS søknad_person_uindex ON søknad (person_id, ekstern_id);

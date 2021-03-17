@@ -1,4 +1,4 @@
-package no.nav.dagpenger.innsyn
+package no.nav.dagpenger.innsyn.db
 
 import no.nav.dagpenger.innsyn.modell.Person
 

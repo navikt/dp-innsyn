@@ -1,10 +1,12 @@
 package no.nav.dagpenger.innsyn.modell
 
-class Person private constructor(
+class Person(
     val fnr: String,
-    private val søknader: MutableList<Søknad>
+    søknader: List<Søknad>
 ) {
-    constructor(fnr: String) : this(fnr, mutableListOf())
+    private val søknader: MutableList<Søknad> = søknader.toMutableList()
+
+    constructor(fnr: String) : this(fnr, listOf())
 
     fun harSøknadUnderBehandling() = søknader.any { !it.harVedtak() }
 
