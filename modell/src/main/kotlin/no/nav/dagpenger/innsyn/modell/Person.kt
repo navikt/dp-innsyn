@@ -1,7 +1,7 @@
 package no.nav.dagpenger.innsyn.modell
 
 class Person private constructor(
-    private val fnr: String,
+    val fnr: String,
     private val søknader: MutableList<Søknad>
 ) {
     constructor(fnr: String) : this(fnr, mutableListOf())

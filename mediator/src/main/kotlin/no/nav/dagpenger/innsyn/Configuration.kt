@@ -8,8 +8,6 @@ import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
 
 internal object Configuration {
-
-    // Gjør det mulig å kjøre docker-compose up && ./gradlew run
     private val localProperties = ConfigurationMap(
         mapOf(
             "KAFKA_CONSUMER_GROUP_ID" to "dp-innsyn-v1",

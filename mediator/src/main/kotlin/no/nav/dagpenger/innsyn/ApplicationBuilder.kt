@@ -1,5 +1,6 @@
 package no.nav.dagpenger.innsyn
 
+import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -19,4 +20,8 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     }
 
     fun start() = rapidsConnection.start()
+
+    override fun onStartup(rapidsConnection: RapidsConnection) {
+        runMigration()
+    }
 }

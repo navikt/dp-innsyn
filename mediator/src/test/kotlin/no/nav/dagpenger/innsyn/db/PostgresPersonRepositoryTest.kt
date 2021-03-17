@@ -1,10 +1,24 @@
-import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
+package no.nav.dagpenger.innsyn.db
+
+import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
+import no.nav.dagpenger.innsyn.modell.Søknad
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-class PostgresPersonRepositoryTest {
+internal class PostgresPersonRepositoryTest {
+    private val repository = PostgresPersonRepository()
 
     @Test
-    fun `skal lagreogfinne person`() {
-        PostgresPersonRepository().person("123")
+    fun `skal lagre og finne person`() {
+        withMigratedDb {
+            val person = repository.person("123")
+
+            person.håndter(Søknad("id"))
+            repository.lagre(person)
+
+            repository.person(person.fnr).also {
+                assertTrue(it.harSøknadUnderBehandling())
+            }
+        }
     }
 }
