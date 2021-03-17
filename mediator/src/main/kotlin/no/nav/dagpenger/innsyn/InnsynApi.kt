@@ -3,9 +3,6 @@ package no.nav.dagpenger.innsyn
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
-import io.ktor.auth.Authentication
-import io.ktor.auth.UserIdPrincipal
-import io.ktor.auth.basic
 import io.ktor.features.CallLogging
 import io.ktor.request.document
 import io.ktor.response.respond
