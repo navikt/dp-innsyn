@@ -1,3 +1,5 @@
 ingresses:
   - "https://dp-innsyn.dev.intern.nav.no"
 kafka_pool: nav-dev
+db_tier: db-custom-1-3840
+db_size: 10

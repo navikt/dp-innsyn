@@ -38,10 +38,10 @@ spec:
     sqlInstances:
       - name: dp-innsyn
         type: POSTGRES_12
-        tier: { { db_tier } }
+        tier: {{ db_tier }}
         diskType: SSD
         highAvailability: false
-        diskSize: { { db_size } }
+        diskSize: {{ db_size }}
         diskAutoresize: true
         autoBackupTime: "03:00"
         databases:
