@@ -18,9 +18,10 @@ internal class Søknadsmottak(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate { it.forbid("@id") }
-            validate { it.requireKey("aktoerId", "brukerBehandlingId", "journalpostId") }
-            validate { it.interestedIn("skjemaNummer", "vedlegg") }
+            validate { it.demandKey("brukerBehandlingId") }
+            validate { it.demandKey("aktoerId") }
+            validate { it.demandKey("journalpostId") }
+            validate { it.interestedIn("skjemaNummer", "vedlegg", "behandlingskjedeId") }
         }.register(this)
     }
 
