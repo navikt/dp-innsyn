@@ -2,7 +2,6 @@ package no.nav.dagpenger.innsyn
 
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.db.PersonRepository
-import no.nav.dagpenger.innsyn.modell.Søknad
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
@@ -18,14 +17,16 @@ internal class Søknadsmottak(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate { it.requireKey("brukerBehandlingId") }
-            validate { it.requireKey("aktoerId") }
-            validate { it.requireKey("journalpostId") }
+            validate { it.forbid("brukerBehandlingId") }
+            validate { it.forbid("aktoerId") }
+            validate { it.forbid("journalpostId") }
             validate { it.interestedIn("skjemaNummer", "vedlegg", "behandlingskjedeId") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        sikkerlogg.info { "Vedleggslista ser sånn ut: ${packet.toJson()}" }
+
         val fnr = packet["aktoerId"].asText()
         val søknadId = packet["brukerBehandlingId"].asText()
         val skjema = packet["skjemaNummer"].asText()
@@ -33,8 +34,7 @@ internal class Søknadsmottak(
 
         sikkerlogg.info { "Mottok ny henvendelse ($søknadId) for person. Skjema ($skjema)" }
         sikkerlogg.info { "Vedleggslista ser sånn ut: $vedlegg" }
-
-        personRepository.person(fnr).håndter(Søknad(søknadId))
+        // personRepository.person(fnr).håndter(Søknad(søknadId))
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {
