@@ -23,7 +23,7 @@ internal object Configuration {
             "KAFKA_CONSUMER_GROUP_ID" to "dp-innsyn-v1",
             "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
             "KAFKA_RESET_POLICY" to "latest",
-            "KAFKA_EXTRA_TOPIC" to "privat-dagpenger-soknadsdata-v1",
+            "KAFKA_EXTRA_TOPIC" to "teamdagpenger.soknadsdata.v1",
             "HTTP_PORT" to "8080"
         )
     )

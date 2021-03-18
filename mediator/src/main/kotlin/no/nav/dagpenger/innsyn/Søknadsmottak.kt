@@ -5,9 +5,11 @@ import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.modell.Søknad
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
+import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
+private val logg = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 internal class Søknadsmottak(
@@ -18,7 +20,7 @@ internal class Søknadsmottak(
         River(rapidsConnection).apply {
             validate { it.forbid("@id") }
             validate { it.requireKey("aktoerId", "brukerBehandlingId", "journalpostId") }
-            validate { it.interestedIn("skjemaNummer") }
+            validate { it.interestedIn("skjemaNummer", "vedlegg") }
         }.register(this)
     }
 
@@ -26,9 +28,15 @@ internal class Søknadsmottak(
         val fnr = packet["aktoerId"].asText()
         val søknadId = packet["brukerBehandlingId"].asText()
         val skjema = packet["skjemaNummer"].asText()
+        val vedlegg = packet["vedlegg"].toPrettyString()
 
         sikkerlogg.info { "Mottok ny henvendelse ($søknadId) for person. Skjema ($skjema)" }
+        sikkerlogg.info { "Vedleggslista ser sånn ut: $vedlegg" }
 
         personRepository.person(fnr).håndter(Søknad(søknadId))
+    }
+
+    override fun onError(problems: MessageProblems, context: MessageContext) {
+        logg.error { problems }
     }
 }

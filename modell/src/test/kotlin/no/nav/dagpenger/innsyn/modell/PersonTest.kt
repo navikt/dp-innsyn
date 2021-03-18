@@ -14,6 +14,15 @@ internal class PersonTest {
         }
     }
 
+    /*
+    1..1 Søknad
+        Går vi til henvendelse og får vi liste med innsendte vedlegg og manglende vedlegg
+    0..* Innsendinger
+        1..* Dokument (hvor ett kan være søknad)
+    0..* Ettersending
+    1..1 Vedtak
+     */
+
     @Test
     fun `Person skal ikke ha noen søknad under behandling etter vedtak`() {
         Person("ident").also { person ->
