@@ -6,7 +6,7 @@ import io.ktor.application.install
 import io.ktor.features.CallLogging
 import io.ktor.request.document
 import io.ktor.response.respond
-import io.ktor.routing.post
+import io.ktor.routing.get
 import io.ktor.routing.routing
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.db.PersonRepository
@@ -53,7 +53,7 @@ internal fun Application.innsynApi(
     }*/
 
     routing {
-        post("/søknad/{fnr}") {
+        get("/søknad/{fnr}") {
             val fnr = call.parameters["fnr"].toString()
             val person = personRepository.person(fnr)
             sikkerlogg.info { "Hentet person $fnr. Person har søknad: (${person.harSøknadUnderBehandling()}). Person: $person" }
