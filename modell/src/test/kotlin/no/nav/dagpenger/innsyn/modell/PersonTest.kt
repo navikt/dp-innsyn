@@ -1,5 +1,6 @@
 package no.nav.dagpenger.innsyn.modell
 
+import no.nav.dagpenger.innsyn.modell.hendelser.Søknadsprosess
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -48,6 +49,6 @@ internal class PersonTest {
     }
 
     private fun vedtak(søknadId: String) = Vedtak("id", søknadId)
-    private fun søknad(id: String) = Søknad(id)
-    private fun søknad(vedlegg: List<String>) = Søknad("id", vedlegg.map { Vedlegg(it) }, emptyList())
+    private fun søknad(id: String) = Søknadsprosess(id)
+    private fun søknad(vedlegg: List<String>) = Søknadsprosess("id", vedlegg.map { Vedlegg(it) }, emptyList())
 }

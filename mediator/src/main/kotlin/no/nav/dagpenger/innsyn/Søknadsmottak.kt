@@ -2,6 +2,7 @@ package no.nav.dagpenger.innsyn
 
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.db.PersonRepository
+import no.nav.dagpenger.innsyn.melding.Søknadsmelding
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
@@ -20,22 +21,20 @@ internal class Søknadsmottak(
             validate { it.demandKey("brukerBehandlingId") }
             validate { it.demandKey("aktoerId") }
             validate { it.demandKey("journalpostId") }
+            validate { it.forbid("behandlingskjedeId") }
             validate { it.interestedIn("skjemaNummer", "vedlegg", "behandlingskjedeId") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        logg.info { "Pakka er kul" }
-        sikkerlogg.info { "Pakka ser sånn ut: ${packet.toJson()}" }
-
         val fnr = packet["aktoerId"].asText()
         val søknadId = packet["brukerBehandlingId"].asText()
-        val skjema = packet["skjemaNummer"].asText()
-        val vedlegg = packet["vedlegg"].toPrettyString()
 
-        sikkerlogg.info { "Mottok ny henvendelse ($søknadId) for person. Skjema ($skjema)" }
-        sikkerlogg.info { "Vedleggslista ser sånn ut: $vedlegg" }
-        // personRepository.person(fnr).håndter(Søknad(søknadId))
+        sikkerlogg.info { "Mottok ny søknad ($søknadId) for person ($fnr)." }
+
+        Søknadsmelding(packet).also {
+            personRepository.person(fnr).håndter(it.søknad)
+        }
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {

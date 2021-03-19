@@ -3,7 +3,6 @@ package no.nav.dagpenger.innsyn
 import no.nav.dagpenger.innsyn.helpers.InMemoryPersonRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 internal class MottaSøknadTest {
@@ -16,9 +15,8 @@ internal class MottaSøknadTest {
     }
 
     @Test
-    @Disabled
     fun `skal kunne motta søknad`() {
-        val person = personRepository.person("21038099999")
+        val person = personRepository.person("10108099999")
         rapid.sendTestMessage(søknadAsJson)
         assertTrue(person.harSøknadUnderBehandling())
     }
