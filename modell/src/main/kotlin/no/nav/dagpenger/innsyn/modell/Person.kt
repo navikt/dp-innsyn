@@ -1,5 +1,6 @@
 package no.nav.dagpenger.innsyn.modell
 
+import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknadsprosess
 
 class Person(
@@ -14,5 +15,9 @@ class Person(
 
     fun håndter(søknadsprosess: Søknadsprosess) {
         søknader.add(søknadsprosess)
+    }
+
+    fun håndter(ettersending: Ettersending) {
+        søknader.forEach { it.håndter(ettersending) }
     }
 }

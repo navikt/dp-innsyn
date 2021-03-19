@@ -2,6 +2,8 @@ package no.nav.dagpenger.innsyn
 
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
+import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
+import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 
@@ -12,7 +14,8 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     ).withKtorModule {
         innsynApi(personRepository) // AuthFactory.jwkProvider, AuthFactory.issuer, AuthFactory.clientId)
     }.build().apply {
-        Søknadsmottak(this, personRepository)
+        SøknadMottak(this, personRepository)
+        EttersendingMottak(this, personRepository)
     }
 
     init {

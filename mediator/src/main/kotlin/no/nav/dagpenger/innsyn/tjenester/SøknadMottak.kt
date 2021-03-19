@@ -1,4 +1,4 @@
-package no.nav.dagpenger.innsyn
+package no.nav.dagpenger.innsyn.tjenester
 
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.db.PersonRepository
@@ -12,7 +12,7 @@ import no.nav.helse.rapids_rivers.River
 private val logg = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
-internal class Søknadsmottak(
+internal class SøknadMottak(
     rapidsConnection: RapidsConnection,
     private val personRepository: PersonRepository
 ) : River.PacketListener {

@@ -7,4 +7,10 @@ class Søknadsprosess constructor(
     private val oppgaver = oppgaver.toMutableList()
 
     fun harUferdigeOppgaver() = oppgaver.any { it.status == "Uferdig" }
+
+    fun håndter(ettersending: Ettersending) {
+        if (id != ettersending.søknadId) return
+
+        oppgaver.forEach { it.status = "Ferdig" }
+    }
 }
