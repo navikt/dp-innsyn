@@ -12,6 +12,7 @@ class Person(
     private val blæh: MutableList<Søknadsprosess> = blæh.toMutableList()
 
     fun harSøknadUnderBehandling() = blæh.any { it.harUferdigeOppgaver() }
+    fun harKomplettSøknad() = blæh.any { it.erKomplett() }
 
     fun håndter(søknad: Søknad) {
         val søknadsprosess = Søknadsprosess(søknad.søknadId, søknad.oppgaver)
