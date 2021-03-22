@@ -1,6 +1,5 @@
 package no.nav.dagpenger.innsyn.modell.hendelser
 
-import no.nav.dagpenger.innsyn.modell.Vedtak
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.Status.Ferdig
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.Status.Uferdig
 

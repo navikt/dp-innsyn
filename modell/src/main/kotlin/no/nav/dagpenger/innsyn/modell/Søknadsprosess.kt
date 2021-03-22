@@ -5,6 +5,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.Status.Ferdig
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.Status.Uferdig
 import no.nav.dagpenger.innsyn.modell.hendelser.OppgaveType.Companion.vedlegg
+import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 
 class Søknadsprosess constructor(
     private val id: String,

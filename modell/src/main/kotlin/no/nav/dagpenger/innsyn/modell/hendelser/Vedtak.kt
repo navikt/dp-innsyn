@@ -1,4 +1,4 @@
-package no.nav.dagpenger.innsyn.modell
+package no.nav.dagpenger.innsyn.modell.hendelser
 
 class Vedtak private constructor(
     private val vedtakId: String,

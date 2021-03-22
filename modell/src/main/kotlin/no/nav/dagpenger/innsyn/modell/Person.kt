@@ -2,6 +2,7 @@ package no.nav.dagpenger.innsyn.modell
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
+import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 
 class Person(
     val fnr: String,

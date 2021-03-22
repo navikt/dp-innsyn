@@ -5,6 +5,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.OppgaveType.Companion.vedlegg
 import no.nav.dagpenger.innsyn.modell.hendelser.OppgaveType.Companion.vedtak
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
+import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
