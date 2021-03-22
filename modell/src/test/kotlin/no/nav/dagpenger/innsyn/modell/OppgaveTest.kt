@@ -15,4 +15,3 @@ class OppgaveTest {
 
     val testOppgave = OppgaveType("testOppgave")
 }
-
