@@ -1,4 +1,7 @@
-package no.nav.dagpenger.innsyn.modell.hendelser
+package no.nav.dagpenger.innsyn.modell
+
+import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 
 class Søknadsprosess constructor(
     private val id: String,

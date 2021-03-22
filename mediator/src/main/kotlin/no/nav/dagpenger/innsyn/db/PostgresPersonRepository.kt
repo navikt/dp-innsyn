@@ -6,7 +6,7 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.innsyn.modell.Person
-import no.nav.dagpenger.innsyn.modell.hendelser.Søknadsprosess
+import no.nav.dagpenger.innsyn.modell.Søknadsprosess
 
 class PostgresPersonRepository : PersonRepository {
     override fun person(fnr: String): Person = getPerson(fnr) ?: lagPerson(fnr)

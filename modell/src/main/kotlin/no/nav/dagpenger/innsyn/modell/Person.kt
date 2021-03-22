@@ -1,23 +1,24 @@
 package no.nav.dagpenger.innsyn.modell
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
-import no.nav.dagpenger.innsyn.modell.hendelser.Søknadsprosess
+import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 
 class Person(
     val fnr: String,
-    søknader: List<Søknadsprosess>
+    blæh: List<Søknadsprosess>
 ) {
     constructor(fnr: String) : this(fnr, listOf())
 
-    private val søknader: MutableList<Søknadsprosess> = søknader.toMutableList()
+    private val blæh: MutableList<Søknadsprosess> = blæh.toMutableList()
 
-    fun harSøknadUnderBehandling() = søknader.any { it.harUferdigeOppgaver() }
+    fun harSøknadUnderBehandling() = blæh.any { it.harUferdigeOppgaver() }
 
-    fun håndter(søknadsprosess: Søknadsprosess) {
-        søknader.add(søknadsprosess)
+    fun håndter(søknad: Søknad) {
+        val søknadsprosess = Søknadsprosess(søknad.søknadId, søknad.oppgaver)
+        blæh.add(søknadsprosess)
     }
 
     fun håndter(ettersending: Ettersending) {
-        søknader.forEach { it.håndter(ettersending) }
+        blæh.forEach { it.håndter(ettersending) }
     }
 }
