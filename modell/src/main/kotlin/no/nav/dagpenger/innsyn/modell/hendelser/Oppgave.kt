@@ -6,12 +6,12 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.Status.Uferdig
 
 open class Oppgave private constructor(private val id: String, type: OppgaveType, var status: Status) {
 
-    constructor(id: String, type: OppgaveType): this(id, type, Uferdig)
+    constructor(id: String, type: OppgaveType) : this(id, type, Uferdig)
 
     fun håndter(hendelse: Hendelse) {
-        if(this !in hendelse.oppgaver) return
+        if (this !in hendelse.oppgaver) return
 
-        hendelse.oppgaver.first{ it == this }.also {
+        hendelse.oppgaver.first { it == this }.also {
             status = it.status
         }
     }
@@ -22,16 +22,10 @@ open class Oppgave private constructor(private val id: String, type: OppgaveType
 
     val oppgaveType = type
 
-    enum class Status{
+    enum class Status {
         Ferdig,
         Uferdig
     }
 
-    class FerdigOppgave(id: String, type: OppgaveType): Oppgave(id, type, Ferdig){
-    }
+    class FerdigOppgave(id: String, type: OppgaveType) : Oppgave(id, type, Ferdig)
 }
-
-
-
-
-

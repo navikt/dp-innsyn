@@ -10,14 +10,15 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 
 internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.StatusListener {
     private val personRepository = PostgresPersonRepository()
+    private val personMediator = PersonMediator(personRepository)
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
     ).withKtorModule {
         innsynApi(personRepository) // AuthFactory.jwkProvider, AuthFactory.issuer, AuthFactory.clientId)
     }.build().apply {
-        SøknadMottak(this, personRepository)
-        EttersendingMottak(this, personRepository)
-        VedtakMottak(this, personRepository)
+        SøknadMottak(this, personMediator)
+        EttersendingMottak(this, personMediator)
+        VedtakMottak(this, personMediator)
     }
 
     init {

@@ -5,7 +5,7 @@ class Vedtak private constructor(
     val søknadId: String,
     private val status: Status,
     oppgaver: List<Oppgave>
-): Hendelse(oppgaver) {
+) : Hendelse(oppgaver) {
     constructor(
         vedtakId: String
     ) : this(

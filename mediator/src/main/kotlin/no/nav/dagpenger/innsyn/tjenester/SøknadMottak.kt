@@ -1,7 +1,7 @@
 package no.nav.dagpenger.innsyn.tjenester
 
 import mu.KotlinLogging
-import no.nav.dagpenger.innsyn.db.PersonRepository
+import no.nav.dagpenger.innsyn.PersonMediator
 import no.nav.dagpenger.innsyn.melding.Søknadsmelding
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -14,7 +14,7 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 internal class SøknadMottak(
     rapidsConnection: RapidsConnection,
-    private val personRepository: PersonRepository
+    private val personMediator: PersonMediator
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
@@ -33,7 +33,7 @@ internal class SøknadMottak(
         sikkerlogg.info { "Mottok ny søknad ($søknadId) for person ($fnr)." }
 
         Søknadsmelding(packet).also {
-            personRepository.person(fnr).håndter(it.søknad)
+            personMediator.håndter(it.søknad, it)
         }
     }
 
