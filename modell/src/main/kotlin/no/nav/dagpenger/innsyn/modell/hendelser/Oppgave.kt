@@ -2,15 +2,16 @@ package no.nav.dagpenger.innsyn.modell.hendelser
 
 import no.nav.dagpenger.innsyn.modell.Vedlegg
 
-abstract class Oppgave(id: String) {
+class Oppgave(id: String, type: OppgaveType) {
     var status: String = "Uferdig"
+    val oppgaveType = type
+
+    enum class OppgaveType{
+        VedleggOppgave,
+        VedtakOppgave
+    }
 
 }
 
-class VedleggOppgave(id: String, navn: String): Oppgave(id){
-}
 
-
-class VedtakOppgave(id: String): Oppgave(id){
-}
 
