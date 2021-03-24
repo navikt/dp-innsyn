@@ -23,7 +23,7 @@ internal class TestTest {
     }
 
     @Test
-    fun `skal kunne motta søknad`() {
+    fun `skal kunne motta søknad, ettersending og vedlegg`() {
         val person = personRepository.person("10108099999")
         rapid.sendTestMessage(søknadAsJson)
         assertTrue(person.harSøknadUnderBehandling())

@@ -1,6 +1,8 @@
 package no.nav.dagpenger.innsyn.modell
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
+import no.nav.dagpenger.innsyn.modell.hendelser.Mangelbrev
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 
@@ -12,9 +14,11 @@ class Person(
 
     private val blæh: MutableList<Søknadsprosess> = blæh.toMutableList()
 
-    fun harSøknadUnderBehandling() = blæh.any { it.harUferdigeOppgaver() }
+    fun finnFerdigeOppgaverAv(type: OppgaveType) = blæh.flatMap { it.ferdigeOppgaverAv(type) }
+    fun finnUferdigeOppgaverAv(type: OppgaveType) = blæh.flatMap { it.uferdigeOppgaverAv(type) }
 
-    fun harKomplettSøknad() = blæh.any { it.erKomplett() }
+    fun harUferdigeOppgaverAv(type: OppgaveType) = finnUferdigeOppgaverAv(type).isNotEmpty()
+    fun harFerdigeOppgaverAv(type: OppgaveType) = finnFerdigeOppgaverAv(type).isNotEmpty()
 
     fun håndter(søknad: Søknad) {
         val søknadsprosess = Søknadsprosess(søknad.søknadId, søknad.oppgaver)
@@ -27,5 +31,9 @@ class Person(
 
     fun håndter(vedtak: Vedtak) {
         blæh.forEach { it.håndter(vedtak) }
+    }
+
+    fun håndter(mangelbrev: Mangelbrev) {
+        blæh.forEach { it.håndter(mangelbrev) }
     }
 }

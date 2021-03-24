@@ -56,7 +56,10 @@ internal fun Application.innsynApi(
         get("/søknad/{fnr}") {
             val fnr = call.parameters["fnr"].toString()
             val person = personRepository.person(fnr)
-            sikkerlogg.info { "Hentet person $fnr. Person har søknad: (${person.harSøknadUnderBehandling()}). Person: $person" }
+
+            val harSøknadUnderBehandling = person.finnUferdigeOppgaverAv(Dagpenger.vedtak).isNotEmpty()
+
+            sikkerlogg.info { "Hentet person $fnr. Person har søknad: ($harSøknadUnderBehandling). Person: $person" }
             call.respond("OK")
         }
     }
