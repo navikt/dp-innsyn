@@ -5,13 +5,13 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.Status.Uferdig
 
 class Oppgave(private val id: String, type: OppgaveType) {
     fun håndter(ettersending: Ettersending) {
-        if(this in ettersending.oppgaver){
+        if (this in ettersending.oppgaver) {
             status = Ferdig
         }
     }
 
     fun håndter(vedtak: Vedtak) {
-        if(oppgaveType == OppgaveType.vedtak){
+        if (oppgaveType == OppgaveType.vedtak) {
             status = Ferdig
         }
     }
@@ -23,10 +23,9 @@ class Oppgave(private val id: String, type: OppgaveType) {
     var status: Status = Uferdig
     val oppgaveType = type
 
-    enum class Status{
+    enum class Status {
         Ferdig,
         Uferdig
-
     }
 }
 
@@ -36,8 +35,3 @@ class OppgaveType private constructor(type: String) {
         val vedtak = OppgaveType("Få vedtak")
     }
 }
-
-
-
-
-

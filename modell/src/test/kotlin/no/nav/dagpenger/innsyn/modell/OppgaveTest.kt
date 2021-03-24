@@ -11,7 +11,6 @@ class OppgaveTest {
     fun `En uferdig oppgave har status Uferdig`() {
 
         val oppgave = Oppgave("1", vedlegg)
-        assertEquals("Uferdig", oppgave.status)
+        assertEquals(Oppgave.Status.Uferdig, oppgave.status)
     }
 }
-

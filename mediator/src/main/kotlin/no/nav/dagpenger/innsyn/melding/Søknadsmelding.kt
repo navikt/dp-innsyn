@@ -8,5 +8,5 @@ import java.util.UUID
 
 internal class Søknadsmelding(packet: JsonMessage) : Innsendingsmelding(packet) {
     private val søknadsid = packet["brukerBehandlingId"].asText()
-    internal val søknad get() = Søknad(søknadsid, oppgaver+Oppgave(UUID.randomUUID().toString(), OppgaveType.vedtak))
+    internal val søknad get() = Søknad(søknadsid, oppgaver + Oppgave(UUID.randomUUID().toString(), OppgaveType.vedtak))
 }

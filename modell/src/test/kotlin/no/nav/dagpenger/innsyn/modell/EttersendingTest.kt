@@ -18,7 +18,6 @@ internal class EttersendingTest {
 
             person.håndter(ettersending("id1", listOf(Oppgave("1", vedlegg))))
             assertFalse(person.harSøknadUnderBehandling())
-
         }
     }
 

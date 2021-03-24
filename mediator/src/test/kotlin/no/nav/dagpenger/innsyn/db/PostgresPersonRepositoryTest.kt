@@ -1,9 +1,8 @@
 package no.nav.dagpenger.innsyn.db
 
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
-import no.nav.dagpenger.innsyn.modell.Søknadsprosess
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 
 internal class PostgresPersonRepositoryTest {
@@ -18,7 +17,7 @@ internal class PostgresPersonRepositoryTest {
             repository.lagre(person)
 
             repository.person(person.fnr).also {
-                assertTrue(it.harSøknadUnderBehandling())
+                assertFalse(it.harSøknadUnderBehandling())
             }
         }
     }
