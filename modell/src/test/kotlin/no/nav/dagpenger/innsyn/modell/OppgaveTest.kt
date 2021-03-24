@@ -9,7 +9,6 @@ class OppgaveTest {
 
     @Test
     fun `En uferdig oppgave har status Uferdig`() {
-
         val oppgave = Oppgave("1", vedlegg)
         assertEquals(Oppgave.Status.Uferdig, oppgave.status)
     }

@@ -11,7 +11,7 @@ internal object Configuration {
     private val localProperties = ConfigurationMap(
         mapOf(
             "KAFKA_CONSUMER_GROUP_ID" to "dp-innsyn-v1",
-            "KAFKA_RAPID_TOPIC" to "private-dagpenger-behov-v2",
+            "KAFKA_RAPID_TOPIC" to "teamdagpenger.journalforing.v1",
             "KAFKA_RESET_POLICY" to "earliest",
             "HTTP_PORT" to "8080",
             "KAFKA_BROKERS" to "localhost:9092"
@@ -23,7 +23,7 @@ internal object Configuration {
             "KAFKA_CONSUMER_GROUP_ID" to "dp-innsyn-v1",
             "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
             "KAFKA_RESET_POLICY" to "latest",
-            "KAFKA_EXTRA_TOPIC" to "teamdagpenger.soknadsdata.v1",
+            "KAFKA_EXTRA_TOPIC" to "teamdagpenger.journalforing.v1",
             "HTTP_PORT" to "8080"
         )
     )
