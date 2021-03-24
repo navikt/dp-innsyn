@@ -21,9 +21,15 @@ internal class EttersendingMottak(
             validate { it.demandKey("søknadsdata") }
             validate { it.demandKey("søknadsdata.brukerBehandlingId") }
             validate { it.demandKey("naturligIdent") }
-            validate { it.demandKey("journalpostId") }
+            validate { it.requireKey("søknadsdata.behandlingskjedeId") }
             validate { it.forbid("søknadsdata.behandlingskjedeId") }
-            validate { it.interestedIn("søknadsdata.skjemaNummer", "søknadsdata.vedlegg", "søknadsdata.behandlingskjedeId") }
+            validate {
+                it.interestedIn(
+                    "søknadsdata.skjemaNummer",
+                    "søknadsdata.vedlegg",
+                    "søknadsdata.behandlingskjedeId"
+                )
+            }
         }.register(this)
     }
 
