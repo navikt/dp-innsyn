@@ -18,20 +18,19 @@ internal class EttersendingMottak(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate { it.demandKey("brukerBehandlingId") }
-            validate { it.demandKey("aktoerId") }
+            validate { it.demandKey("naturligIdent") }
             validate { it.demandKey("journalpostId") }
-            validate { it.requireKey("behandlingskjedeId") }
-            validate { it.interestedIn("skjemaNummer", "vedlegg", "behandlingskjedeId") }
+            validate { it.demandKey("søknadsdata.behandlingskjedeId") }
+            validate { it.requireValue("henvendelsestype", "ETTERSENDELSE") }
+            validate { it.interestedIn("søknadsdata.vedlegg") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val fnr = packet["aktoerId"].asText()
-        val søknadId = packet["brukerBehandlingId"].asText()
+        val fnr = packet["naturligIdent"].asText()
+        val søknadId = packet["søknadsdata.behandlingskjedeId"].asText()
 
         sikkerlogg.info { "Mottok ny søknad ($søknadId) for person ($fnr)." }
-        sikkerlogg.info { packet.toJson() }
 
         Ettersendingsmelding(packet).also {
             personMediator.håndter(it.ettersending, it)

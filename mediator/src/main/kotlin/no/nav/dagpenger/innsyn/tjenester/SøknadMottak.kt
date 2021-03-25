@@ -18,22 +18,19 @@ internal class SøknadMottak(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate { it.interestedIn("brukerBehandlingId") }
-            validate { it.interestedIn("aktoerId") }
+            validate { it.demandKey("naturligIdent") }
             validate { it.demandKey("journalpostId") }
-            validate { it.forbid("behandlingskjedeId") }
-            validate { it.interestedIn("skjemaNummer", "vedlegg", "behandlingskjedeId") }
+            validate { it.demandKey("søknadsdata.brukerBehandlingId") }
+            validate { it.requireValue("henvendelsestype", "NY_SØKNAD") }
+            validate { it.interestedIn("søknadsdata.vedlegg") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        sikkerlogg.info { packet.toJson() }
-
-        val fnr = packet["aktoerId"].asText()
-        val søknadId = packet["brukerBehandlingId"].asText()
+        val fnr = packet["naturligIdent"].asText()
+        val søknadId = packet["søknadsdata.brukerBehandlingId"].asText()
 
         sikkerlogg.info { "Mottok ny søknad ($søknadId) for person ($fnr)." }
-        sikkerlogg.info { packet.toJson() }
 
         Søknadsmelding(packet).also {
             personMediator.håndter(it.søknad, it)

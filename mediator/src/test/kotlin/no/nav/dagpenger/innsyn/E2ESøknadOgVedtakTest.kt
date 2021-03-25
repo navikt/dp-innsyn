@@ -14,7 +14,7 @@ internal class E2ESøknadOgVedtakTest {
     private val rapid = TestRapid()
     private val personRepository = InMemoryPersonRepository()
     private val personMediator = PersonMediator(personRepository)
-    private val søknadAsJson = javaClass.getResource("/soknadsdata.json").readText()
+    private val søknadAsJson = javaClass.getResource("/søknadsinnsending.json").readText()
     private val ettersendingAsJson = javaClass.getResource("/ettersending.json").readText()
     private val vedtakAsJson = javaClass.getResource("/vedtak.json").readText()
 
