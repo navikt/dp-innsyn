@@ -27,6 +27,7 @@ internal class EttersendingMottak(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        sikkerlogg.info { "SØKNAD: ${packet.toJson()}" }
         val fnr = packet["naturligIdent"].asText()
         val søknadId = packet["søknadsdata.behandlingskjedeId"].asText()
 
