@@ -18,15 +18,17 @@ internal class SøknadMottak(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate { it.requireKey("brukerBehandlingId") }
-            validate { it.requireKey("aktoerId") }
-            validate { it.requireKey("journalpostId") }
+            validate { it.interestedIn("brukerBehandlingId") }
+            validate { it.interestedIn("aktoerId") }
+            validate { it.demandKey("journalpostId") }
             validate { it.forbid("behandlingskjedeId") }
             validate { it.interestedIn("skjemaNummer", "vedlegg", "behandlingskjedeId") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        sikkerlogg.info { packet.toJson() }
+
         val fnr = packet["aktoerId"].asText()
         val søknadId = packet["brukerBehandlingId"].asText()
 
