@@ -1,20 +1,18 @@
 package no.nav.dagpenger.innsyn.modell.hendelser
 
+import java.util.Objects
+
 class Oppgave private constructor(
     private val id: String,
     val oppgaveType: OppgaveType,
     var tilstand: Tilstand
 ) {
-    fun håndter(hendelse: Hendelse) {
-        if (this !in hendelse.plan) return
-
-        hendelse.plan.first { it == this }.also {
-            tilstand = it.tilstand
-        }
-    }
-
     override fun equals(other: Any?): Boolean {
         return other is Oppgave && id == other.id && oppgaveType == other.oppgaveType
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(id, oppgaveType)
     }
 
     interface Tilstand

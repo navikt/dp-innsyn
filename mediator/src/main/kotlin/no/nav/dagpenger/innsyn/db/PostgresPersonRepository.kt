@@ -6,7 +6,6 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.innsyn.modell.Person
-import no.nav.dagpenger.innsyn.modell.Person
 
 class PostgresPersonRepository : PersonRepository {
     override fun person(fnr: String): Person = getPerson(fnr) ?: lagPerson(fnr)
@@ -38,7 +37,7 @@ class PostgresPersonRepository : PersonRepository {
         using(sessionOf(dataSource)) { session ->
             session.run(selectPerson(fnr))?.let {
                 val søknader = hentSøknader(session, it)
-                Person(fnr, søknader.toMutableList())
+                Person(fnr)
             }
         }
 
@@ -48,7 +47,7 @@ class PostgresPersonRepository : PersonRepository {
             "SELECT ekstern_id FROM søknad WHERE person_id=?",
             personId
         ).map { row ->
-            Person(row.string(1), listOf())
+            Person(row.string(1))
         }.asList
     )
 

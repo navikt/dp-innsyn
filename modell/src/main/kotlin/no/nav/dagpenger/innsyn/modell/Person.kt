@@ -1,39 +1,35 @@
 package no.nav.dagpenger.innsyn.modell
 
-import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
-import no.nav.dagpenger.innsyn.modell.hendelser.Mangelbrev
-import no.nav.dagpenger.innsyn.modell.hendelser.OppgaveType
-import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
-import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
+import no.nav.dagpenger.innsyn.modell.hendelser.Hendelse
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
 
-/*class Person(
+class Person constructor(
     val fnr: String,
-    blæh: List<Prosess>
 ) {
-    constructor(fnr: String) : this(fnr, listOf())
+    private var plan: Plan = Plan(emptySet())
 
-    private val blæh: MutableList<Prosess> = blæh.toMutableList()
+    private fun ferdigeOppgaverAv(type: OppgaveType) =
+        plan.filter { it.oppgaveType == type && it.tilstand == Oppgave.Ferdig }
 
-    fun finnFerdigeOppgaverAv(type: OppgaveType) = blæh.flatMap { it.ferdigeOppgaverAv(type) }
-    fun finnUferdigeOppgaverAv(type: OppgaveType) = blæh.flatMap { it.uferdigeOppgaverAv(type) }
+    private fun uferdigeOppgaverAv(type: OppgaveType) =
+        plan.filter { it.oppgaveType == type && it.tilstand == Oppgave.Uferdig }
 
-    fun harUferdigeOppgaverAv(type: OppgaveType) = finnUferdigeOppgaverAv(type).isNotEmpty()
-    fun harFerdigeOppgaverAv(type: OppgaveType) = finnFerdigeOppgaverAv(type).isNotEmpty()
+    fun harUferdigeOppgaverAv(type: OppgaveType) = uferdigeOppgaverAv(type).isNotEmpty()
+    fun harFerdigeOppgaverAv(type: OppgaveType) = ferdigeOppgaverAv(type).isNotEmpty()
 
-    fun håndter(søknad: Søknad) {
-        val søknadsprosess = Prosess(søknad.søknadId, søknad.plan)
-        blæh.add(søknadsprosess)
+    fun håndter(hendelse: Hendelse) {
+        plan = plan.slåSammen(hendelse.plan)
     }
+}
 
-    fun håndter(ettersending: Ettersending) {
-        blæh.forEach { it.håndter(ettersending) }
-    }
+internal class Plan(
+    val oppgaver: Set<Oppgave>
+) : Collection<Oppgave> by oppgaver {
+    fun slåSammen(med: Plan): Plan {
 
-    fun håndter(vedtak: Vedtak) {
-        blæh.forEach { it.håndter(vedtak) }
-    }
+        val unike = oppgaver subtract med.oppgaver
 
-    fun håndter(mangelbrev: Mangelbrev) {
-        blæh.forEach { it.håndter(mangelbrev) }
+        return Plan(unike + med.oppgaver)
     }
-}*/
+}

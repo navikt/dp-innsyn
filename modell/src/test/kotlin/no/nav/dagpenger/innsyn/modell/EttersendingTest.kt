@@ -2,8 +2,7 @@ package no.nav.dagpenger.innsyn.modell
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.FerdigOppgave
-import no.nav.dagpenger.innsyn.modell.hendelser.OppgaveType
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -17,14 +16,14 @@ internal class EttersendingTest {
             person.håndter(søknad("id1", manglerEttersendingOppgave()))
             assertTrue(person.harUferdigeOppgaverAv(testOppgave))
 
-            person.håndter(ettersending("id1", listOf(FerdigOppgave("1", testOppgave))))
+            person.håndter(ettersending("id1", setOf(testOppgave.ferdig("1"))))
             assertFalse(person.harUferdigeOppgaverAv(testOppgave))
         }
     }
 
-    private fun søknad(id: String, oppgaver: List<Oppgave>) = Søknad(id, oppgaver)
-    private fun ettersending(id: String, oppgaver: List<Oppgave>) = Ettersending(id, oppgaver)
-    private fun manglerEttersendingOppgave() = listOf(Oppgave("1", testOppgave))
+    private fun søknad(id: String, oppgaver: Set<Oppgave>) = Søknad(id, oppgaver)
+    private fun ettersending(id: String, oppgaver: Set<Oppgave>) = Ettersending(id, oppgaver)
+    private fun manglerEttersendingOppgave() = setOf(testOppgave.ny("1"))
 
     val testOppgave = OppgaveType("testOppgave")
 }

@@ -1,5 +1,6 @@
 package no.nav.dagpenger.innsyn.db
 
+import no.nav.dagpenger.innsyn.Dagpenger.vedtakOppgave
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -13,11 +14,11 @@ internal class PostgresPersonRepositoryTest {
         withMigratedDb {
             val person = repository.person("123")
 
-            person.håndter(Søknad("id", listOf()))
+            person.håndter(Søknad("id", setOf()))
             repository.lagre(person)
 
             repository.person(person.fnr).also {
-                assertFalse(it.harSøknadUnderBehandling())
+                assertFalse(it.harUferdigeOppgaverAv(vedtakOppgave))
             }
         }
     }

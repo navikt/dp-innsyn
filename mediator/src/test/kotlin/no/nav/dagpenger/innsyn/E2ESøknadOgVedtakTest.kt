@@ -1,5 +1,6 @@
 package no.nav.dagpenger.innsyn
 
+import no.nav.dagpenger.innsyn.Dagpenger.vedtakOppgave
 import no.nav.dagpenger.innsyn.helpers.InMemoryPersonRepository
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
@@ -28,12 +29,12 @@ internal class E2ESøknadOgVedtakTest {
         val person = personRepository.person("10108099999")
 
         rapid.sendTestMessage(søknadAsJson)
-        assertTrue(person.harSøknadUnderBehandling())
+        assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
 
         rapid.sendTestMessage(ettersendingAsJson)
-        assertTrue(person.harSøknadUnderBehandling())
+        assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
 
         rapid.sendTestMessage(vedtakAsJson)
-        assertFalse(person.harSøknadUnderBehandling())
+        assertFalse(person.harUferdigeOppgaverAv(vedtakOppgave))
     }
 }

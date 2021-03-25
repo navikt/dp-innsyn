@@ -1,9 +1,8 @@
 package no.nav.dagpenger.innsyn
 
-import no.nav.dagpenger.innsyn.modell.hendelser.OppgaveType
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
 
 object Dagpenger {
-    val vedlegg = OppgaveType("Vedlegg")
-    val ekstrating = OppgaveType("Mangelbrevet sier at du mangler noe")
-    val vedtak = OppgaveType("Få vedtak")
+    val vedleggOppgave = OppgaveType("Vedlegg")
+    val vedtakOppgave = OppgaveType("Få vedtak")
 }

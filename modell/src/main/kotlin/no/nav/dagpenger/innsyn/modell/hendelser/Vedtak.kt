@@ -4,7 +4,7 @@ class Vedtak private constructor(
     private val vedtakId: String,
     val søknadId: String,
     private val status: Status,
-    oppgaver: List<Oppgave>
+    oppgaver: Set<Oppgave>
 ) : Hendelse(oppgaver) {
     constructor(
         vedtakId: String
@@ -12,13 +12,13 @@ class Vedtak private constructor(
         vedtakId,
         "",
         Status.INNVILGET,
-        emptyList()
+        emptySet()
     )
 
     constructor(
         vedtakId: String,
         søknadId: String,
-        oppgaver: List<Oppgave>
+        oppgaver: Set<Oppgave>
     ) : this(
         vedtakId,
         søknadId,
