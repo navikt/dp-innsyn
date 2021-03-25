@@ -31,6 +31,7 @@ internal class EttersendingMottak(
         val søknadId = packet["brukerBehandlingId"].asText()
 
         sikkerlogg.info { "Mottok ny søknad ($søknadId) for person ($fnr)." }
+        sikkerlogg.info { packet.toJson() }
 
         Ettersendingsmelding(packet).also {
             personMediator.håndter(it.ettersending, it)
