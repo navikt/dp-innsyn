@@ -3,7 +3,7 @@ package no.nav.dagpenger.innsyn.modell
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
 import no.nav.dagpenger.innsyn.modell.hendelser.Mangelbrev
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.FerdigOppgave
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -43,19 +43,19 @@ internal class PersonTest {
         Person("ident").also { person ->
             person.håndter(søknad("id", manglerVedtakOppgave()))
             person.håndter(mangelbrev("id"))
-            assertTrue(person.finnUferdigeOppgaverAv(mangelbrevOppgave).isNotEmpty())
+            assertTrue(person.harUferdigeOppgaverAv(mangelbrevOppgave))
         }
     }
 
     private fun søknad(id: String, oppgaver: List<Oppgave>) = Søknad(id, oppgaver)
     private fun ettersending(id: String, oppgaver: List<Oppgave>) = Ettersending(id, oppgaver)
-    private fun vedtak(søknadId: String) = Vedtak("1", søknadId, listOf(FerdigOppgave("vedtak", vedtakOppgave)))
-    private fun manglerVedtakOppgave() = listOf(Oppgave("vedtak", vedtakOppgave))
-    private fun manglerVedleggOppgave(navn: String) = listOf(Oppgave(navn, vedleggOppgave))
-    private fun ferdigVedleggOppgave(navn: String) = listOf(FerdigOppgave(navn, vedleggOppgave))
-    private fun mangelbrev(søknadId: String) = Mangelbrev("id", søknadId, listOf(Oppgave("", mangelbrevOppgave)))
+    private fun vedtak(søknadId: String) = Vedtak("1", søknadId, listOf(vedtakOppgave.ferdig("vedtak")))
+    private fun manglerVedtakOppgave() = listOf(vedtakOppgave.ny("vedtak"))
+    private fun manglerVedleggOppgave(navn: String) = listOf(vedleggOppgave.ny(navn))
+    private fun ferdigVedleggOppgave(navn: String) = listOf(vedleggOppgave.ferdig(navn))
+    private fun mangelbrev(søknadId: String) = Mangelbrev("id", søknadId, listOf(mangelbrevOppgave.ny("")))
 
-    val vedtakOppgave = OppgaveType("testOppgave")
-    val vedleggOppgave = OppgaveType("testOppgave")
-    val mangelbrevOppgave = OppgaveType("testOppgave")
+    private val vedtakOppgave = OppgaveType("testOppgave")
+    private val vedleggOppgave = OppgaveType("testOppgave")
+    private val mangelbrevOppgave = OppgaveType("testOppgave")
 }

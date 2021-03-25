@@ -1,6 +1,6 @@
 package no.nav.dagpenger.innsyn
 
-import no.nav.dagpenger.innsyn.modell.OppgaveType
+import no.nav.dagpenger.innsyn.modell.hendelser.OppgaveType
 
 object Dagpenger {
     val vedlegg = OppgaveType("Vedlegg")

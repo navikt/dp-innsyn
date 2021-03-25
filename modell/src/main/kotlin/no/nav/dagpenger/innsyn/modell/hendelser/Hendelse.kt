@@ -1,3 +1,10 @@
 package no.nav.dagpenger.innsyn.modell.hendelser
 
-abstract class Hendelse(val oppgaver: List<Oppgave>)
+import no.nav.dagpenger.innsyn.modell.Plan
+
+abstract class Hendelse(
+    val prosessId: String,
+    oppgaver: List<Oppgave>
+) {
+    internal val plan = Plan(oppgaver)
+}

@@ -1,6 +1,6 @@
 package no.nav.dagpenger.innsyn.melding
 
-import no.nav.dagpenger.innsyn.modell.OppgaveType.Companion.vedlegg
+import no.nav.dagpenger.innsyn.modell.hendelser.OppgaveType.Companion.vedlegg
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.helse.rapids_rivers.JsonMessage
 

@@ -3,6 +3,7 @@ package no.nav.dagpenger.innsyn.modell
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.FerdigOppgave
+import no.nav.dagpenger.innsyn.modell.hendelser.OppgaveType
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue

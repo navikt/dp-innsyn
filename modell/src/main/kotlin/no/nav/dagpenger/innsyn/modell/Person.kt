@@ -2,16 +2,17 @@ package no.nav.dagpenger.innsyn.modell
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
 import no.nav.dagpenger.innsyn.modell.hendelser.Mangelbrev
+import no.nav.dagpenger.innsyn.modell.hendelser.OppgaveType
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 
-class Person(
+/*class Person(
     val fnr: String,
-    blæh: List<Søknadsprosess>
+    blæh: List<Prosess>
 ) {
     constructor(fnr: String) : this(fnr, listOf())
 
-    private val blæh: MutableList<Søknadsprosess> = blæh.toMutableList()
+    private val blæh: MutableList<Prosess> = blæh.toMutableList()
 
     fun finnFerdigeOppgaverAv(type: OppgaveType) = blæh.flatMap { it.ferdigeOppgaverAv(type) }
     fun finnUferdigeOppgaverAv(type: OppgaveType) = blæh.flatMap { it.uferdigeOppgaverAv(type) }
@@ -20,7 +21,7 @@ class Person(
     fun harFerdigeOppgaverAv(type: OppgaveType) = finnFerdigeOppgaverAv(type).isNotEmpty()
 
     fun håndter(søknad: Søknad) {
-        val søknadsprosess = Søknadsprosess(søknad.søknadId, søknad.oppgaver)
+        val søknadsprosess = Prosess(søknad.søknadId, søknad.plan)
         blæh.add(søknadsprosess)
     }
 
@@ -35,4 +36,4 @@ class Person(
     fun håndter(mangelbrev: Mangelbrev) {
         blæh.forEach { it.håndter(mangelbrev) }
     }
-}
+}*/

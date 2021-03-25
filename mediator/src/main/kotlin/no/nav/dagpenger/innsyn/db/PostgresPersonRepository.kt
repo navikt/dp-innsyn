@@ -6,7 +6,7 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.innsyn.modell.Person
-import no.nav.dagpenger.innsyn.modell.Søknadsprosess
+import no.nav.dagpenger.innsyn.modell.Person
 
 class PostgresPersonRepository : PersonRepository {
     override fun person(fnr: String): Person = getPerson(fnr) ?: lagPerson(fnr)
@@ -42,13 +42,13 @@ class PostgresPersonRepository : PersonRepository {
             }
         }
 
-    private fun hentSøknader(session: Session, personId: Int): List<Søknadsprosess> = session.run(
+    private fun hentSøknader(session: Session, personId: Int): List<Person> = session.run(
         queryOf(
             //language=PostgreSQL
             "SELECT ekstern_id FROM søknad WHERE person_id=?",
             personId
         ).map { row ->
-            Søknadsprosess(row.string(1), listOf())
+            Person(row.string(1), listOf())
         }.asList
     )
 
