@@ -5,11 +5,12 @@ import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.CallLogging
 import io.ktor.request.document
-import io.ktor.response.respond
+import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.routing
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.db.PersonRepository
+import no.nav.dagpenger.innsyn.modell.PersonJsonBuilder
 import org.slf4j.event.Level
 
 private val logger = KotlinLogging.logger { }
@@ -61,7 +62,7 @@ internal fun Application.innsynApi(
             val harSøknadUnderBehandling = person.harUferdigeOppgaverAv(Dagpenger.vedleggOppgave)
 
             sikkerlogg.info { "Personen har søkt: $harSendtSøknad, manglende vedlegg: $harManglendeVedlegg, og søknad under behandling: $harSøknadUnderBehandling" }
-            call.respond("OK")
+            call.respondText { PersonJsonBuilder(person).resultat().toString() }
         }
     }
 }
