@@ -55,7 +55,7 @@ internal class PersonTest {
     private fun ferdigVedleggOppgave(navn: String) = setOf(vedleggOppgave.ferdig(navn))
     private fun mangelbrev(søknadId: String) = Mangelbrev("id", søknadId, setOf(mangelbrevOppgave.ny("")))
 
-    private val vedtakOppgave = OppgaveType("testOppgave")
-    private val vedleggOppgave = OppgaveType("testOppgave")
-    private val mangelbrevOppgave = OppgaveType("testOppgave")
+    private val vedtakOppgave = OppgaveType("testOppgave1")
+    private val vedleggOppgave = OppgaveType("testOppgave2")
+    private val mangelbrevOppgave = OppgaveType("testOppgave3")
 }

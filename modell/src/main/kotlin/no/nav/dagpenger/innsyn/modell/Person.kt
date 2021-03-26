@@ -9,7 +9,11 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
 class Person constructor(
     val fnr: String
 ) {
-    private var plan: Plan = Plan(emptySet())
+    private var plan = Plan(emptySet())
+
+    constructor(fnr: String, oppgaver: List<Oppgave>) : this(fnr) {
+        plan = Plan(oppgaver.toSet())
+    }
 
     fun harUferdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Uferdig).isNotEmpty()
     fun harFerdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Ferdig).isNotEmpty()
@@ -23,7 +27,7 @@ class Person constructor(
             plan.forEach { it.leggTilHvis(type, oppgaveTilstand, oppgaver) }
         }
 
-    internal fun accept(visitor: PersonVisitor) {
+    fun accept(visitor: PersonVisitor) {
         visitor.preVisit(this, fnr)
         plan.accept(visitor)
         visitor.postVisit(this, fnr)

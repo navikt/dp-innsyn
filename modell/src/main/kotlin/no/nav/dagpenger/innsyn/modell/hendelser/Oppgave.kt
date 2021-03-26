@@ -46,6 +46,7 @@ class Oppgave private constructor(
         fun ny(id: String) = Oppgave(id, this, Uferdig)
         fun ferdig(id: String) = Oppgave(id, this, Ferdig)
 
+        override fun equals(other: Any?) = other is OppgaveType && type == other.type
         override fun toString() = type
     }
 }

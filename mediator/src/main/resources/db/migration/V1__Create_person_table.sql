@@ -6,14 +6,16 @@ CREATE TABLE IF NOT EXISTS person
 );
 CREATE UNIQUE INDEX IF NOT EXISTS person_fnr_uindex ON person (fnr);
 
-CREATE TABLE søknad
+CREATE TABLE oppgave
 (
-    søknad_id  SERIAL,
-    person_id  INT      NOT NULL,
-    ekstern_id CHAR(20) NOT NULL,
-    PRIMARY KEY (søknad_id),
+    oppgave_id  SERIAL,
+    person_id INT,
+    id  VARCHAR(255),
+    type VARCHAR(255) NOT NULL,
+    tilstand VARCHAR(255) NOT NULL,
+    PRIMARY KEY (oppgave_id),
     CONSTRAINT fk_person
         FOREIGN KEY (person_id)
             REFERENCES person (person_id)
 );
-CREATE UNIQUE INDEX IF NOT EXISTS søknad_person_uindex ON søknad (person_id, ekstern_id);
+CREATE UNIQUE INDEX IF NOT EXISTS oppgave_person_uindex ON oppgave (person_id, id, type);
