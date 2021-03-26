@@ -1,7 +1,8 @@
 package no.nav.dagpenger.innsyn
 
 import no.nav.dagpenger.innsyn.Dagpenger.vedtakOppgave
-import no.nav.dagpenger.innsyn.helpers.InMemoryPersonRepository
+import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
+import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
 import no.nav.dagpenger.innsyn.modell.PersonJsonBuilder
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
@@ -13,7 +14,7 @@ import org.junit.jupiter.api.Test
 
 internal class E2ESøknadOgVedtakTest {
     private val rapid = TestRapid()
-    private val personRepository = InMemoryPersonRepository()
+    private val personRepository = PostgresPersonRepository()
     private val personMediator = PersonMediator(personRepository)
     private val søknadAsJson = javaClass.getResource("/søknadsinnsending.json").readText()
     private val ettersendingAsJson = javaClass.getResource("/ettersending.json").readText()
@@ -27,17 +28,19 @@ internal class E2ESøknadOgVedtakTest {
 
     @Test
     fun `skal kunne motta søknad og vedtak`() {
-        val person = personRepository.person("10108099999")
+        withMigratedDb {
+            rapid.sendTestMessage(søknadAsJson)
+            assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
 
-        rapid.sendTestMessage(søknadAsJson)
-        assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
+            rapid.sendTestMessage(ettersendingAsJson)
+            assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
 
-        rapid.sendTestMessage(ettersendingAsJson)
-        assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
+            rapid.sendTestMessage(vedtakAsJson)
+            assertFalse(person.harUferdigeOppgaverAv(vedtakOppgave))
 
-        rapid.sendTestMessage(vedtakAsJson)
-        assertFalse(person.harUferdigeOppgaverAv(vedtakOppgave))
-
-        println(PersonJsonBuilder(person).resultat().toString())
+            println(PersonJsonBuilder(person).resultat().toString())
+        }
     }
+
+    private val person get() = personRepository.person("10108099999")
 }
