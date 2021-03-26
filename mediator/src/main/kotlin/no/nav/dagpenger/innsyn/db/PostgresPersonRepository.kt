@@ -6,12 +6,11 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.innsyn.modell.Person
-import no.nav.dagpenger.innsyn.modell.PersonVisitor
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand.Ferdig
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand.Uferdig
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
+import no.nav.dagpenger.innsyn.modell.serde.OppgaveData
+import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import java.time.LocalDateTime
 
 class PostgresPersonRepository : PersonRepository {
@@ -61,20 +60,13 @@ class PostgresPersonRepository : PersonRepository {
             "SELECT id, beskrivelse, opprettet, type, tilstand FROM oppgave WHERE person_id=?",
             personId
         ).map { row ->
-            val oppgaveType = row.string("type")
-            when (row.string("tilstand")) {
-                Uferdig.toString() -> OppgaveType(oppgaveType).ny(
-                    row.string("id"),
-                    row.string("beskrivelse"),
-                    row.localDateTime("opprettet")
-                )
-                Ferdig.toString() -> OppgaveType(oppgaveType).ferdig(
-                    row.string("id"),
-                    row.string("beskrivelse"),
-                    row.localDateTime("opprettet")
-                )
-                else -> throw IllegalArgumentException("ukjent tilstand")
-            }
+            OppgaveData(
+                row.string("id"),
+                row.string("beskrivelse"),
+                row.localDateTime("opprettet"),
+                row.string("type"),
+                row.string("tilstand")
+            ).oppgave
         }.asList
     )
 

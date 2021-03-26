@@ -1,6 +1,6 @@
 package no.nav.dagpenger.innsyn.modell.hendelser
 
-import no.nav.dagpenger.innsyn.modell.OppgaveVisitor
+import no.nav.dagpenger.innsyn.modell.serde.OppgaveVisitor
 import java.time.LocalDateTime
 import java.util.Objects
 
@@ -28,15 +28,15 @@ class Oppgave private constructor(
         visitor.postVisit(this, id, beskrivelse, opprettet, oppgaveType, tilstand.kode)
     }
 
-    private interface Tilstand {
+    internal interface Tilstand {
         val kode: OppgaveTilstand
     }
 
-    private object Uferdig : Tilstand {
+    internal object Uferdig : Tilstand {
         override val kode = OppgaveTilstand.Uferdig
     }
 
-    private object Ferdig : Tilstand {
+    internal object Ferdig : Tilstand {
         override val kode = OppgaveTilstand.Ferdig
     }
 
@@ -46,8 +46,8 @@ class Oppgave private constructor(
     }
 
     class OppgaveType(private val type: String) {
-        fun ny(id: String, beskrivelse: String, opprettet: LocalDateTime = LocalDateTime.now()) = Oppgave(id, beskrivelse, opprettet, this, Uferdig)
-        fun ferdig(id: String, beskrivelse: String, opprettet: LocalDateTime = LocalDateTime.now()) = Oppgave(id, beskrivelse, opprettet, this, Ferdig)
+        fun ny(id: String, beskrivelse: String) = Oppgave(id, beskrivelse, LocalDateTime.now(), this, Uferdig)
+        fun ferdig(id: String, beskrivelse: String) = Oppgave(id, beskrivelse, LocalDateTime.now(), this, Ferdig)
 
         override fun equals(other: Any?) = other is OppgaveType && type == other.type
         override fun toString() = type

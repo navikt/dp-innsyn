@@ -1,5 +1,7 @@
-package no.nav.dagpenger.innsyn.modell
+package no.nav.dagpenger.innsyn.modell.serde
 
+import no.nav.dagpenger.innsyn.modell.Person
+import no.nav.dagpenger.innsyn.modell.Plan
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
 import java.time.LocalDateTime

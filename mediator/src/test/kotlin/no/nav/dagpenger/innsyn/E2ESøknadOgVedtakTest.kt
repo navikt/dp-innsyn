@@ -3,7 +3,7 @@ package no.nav.dagpenger.innsyn
 import no.nav.dagpenger.innsyn.Dagpenger.vedtakOppgave
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
-import no.nav.dagpenger.innsyn.modell.PersonJsonBuilder
+import no.nav.dagpenger.innsyn.modell.serde.PersonJsonBuilder
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakMottak

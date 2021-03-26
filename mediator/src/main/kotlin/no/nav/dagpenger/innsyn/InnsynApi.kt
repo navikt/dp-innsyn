@@ -10,7 +10,7 @@ import io.ktor.routing.get
 import io.ktor.routing.routing
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.db.PersonRepository
-import no.nav.dagpenger.innsyn.modell.PersonJsonBuilder
+import no.nav.dagpenger.innsyn.modell.serde.PersonJsonBuilder
 import org.slf4j.event.Level
 
 private val logger = KotlinLogging.logger { }
