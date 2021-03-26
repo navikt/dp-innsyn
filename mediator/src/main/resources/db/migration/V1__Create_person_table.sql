@@ -9,10 +9,12 @@ CREATE UNIQUE INDEX IF NOT EXISTS person_fnr_uindex ON person (fnr);
 CREATE TABLE oppgave
 (
     oppgave_id  SERIAL,
-    person_id INT,
-    id  VARCHAR(255),
-    type VARCHAR(255) NOT NULL,
-    tilstand VARCHAR(255) NOT NULL,
+    person_id   INT,
+    id          VARCHAR(255) NOT NULL,
+    beskrivelse VARCHAR(255),
+    opprettet   TIMESTAMP    NOT NULL,
+    type        VARCHAR(255) NOT NULL,
+    tilstand    VARCHAR(255) NOT NULL,
     PRIMARY KEY (oppgave_id),
     CONSTRAINT fk_person
         FOREIGN KEY (person_id)

@@ -13,9 +13,9 @@ internal class PostgresPersonRepositoryTest {
     fun `skal lagre og finne person`() {
         withMigratedDb {
             val person = repository.person("123")
-            val testOppgave = OppgaveType("test")
+            val testOppgave = OppgaveType("testType")
 
-            person.håndter(Søknad("id", setOf(testOppgave.ny("oppgaver", ""))))
+            person.håndter(Søknad("id", setOf(testOppgave.ny("oppgaver", "tom"))))
             repository.lagre(person)
 
             repository.person(person.fnr).also {
