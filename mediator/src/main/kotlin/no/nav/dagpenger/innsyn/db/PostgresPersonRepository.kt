@@ -59,8 +59,8 @@ class PostgresPersonRepository : PersonRepository {
         ).map { row ->
             val oppgaveType = row.string(2)
             when (row.string(3)) {
-                Uferdig.toString() -> OppgaveType(oppgaveType).ny(row.string(1))
-                Ferdig.toString() -> OppgaveType(oppgaveType).ferdig(row.string(1))
+                Uferdig.toString() -> OppgaveType(oppgaveType).ny(row.string(1), "")
+                Ferdig.toString() -> OppgaveType(oppgaveType).ferdig(row.string(1), "")
                 else -> throw IllegalArgumentException("ukjent tilstand")
             }
         }.asList

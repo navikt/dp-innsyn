@@ -49,11 +49,11 @@ internal class PersonTest {
 
     private fun søknad(id: String, oppgaver: Set<Oppgave>) = Søknad(id, oppgaver)
     private fun ettersending(id: String, oppgaver: Set<Oppgave>) = Ettersending(id, oppgaver)
-    private fun vedtak(søknadId: String) = Vedtak("1", søknadId, setOf(vedtakOppgave.ferdig("vedtak")))
-    private fun manglerVedtakOppgave() = setOf(vedtakOppgave.ny("vedtak"))
-    private fun manglerVedleggOppgave(navn: String) = setOf(vedleggOppgave.ny(navn))
-    private fun ferdigVedleggOppgave(navn: String) = setOf(vedleggOppgave.ferdig(navn))
-    private fun mangelbrev(søknadId: String) = Mangelbrev("id", søknadId, setOf(mangelbrevOppgave.ny("")))
+    private fun vedtak(søknadId: String) = Vedtak("1", søknadId, setOf(vedtakOppgave.ferdig("vedtak", "")))
+    private fun manglerVedtakOppgave() = setOf(vedtakOppgave.ny("vedtak", ""))
+    private fun manglerVedleggOppgave(navn: String) = setOf(vedleggOppgave.ny(navn, ""))
+    private fun ferdigVedleggOppgave(navn: String) = setOf(vedleggOppgave.ferdig(navn, ""))
+    private fun mangelbrev(søknadId: String) = Mangelbrev("id", søknadId, setOf(mangelbrevOppgave.ny("", "")))
 
     private val vedtakOppgave = OppgaveType("testOppgave1")
     private val vedleggOppgave = OppgaveType("testOppgave2")

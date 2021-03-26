@@ -16,14 +16,14 @@ internal class EttersendingTest {
             person.håndter(søknad("id1", manglerEttersendingOppgave()))
             assertTrue(person.harUferdigeOppgaverAv(testOppgave))
 
-            person.håndter(ettersending("id1", setOf(testOppgave.ferdig("1"))))
+            person.håndter(ettersending("id1", setOf(testOppgave.ferdig("1", ""))))
             assertFalse(person.harUferdigeOppgaverAv(testOppgave))
         }
     }
 
     private fun søknad(id: String, oppgaver: Set<Oppgave>) = Søknad(id, oppgaver)
     private fun ettersending(id: String, oppgaver: Set<Oppgave>) = Ettersending(id, oppgaver)
-    private fun manglerEttersendingOppgave() = setOf(testOppgave.ny("1"))
+    private fun manglerEttersendingOppgave() = setOf(testOppgave.ny("1", ""))
 
     val testOppgave = OppgaveType("testOppgave")
 }

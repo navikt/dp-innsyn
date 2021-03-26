@@ -33,6 +33,7 @@ internal class SøknadMottak(
         val søknadId = packet["søknadsdata.brukerBehandlingId"].asText()
 
         sikkerlogg.info { "Mottok ny søknad ($søknadId) for person ($fnr)." }
+        sikkerlogg.info { "SØKNAD: ${packet.toJson()}" }
 
         Søknadsmelding(packet).also {
             personMediator.håndter(it.søknad, it)

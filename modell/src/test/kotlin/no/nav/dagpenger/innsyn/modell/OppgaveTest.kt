@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 class OppgaveTest {
     @Test
     fun `En uferdig oppgave har status Uferdig`() {
-        val oppgave = testOppgave.ny("1")
+        val oppgave = testOppgave.ny("1", "")
         val oppgaver = mutableSetOf<Oppgave>()
 
         oppgave.leggTilHvis(testOppgave, Uferdig, oppgaver)

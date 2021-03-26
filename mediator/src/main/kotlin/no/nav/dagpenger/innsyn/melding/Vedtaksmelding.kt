@@ -8,7 +8,7 @@ internal class Vedtaksmelding(packet: JsonMessage) : Hendelsemelding(packet) {
 
     private val vedtakId = packet["vedtakId"].asText()
     private val søknadId = packet["søknadId"].asText()
-    internal val vedtak get() = Vedtak(vedtakId, søknadId, setOf(vedtakOppgave.ferdig(søknadId)))
+    internal val vedtak get() = Vedtak(vedtakId, søknadId, setOf(vedtakOppgave.ferdig(søknadId, "")))
 
     override val fødselsnummer: String = packet["fødselsnummer"].asText()
 }

@@ -5,6 +5,7 @@ import java.util.Objects
 
 class Oppgave private constructor(
     private val id: String,
+    private val beskrivelse: String,
     private val oppgaveType: OppgaveType,
     private var tilstand: Tilstand
 ) {
@@ -43,8 +44,8 @@ class Oppgave private constructor(
     }
 
     class OppgaveType(private val type: String) {
-        fun ny(id: String) = Oppgave(id, this, Uferdig)
-        fun ferdig(id: String) = Oppgave(id, this, Ferdig)
+        fun ny(id: String, beskrivelse: String) = Oppgave(id, beskrivelse, this, Uferdig)
+        fun ferdig(id: String, beskrivelse: String) = Oppgave(id, beskrivelse, this, Ferdig)
 
         override fun equals(other: Any?) = other is OppgaveType && type == other.type
         override fun toString() = type

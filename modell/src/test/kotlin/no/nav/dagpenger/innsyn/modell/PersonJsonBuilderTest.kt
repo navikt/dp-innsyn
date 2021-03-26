@@ -11,7 +11,7 @@ internal class PersonJsonBuilderTest {
     @Test
     fun `vi kan bygge json`() {
         val person = Person("123")
-        person.håndter(Søknad("1", setOf(oppgaveType.ny("ny"))))
+        person.håndter(Søknad("1", setOf(oppgaveType.ny("ny", ""))))
 
         val json = PersonJsonBuilder(person).resultat()
 

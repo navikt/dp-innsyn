@@ -10,6 +10,6 @@ internal class Søknadsmelding(packet: JsonMessage) : Innsendingsmelding(packet)
     internal val søknad
         get() = Søknad(
             søknadId,
-            oppgaver + søknadOppgave.ferdig(søknadId) + vedtakOppgave.ny(søknadId)
+            oppgaver + søknadOppgave.ferdig(søknadId, "") + vedtakOppgave.ny(søknadId, "")
         )
 }

@@ -15,7 +15,7 @@ internal class PostgresPersonRepositoryTest {
             val person = repository.person("123")
             val testOppgave = OppgaveType("test")
 
-            person.håndter(Søknad("id", setOf(testOppgave.ny("oppgaver"))))
+            person.håndter(Søknad("id", setOf(testOppgave.ny("oppgaver", ""))))
             repository.lagre(person)
 
             repository.person(person.fnr).also {
