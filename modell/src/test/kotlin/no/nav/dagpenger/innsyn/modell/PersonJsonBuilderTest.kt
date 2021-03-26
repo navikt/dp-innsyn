@@ -15,7 +15,6 @@ internal class PersonJsonBuilderTest {
 
         val json = PersonJsonBuilder(person).resultat()
 
-        assertEquals("123", json["fnr"].asText())
         assertEquals(1, json["oppgaver"].size())
 
         println(json)
