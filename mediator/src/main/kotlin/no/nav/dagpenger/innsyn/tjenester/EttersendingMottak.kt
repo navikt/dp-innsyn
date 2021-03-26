@@ -18,7 +18,8 @@ internal class EttersendingMottak(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate { it.demandKey("naturligIdent") }
+            // validate { it.demandKey("naturligIdent") }
+            validate { it.demandKey("søknadsdata.aktoerId") }
             validate { it.demandKey("journalpostId") }
             validate { it.demandKey("søknadsdata.behandlingskjedeId") }
             validate { it.requireValue("henvendelsestype", "ETTERSENDELSE") }
@@ -27,7 +28,8 @@ internal class EttersendingMottak(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val fnr = packet["naturligIdent"].asText()
+        // val fnr = packet["naturligIdent"].asText()
+        val fnr = packet["søknadsdata.aktoerId"].asText()
         val søknadId = packet["søknadsdata.behandlingskjedeId"].asText()
 
         sikkerlogg.info { "Mottok ny ettersending ($søknadId) for person ($fnr)." }

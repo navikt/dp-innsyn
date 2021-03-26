@@ -2,6 +2,7 @@ package no.nav.dagpenger.innsyn
 
 import no.nav.dagpenger.innsyn.Dagpenger.vedtakOppgave
 import no.nav.dagpenger.innsyn.helpers.InMemoryPersonRepository
+import no.nav.dagpenger.innsyn.modell.PersonJsonBuilder
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakMottak
@@ -36,5 +37,7 @@ internal class E2ESøknadOgVedtakTest {
 
         rapid.sendTestMessage(vedtakAsJson)
         assertFalse(person.harUferdigeOppgaverAv(vedtakOppgave))
+
+        println(PersonJsonBuilder(person).resultat().toString())
     }
 }
