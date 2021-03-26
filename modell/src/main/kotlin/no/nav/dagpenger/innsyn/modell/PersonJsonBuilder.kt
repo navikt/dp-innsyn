@@ -18,7 +18,7 @@ class PersonJsonBuilder(person: Person) : PersonVisitor {
     fun resultat() = root
 
     override fun preVisit(person: Person, fnr: String) {
-        root.put("fnr", fnr)
+        // root.put("fnr", fnr)
         root.put("oppgaver", planNode)
     }
 
