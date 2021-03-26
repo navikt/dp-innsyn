@@ -6,16 +6,14 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand.Ferdig
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand.Uferdig
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
-import no.nav.dagpenger.innsyn.modell.serde.PlanVisitor
 
-class Person constructor(
-    val fnr: String
+class Person private constructor(
+    val fnr: String,
+    oppgaver: Collection<Oppgave>
 ) {
-    private var plan = Plan(emptySet())
+    constructor(fnr: String) : this(fnr, emptySet())
 
-    constructor(fnr: String, oppgaver: List<Oppgave>) : this(fnr) {
-        plan = Plan(oppgaver.toSet())
-    }
+    private var plan = Plan(oppgaver.toSet())
 
     fun harUferdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Uferdig).isNotEmpty()
     fun harFerdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Ferdig).isNotEmpty()
@@ -33,21 +31,5 @@ class Person constructor(
         visitor.preVisit(this, fnr)
         plan.accept(visitor)
         visitor.postVisit(this, fnr)
-    }
-}
-
-class Plan internal constructor(
-    private val oppgaver: Set<Oppgave>
-) : Collection<Oppgave> by oppgaver {
-    fun slåSammen(med: Plan): Plan {
-        val unike = oppgaver subtract med.oppgaver
-
-        return Plan(unike + med.oppgaver)
-    }
-
-    fun accept(visitor: PlanVisitor) {
-        visitor.preVisit(this)
-        oppgaver.forEach { it.accept(visitor) }
-        visitor.postVisit(this)
     }
 }

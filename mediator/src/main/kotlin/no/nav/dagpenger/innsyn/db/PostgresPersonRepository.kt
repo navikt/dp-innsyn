@@ -10,6 +10,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
 import no.nav.dagpenger.innsyn.modell.serde.OppgaveData
+import no.nav.dagpenger.innsyn.modell.serde.PersonData
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import java.time.LocalDateTime
 
@@ -50,7 +51,7 @@ class PostgresPersonRepository : PersonRepository {
         using(sessionOf(dataSource)) { session ->
             session.run(selectPerson(fnr))?.let {
                 val oppgaver = hentOppgaver(session, it)
-                Person(fnr, oppgaver)
+                PersonData(fnr, oppgaver).person
             }
         }
 
