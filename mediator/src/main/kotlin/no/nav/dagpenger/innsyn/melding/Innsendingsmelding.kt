@@ -17,5 +17,6 @@ internal abstract class Innsendingsmelding(packet: JsonMessage) : Hendelsemeldin
         }
     }.toSet()
 
-    private fun beskrivelse(vedlegg: JsonNode) = "${vedlegg["navn"]?.let { it.asText()}} (${vedlegg["skjemaNummer"].asText()})"
+    private fun beskrivelse(vedlegg: JsonNode) =
+        "${vedlegg["navn"]?.let { it.asText() }} (${vedlegg["skjemaNummer"].asText()})"
 }
