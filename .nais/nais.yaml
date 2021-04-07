@@ -36,6 +36,8 @@ spec:
     inbound:
       rules:
         - application: dp-dagpenger
+  tokenx:
+    enabled: true
   gcp:
     sqlInstances:
       - name: dp-innsyn
