@@ -1,19 +1,20 @@
 package no.nav.dagpenger.innsyn.modell.serde
 
+import no.nav.dagpenger.innsyn.modell.BehandlingskjedeId
 import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.Plan
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
 import java.time.LocalDateTime
 
-interface PersonVisitor : PlanVisitor {
+interface PersonVisitor : BehandlingskjedeVisitor {
     fun preVisit(person: Person, fnr: String) {}
     fun postVisit(person: Person, fnr: String) {}
 }
 
-interface PlanVisitor : OppgaveVisitor {
-    fun preVisit(plan: Plan) {}
-    fun postVisit(plan: Plan) {}
+interface BehandlingskjedeVisitor : OppgaveVisitor {
+    fun preVisit(behandlingskjede: Plan, id: BehandlingskjedeId) {}
+    fun postVisit(behandlingskjede: Plan, id: BehandlingskjedeId) {}
 }
 
 interface OppgaveVisitor {

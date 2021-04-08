@@ -1,6 +1,5 @@
 package no.nav.dagpenger.innsyn
 
-import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.clean
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak

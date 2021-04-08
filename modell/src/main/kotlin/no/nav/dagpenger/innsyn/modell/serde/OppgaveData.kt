@@ -15,6 +15,7 @@ class OppgaveData(
     tilstandString: String
 ) {
     private val tilstand = OppgaveTilstand.valueOf(tilstandString)
+
     val oppgave = Oppgave::class.primaryConstructor!!
         .apply { isAccessible = true }
         .call(id, beskrivelse, opprettet, OppgaveType(oppgaveType), parseTilstand(tilstand))

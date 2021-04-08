@@ -7,13 +7,10 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand.Uferdig
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 
-class Person private constructor(
-    val fnr: String,
-    oppgaver: Collection<Oppgave>
+class Person constructor(
+    val fnr: String
 ) {
-    constructor(fnr: String) : this(fnr, emptySet())
-
-    private var behandlingskjeder = mutableSetOf<Plan>()
+    private val behandlingskjeder = mutableSetOf<Plan>()
 
     fun harUferdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Uferdig).isNotEmpty()
     fun harFerdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Ferdig).isNotEmpty()

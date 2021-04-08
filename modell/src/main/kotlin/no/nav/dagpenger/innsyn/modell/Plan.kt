@@ -2,7 +2,7 @@ package no.nav.dagpenger.innsyn.modell
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Hendelse
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
-import no.nav.dagpenger.innsyn.modell.serde.PlanVisitor
+import no.nav.dagpenger.innsyn.modell.serde.BehandlingskjedeVisitor
 
 typealias BehandlingskjedeId = String
 
@@ -17,10 +17,10 @@ class Plan internal constructor(
         oppgaver = slåSammen(hendelse.plan)
     }
 
-    fun accept(visitor: PlanVisitor) {
-        visitor.preVisit(this)
+    fun accept(visitor: BehandlingskjedeVisitor) {
+        visitor.preVisit(this, id)
         oppgaver.forEach { it.accept(visitor) }
-        visitor.postVisit(this)
+        visitor.postVisit(this, id)
     }
 
     private fun erRelevant(hendelse: Hendelse) = hendelse.behandlingskjedeId == id
