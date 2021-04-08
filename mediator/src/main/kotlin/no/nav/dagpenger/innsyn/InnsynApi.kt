@@ -62,7 +62,7 @@ internal fun Application.innsynApi(
 
     routing {
         authenticate {
-            get("/søknad") {
+            get("/soknad") {
                 val fnr = call.authentication.principal<JWTPrincipal>()
                 val person = personRepository.person(fnr!!.payload!!.subject)
                 val harSendtSøknad = person.harFerdigeOppgaverAv(Dagpenger.søknadOppgave)

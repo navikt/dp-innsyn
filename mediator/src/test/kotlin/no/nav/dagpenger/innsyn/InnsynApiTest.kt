@@ -28,7 +28,7 @@ internal class InnsynApiTest {
                 clientId
             )
         }) {
-            autentisert("/søknad")
+            autentisert("/soknad")
         }.apply {
 
             assertEquals(200, response.status()?.value)
