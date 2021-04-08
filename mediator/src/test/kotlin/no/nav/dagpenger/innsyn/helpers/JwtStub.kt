@@ -10,14 +10,12 @@ import java.security.interfaces.RSAPublicKey
 import java.util.Base64
 
 class JwtStub(private val issuer: String = "test issuer") {
-
     private val privateKey: RSAPrivateKey
     private val publicKey: RSAPublicKey
 
     init {
         val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
         keyPairGenerator.initialize(512)
-
         val keyPair = keyPairGenerator.genKeyPair()
         privateKey = keyPair.private as RSAPrivateKey
         publicKey = keyPair.public as RSAPublicKey
@@ -30,6 +28,7 @@ class JwtStub(private val issuer: String = "test issuer") {
             .withIssuer(issuer)
             .withSubject(subject)
             .withAudience(clientId)
+            .withClaim("pid", subject)
             .sign(algorithm)
     }
 
