@@ -8,6 +8,7 @@ import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
 
 internal object Configuration {
+    const val appName = "dp-innsyn"
     private val localProperties = ConfigurationMap(
         mapOf(
             "KAFKA_CONSUMER_GROUP_ID" to "dp-innsyn-v1",
