@@ -18,6 +18,15 @@ internal class PersonTest {
             assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
         }
     }
+    @Test
+    fun `Flere søknader gir flere behandlingskjeder`() {
+        Person("ident").also { person ->
+            person.håndter(søknad("id1", manglerVedleggOppgave("vedleggA") + manglerVedtakOppgave()))
+            person.håndter(søknad("id2", manglerVedleggOppgave("vedleggA") + manglerVedtakOppgave()))
+
+            // assertEquals(2, person.kjeder)
+        }
+    }
 
     @Test
     fun `Søknad uten vedlegg og deretter innsendte vedlegg også vedtak`() {
@@ -50,12 +59,12 @@ internal class PersonTest {
     private fun søknad(id: String, oppgaver: Set<Oppgave>) = Søknad(id, oppgaver)
     private fun ettersending(id: String, oppgaver: Set<Oppgave>) = Ettersending(id, oppgaver)
     private fun vedtak(søknadId: String) = Vedtak("1", søknadId, setOf(vedtakOppgave.ferdig("vedtak", "")))
+    private fun mangelbrev(søknadId: String) = Mangelbrev("id", søknadId, setOf(mangelbrevOppgave.ny("", "")))
     private fun manglerVedtakOppgave() = setOf(vedtakOppgave.ny("vedtak", ""))
     private fun manglerVedleggOppgave(navn: String) = setOf(vedleggOppgave.ny(navn, ""))
     private fun ferdigVedleggOppgave(navn: String) = setOf(vedleggOppgave.ferdig(navn, ""))
-    private fun mangelbrev(søknadId: String) = Mangelbrev("id", søknadId, setOf(mangelbrevOppgave.ny("", "")))
 
-    private val vedtakOppgave = OppgaveType("testOppgave1")
-    private val vedleggOppgave = OppgaveType("testOppgave2")
-    private val mangelbrevOppgave = OppgaveType("testOppgave3")
+    private val vedtakOppgave = OppgaveType("testOppgaveVedtak")
+    private val vedleggOppgave = OppgaveType("testOppgaveVedlegg")
+    private val mangelbrevOppgave = OppgaveType("testOppgaveMangelbrev")
 }

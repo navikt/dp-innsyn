@@ -1,3 +1,8 @@
 package no.nav.dagpenger.innsyn.modell.hendelser
 
-abstract class Innsending(oppgaver: Set<Oppgave>) : Hendelse(oppgaver)
+import no.nav.dagpenger.innsyn.modell.BehandlingskjedeId
+
+abstract class Innsending(behandlingskjedeId: BehandlingskjedeId, oppgaver: Set<Oppgave>) : Hendelse(
+    behandlingskjedeId,
+    oppgaver
+)

@@ -13,23 +13,33 @@ class Person private constructor(
 ) {
     constructor(fnr: String) : this(fnr, emptySet())
 
-    private var plan = Plan(oppgaver.toSet())
+    private var behandlingskjeder = mutableSetOf<Plan>()
 
     fun harUferdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Uferdig).isNotEmpty()
     fun harFerdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Ferdig).isNotEmpty()
 
     fun håndter(hendelse: Hendelse) {
-        plan = plan.slåSammen(hendelse.plan)
+        if (behandlingskjeder.map { it.håndter(hendelse) }.none { it }) {
+            behandlingskjeder.add(hendelse.plan)
+        }
     }
 
     private fun oppgaverAv(type: OppgaveType, oppgaveTilstand: Oppgave.OppgaveTilstand): Set<Oppgave> =
         mutableSetOf<Oppgave>().also { oppgaver ->
-            plan.forEach { it.leggTilHvis(type, oppgaveTilstand, oppgaver) }
+            behandlingskjeder.forEach { behandlingskjede ->
+                behandlingskjede.forEach { oppgave ->
+                    oppgave.leggTilHvis(
+                        type,
+                        oppgaveTilstand,
+                        oppgaver
+                    )
+                }
+            }
         }
 
     fun accept(visitor: PersonVisitor) {
         visitor.preVisit(this, fnr)
-        plan.accept(visitor)
+        behandlingskjeder.forEach { it.accept(visitor) }
         visitor.postVisit(this, fnr)
     }
 }
