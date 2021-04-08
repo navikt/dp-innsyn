@@ -63,10 +63,10 @@ internal fun Application.innsynApi(
     routing {
         authenticate {
             get("/soknad") {
-                val fnr = call.authentication.principal<JWTPrincipal>()
+                val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 logger.info { "Fikk request." }
-                sikkerlogg.info { "Fikk request. JWT ser slik ut: ${fnr!!}" }
-                val person = personRepository.person(fnr!!.payload!!.subject)
+                sikkerlogg.info { "Fikk request. Subject: ${jwtPrincipal!!.payload!!.subject}. JWT ser slik ut: ${jwtPrincipal!!}" }
+                val person = personRepository.person(jwtPrincipal!!.payload!!.subject)
                 val harSendtSøknad = person.harFerdigeOppgaverAv(Dagpenger.søknadOppgave)
                 val harManglendeVedlegg = person.harUferdigeOppgaverAv(Dagpenger.vedleggOppgave)
                 val harSøknadUnderBehandling = person.harUferdigeOppgaverAv(Dagpenger.vedleggOppgave)
