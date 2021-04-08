@@ -1,28 +1,28 @@
 {
-  "system_read_count": 2,
-  "system_started": "2021-03-25T19:33:28.509696",
-  "system_correlation_id": "01F1NAKBNXS7HGXH6HA6M0B394",
+  "system_read_count": 1,
+  "system_started": "2021-04-08T13:36:02.348274",
+  "system_correlation_id": "01F2RM92HCE61J70DRB4DC46VG",
   "toggleBehandleNySøknad": true,
   "søknadsdata": {
-    "soknadId": 11564.0,
+    "soknadId": 11611,
     "soknadsType": "dagpenger.ordinaer",
     "skjemaNummer": "NAV 04-01.03",
-    "uuid": "b8dd4be0-8b5f-4a83-b44f-cda41d960d3e",
-    "brukerBehandlingId": "10010WQFL",
-    "behandlingskjedeId": "10010WQFK",
+    "uuid": "6485fc94-d385-4746-8890-2d12930018e2",
+    "brukerBehandlingId": "10010WQHB",
+    "behandlingskjedeId": "10010WQHA",
     "fakta": [
       {
-        "faktumId": 837873.0,
-        "soknadId": 11564.0,
+        "faktumId": 839937,
+        "soknadId": 11611,
         "key": "soknadInnsendingsDato",
-        "value": "1616695728835",
+        "value": "1617881653070",
         "faktumEgenskaper": [],
         "properties": {},
         "type": "SYSTEMREGISTRERT"
       },
       {
-        "faktumId": 837874.0,
-        "soknadId": 11564.0,
+        "faktumId": 839938,
+        "soknadId": 11611,
         "key": "skjema.sprak",
         "value": "nb_NO",
         "faktumEgenskaper": [],
@@ -30,448 +30,394 @@
         "type": "BRUKERREGISTRERT"
       },
       {
-        "faktumId": 837875.0,
-        "soknadId": 11564.0,
+        "faktumId": 839939,
+        "soknadId": 11611,
         "key": "personalia",
         "faktumEgenskaper": [
           {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "statsborgerskapType",
-            "value": "norsk",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "gjeldendeAdresseGyldigTil",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "alder",
-            "value": "40",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "sekundarAdresse",
-            "value": "FREGATTEN , 1798 AREMARK",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "sekundarAdresseGyldigFra",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "kontonummer",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "diskresjonskode",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "sekundarAdresseGyldigTil",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
+            "faktumId": 839939,
+            "soknadId": 11611,
             "key": "fornavn",
-            "value": "VINAYAGUM-MASK",
-            "systemEgenskap": 1.0
+            "value": "KRAFTIG",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "epost",
-            "value": "julenissen@nordpolen.no",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "gjeldendeAdresseGyldigFra",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "utenlandskKontoBanknavn",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "mellomnavn",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
+            "faktumId": 839939,
+            "soknadId": 11611,
             "key": "etternavn",
-            "value": "AMIZIC",
-            "systemEgenskap": 1.0
+            "value": "GAPAHUK",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "fnr",
-            "value": "10108099999",
-            "systemEgenskap": 1.0
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "sekundarAdresseGyldigTil",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "gjeldendeAdresseLandkode",
-            "value": "NOR",
-            "systemEgenskap": 1.0
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "gjeldendeAdresseGyldigTil",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "gjeldendeAdresseType",
-            "value": "POSTADRESSE",
-            "systemEgenskap": 1.0
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "sekundarAdresseGyldigFra",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "kjonn",
-            "value": "m",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
+            "faktumId": 839939,
+            "soknadId": 11611,
             "key": "navn",
-            "value": "VINAYAGUM-MASK AMIZIC",
-            "systemEgenskap": 1.0
+            "value": "KRAFTIG GAPAHUK",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "gjeldendeAdresse",
-            "value": "JORDAN, JOHANNISSTR., 12277, 0130 OSLO, Norge",
-            "systemEgenskap": 1.0
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "alder",
+            "value": "75",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "utenlandskKontoLand",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "sekundarAdresseType",
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "gjeldendeAdresseType",
             "value": "BOSTEDSADRESSE",
-            "systemEgenskap": 1.0
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
-            "key": "statsborgerskap",
-            "value": "NOR",
-            "systemEgenskap": 1.0
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "gjeldendeAdresseLandkode",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837875.0,
-            "soknadId": 11564.0,
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "gjeldendeAdresse",
+            "value": "SPRENGSDALEN 49, 0963 OSLO",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "epost",
+            "value": "test@gmail.com",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "diskresjonskode",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
             "key": "erUtenlandskBankkonto",
             "value": "false",
-            "systemEgenskap": 1.0
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "statsborgerskapType",
+            "value": "eos",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "sekundarAdresse",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "kontonummer",
+            "value": "09301499113",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "kjonn",
+            "value": "k",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "sekundarAdresseType",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "statsborgerskap",
+            "value": "DEU",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "utenlandskKontoBanknavn",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "fnr",
+            "value": "10108099999",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "mellomnavn",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "gjeldendeAdresseGyldigFra",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839939,
+            "soknadId": 11611,
+            "key": "utenlandskKontoLand",
+            "systemEgenskap": 1
           }
         ],
         "properties": {
-          "gjeldendeAdresseLandkode": "NOR",
-          "statsborgerskapType": "norsk",
-          "statsborgerskap": "NOR",
+          "statsborgerskapType": "eos",
+          "statsborgerskap": "DEU",
           "erUtenlandskBankkonto": "false",
-          "kjonn": "m",
-          "epost": "julenissen@nordpolen.no",
-          "sekundarAdresseType": "BOSTEDSADRESSE",
-          "gjeldendeAdresse": "JORDAN, JOHANNISSTR., 12277, 0130 OSLO, Norge",
+          "kjonn": "k",
+          "epost": "test@gmail.com",
+          "gjeldendeAdresse": "SPRENGSDALEN 49, 0963 OSLO",
           "fnr": "10108099999",
-          "fornavn": "VINAYAGUM-MASK",
-          "alder": "40",
-          "sekundarAdresse": "FREGATTEN , 1798 AREMARK",
-          "etternavn": "AMIZIC",
-          "gjeldendeAdresseType": "POSTADRESSE",
-          "navn": "VINAYAGUM-MASK AMIZIC"
+          "fornavn": "KRAFTIG",
+          "alder": "75",
+          "kontonummer": "09301499113",
+          "etternavn": "GAPAHUK",
+          "gjeldendeAdresseType": "BOSTEDSADRESSE",
+          "navn": "KRAFTIG GAPAHUK"
         },
         "type": "SYSTEMREGISTRERT"
       },
       {
-        "faktumId": 837876.0,
-        "soknadId": 11564.0,
+        "faktumId": 839940,
+        "soknadId": 11611,
         "key": "personalia",
         "faktumEgenskaper": [
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "sekundarAdresseGyldigFra",
-            "systemEgenskap": 1.0
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "epost",
+            "value": "test@gmail.com",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "fnr",
-            "value": "10108099999",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "gjeldendeAdresseGyldigFra",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
+            "faktumId": 839940,
+            "soknadId": 11611,
             "key": "mellomnavn",
-            "systemEgenskap": 1.0
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "sekundarAdresseType",
-            "value": "BOSTEDSADRESSE",
-            "systemEgenskap": 1.0
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "statsborgerskap",
+            "value": "DEU",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "sekundarAdresse",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "diskresjonskode",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "gjeldendeAdresseGyldigFra",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "etternavn",
+            "value": "GAPAHUK",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "sekundarAdresseGyldigTil",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839940,
+            "soknadId": 11611,
             "key": "erUtenlandskBankkonto",
             "value": "false",
-            "systemEgenskap": 1.0
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "navn",
-            "value": "VINAYAGUM-MASK AMIZIC",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "epost",
-            "value": "julenissen@nordpolen.no",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "sekundarAdresse",
-            "value": "FREGATTEN , 1798 AREMARK",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "kontonummer",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
+            "faktumId": 839940,
+            "soknadId": 11611,
             "key": "gjeldendeAdresseLandkode",
-            "value": "NOR",
-            "systemEgenskap": 1.0
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "gjeldendeAdresse",
-            "value": "JORDAN, JOHANNISSTR., 12277, 0130 OSLO, Norge",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
+            "faktumId": 839940,
+            "soknadId": 11611,
             "key": "kjonn",
-            "value": "m",
-            "systemEgenskap": 1.0
+            "value": "k",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "gjeldendeAdresseType",
-            "value": "POSTADRESSE",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
+            "faktumId": 839940,
+            "soknadId": 11611,
             "key": "utenlandskKontoBanknavn",
-            "systemEgenskap": 1.0
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
+            "faktumId": 839940,
+            "soknadId": 11611,
             "key": "gjeldendeAdresseGyldigTil",
-            "systemEgenskap": 1.0
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "sekundarAdresseGyldigTil",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
+            "faktumId": 839940,
+            "soknadId": 11611,
             "key": "alder",
-            "value": "40",
-            "systemEgenskap": 1.0
+            "value": "75",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "diskresjonskode",
-            "systemEgenskap": 1.0
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "sekundarAdresseType",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "statsborgerskap",
-            "value": "NOR",
-            "systemEgenskap": 1.0
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "gjeldendeAdresseType",
+            "value": "BOSTEDSADRESSE",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "navn",
+            "value": "KRAFTIG GAPAHUK",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839940,
+            "soknadId": 11611,
             "key": "statsborgerskapType",
-            "value": "norsk",
-            "systemEgenskap": 1.0
+            "value": "eos",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "fornavn",
-            "value": "VINAYAGUM-MASK",
-            "systemEgenskap": 1.0
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "kontonummer",
+            "value": "09301499113",
+            "systemEgenskap": 1
           },
           {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
-            "key": "etternavn",
-            "value": "AMIZIC",
-            "systemEgenskap": 1.0
-          },
-          {
-            "faktumId": 837876.0,
-            "soknadId": 11564.0,
+            "faktumId": 839940,
+            "soknadId": 11611,
             "key": "utenlandskKontoLand",
-            "systemEgenskap": 1.0
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "sekundarAdresseGyldigFra",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "fornavn",
+            "value": "KRAFTIG",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "fnr",
+            "value": "10108099999",
+            "systemEgenskap": 1
+          },
+          {
+            "faktumId": 839940,
+            "soknadId": 11611,
+            "key": "gjeldendeAdresse",
+            "value": "SPRENGSDALEN 49, 0963 OSLO",
+            "systemEgenskap": 1
           }
         ],
         "properties": {
-          "gjeldendeAdresseLandkode": "NOR",
-          "statsborgerskapType": "norsk",
-          "statsborgerskap": "NOR",
+          "statsborgerskapType": "eos",
+          "statsborgerskap": "DEU",
           "erUtenlandskBankkonto": "false",
-          "kjonn": "m",
-          "epost": "julenissen@nordpolen.no",
-          "sekundarAdresseType": "BOSTEDSADRESSE",
-          "gjeldendeAdresse": "JORDAN, JOHANNISSTR., 12277, 0130 OSLO, Norge",
+          "kjonn": "k",
+          "epost": "test@gmail.com",
+          "gjeldendeAdresse": "SPRENGSDALEN 49, 0963 OSLO",
           "fnr": "10108099999",
-          "fornavn": "VINAYAGUM-MASK",
-          "alder": "40",
-          "sekundarAdresse": "FREGATTEN , 1798 AREMARK",
-          "etternavn": "AMIZIC",
-          "gjeldendeAdresseType": "POSTADRESSE",
-          "navn": "VINAYAGUM-MASK AMIZIC"
+          "fornavn": "KRAFTIG",
+          "alder": "75",
+          "kontonummer": "09301499113",
+          "etternavn": "GAPAHUK",
+          "gjeldendeAdresseType": "BOSTEDSADRESSE",
+          "navn": "KRAFTIG GAPAHUK"
         },
         "type": "SYSTEMREGISTRERT"
       }
     ],
     "status": "UNDER_ARBEID",
     "aktoerId": "10108099999",
-    "opprettetDato": "2021-03-25T18:32:59.173Z",
-    "sistLagret": "2021-03-25T18:33:14.671Z",
+    "opprettetDato": "2021-04-08T11:35:18.740Z",
+    "sistLagret": "2021-04-08T11:35:25.478Z",
     "delstegStatus": "ETTERSENDING_OPPRETTET",
     "vedlegg": [
       {
-        "vedleggId": 21808.0,
-        "soknadId": 11564.0,
-        "skjemaNummer": "G4",
+        "vedleggId": 21931,
+        "soknadId": 11611,
+        "skjemaNummer": "K1",
         "innsendingsvalg": "LastetOpp",
-        "opprinneligInnsendingsvalg": "LastetOpp",
-        "navn": "Oversikt over arbeidstimer",
-        "storrelse": 0.0,
-        "opprettetDato": 1.616697179E12,
-        "fillagerReferanse": "8621b8bd-aff2-46fa-a86a-15a82adc4011",
-        "urls": {}
-      },
-      {
-        "vedleggId": 21810.0,
-        "soknadId": 11564.0,
-        "skjemaNummer": "K1",
-        "innsendingsvalg": "VedleggAlleredeSendt",
-        "opprinneligInnsendingsvalg": "VedleggAlleredeSendt",
+        "opprinneligInnsendingsvalg": "SendesSenere",
         "navn": "Vartpenger",
-        "storrelse": 0.0,
-        "opprettetDato": 1.616697179E12,
-        "fillagerReferanse": "c416e758-12fb-43ab-b6b5-3cf3bf9a2c91",
+        "storrelse": 506663,
+        "opprettetDato": 1617881718000,
+        "fillagerReferanse": "561a11ca-92c1-4a10-b679-a0e4e3a95e5e",
         "urls": {}
       },
       {
-        "vedleggId": 21811.0,
-        "soknadId": 11564.0,
-        "skjemaNummer": "K1",
-        "innsendingsvalg": "VedleggSendesAvAndre",
-        "opprinneligInnsendingsvalg": "VedleggSendesAvAndre",
-        "navn": "Etterlønn fra arbeidsgiver",
-        "storrelse": 0.0,
-        "opprettetDato": 1.616697179E12,
-        "fillagerReferanse": "64b31722-19d7-43ee-8081-65339b674f0c",
-        "urls": {}
-      },
-      {
-        "vedleggId": 21809.0,
-        "soknadId": 11564.0,
+        "vedleggId": 21932,
+        "soknadId": 11611,
         "skjemaNummer": "K1",
         "innsendingsvalg": "SendesSenere",
         "opprinneligInnsendingsvalg": "SendesSenere",
-        "navn": "Dagpenger fra et annet EØS-land",
-        "storrelse": 0.0,
-        "opprettetDato": 1.616697179E12,
-        "fillagerReferanse": "7c62e75c-d1a9-4e93-b9c9-c1eb680c49be",
-        "urls": {}
-      },
-      {
-        "vedleggId": 21812.0,
-        "soknadId": 11564.0,
-        "skjemaNummer": "T3",
-        "innsendingsvalg": "VedleggSendesIkke",
-        "opprinneligInnsendingsvalg": "VedleggSendesIkke",
-        "storrelse": 0.0,
-        "opprettetDato": 1.616697179E12,
-        "fillagerReferanse": "953abd3b-86c1-4d6f-bc88-d192ea39e190",
-        "urls": {}
-      },
-      {
-        "vedleggId": 21813.0,
-        "soknadId": 11564.0,
-        "skjemaNummer": "Y2",
-        "innsendingsvalg": "LastetOpp",
-        "opprinneligInnsendingsvalg": "SendesSenere",
-        "storrelse": 506653.0,
-        "opprettetDato": 1.616697179E12,
-        "fillagerReferanse": "4c747e5e-8a5e-4467-9bac-e6ccad789f70",
+        "navn": "Etterlønn fra arbeidsgiver",
+        "storrelse": 0,
+        "opprettetDato": 1617881718000,
+        "fillagerReferanse": "aac6faac-ae3e-4431-b87f-6742eb9483d9",
         "urls": {}
       }
     ],
@@ -479,54 +425,46 @@
     "soknadUrl": "/soknaddagpenger/NAV04-01.03",
     "fortsettSoknadUrl": "/soknaddagpenger/utslagskriterier",
     "erEttersending": true,
-    "journalpostId": "493354161",
-    "journalRegistrertDato": "2021-03-25T19:33:23"
+    "journalpostId": "493355116",
+    "journalRegistrertDato": "2021-04-08T13:35:56"
   },
-  "journalpostId": "493354161",
+  "journalpostId": "493355116",
   "hovedskjemaId": "NAVe 04-01.03",
   "dokumenter": [
     {
       "tittel": "Ettersendelse til søknad om dagpenger ved arbeidsledighet (ikke permittert)",
-      "dokumentInfoId": "515153363",
+      "dokumentInfoId": "515154410",
       "brevkode": "NAVe 04-01.03"
     },
     {
-      "tittel": "Uttalelse eller vurdering fra kompetent fagpersonell",
-      "dokumentInfoId": "515153364",
-      "brevkode": "Y2"
+      "tittel": "Dokumentasjon av andre ytelser: Vartpenger",
+      "dokumentInfoId": "515154411",
+      "brevkode": "K1"
     },
     {
       "tittel": "Kvitteringsside for dokumentinnsending",
-      "dokumentInfoId": "515153365",
+      "dokumentInfoId": "515154412",
       "brevkode": "L7"
     }
   ],
   "henvendelsestype": "ETTERSENDELSE",
-  "datoRegistrert": "2021-03-25T19:33:23",
-  "aktørId": "1000096233942",
+  "datoRegistrert": "2021-04-08T13:35:56",
+  "aktørId": "1819645303073",
   "naturligIdent": "10108099999",
-  "avsenderNavn": "AREMARK TESTFAMILIEN",
+  "avsenderNavn": "KRAFTIG GAPAHUK",
   "behandlendeEnhet": "4450",
   "system_breadcrumbs": [
     {
       "appId": "dagpenger-joark-mottak",
-      "dateTime": "2021-03-25T19:33:28.509886",
-      "instance": "about:blank"
-    },
-    {
-      "appId": "dagpenger-journalforing-ferdigstill",
-      "dateTime": "2021-03-25T19:33:28.824527",
+      "dateTime": "2021-04-08T13:36:02.348486",
       "instance": "about:blank"
     }
   ],
-  "oppgaveId": "236368444",
-  "ferdigstiltIArena": true,
-  "ferdigBehandlet": true,
   "system_participating_services": [
     {
       "service": "dp-innsyn",
-      "instance": "dp-innsyn-58d5d644b4-brw6c",
-      "time": "2021-03-25T19:33:29.644208"
+      "instance": "dp-innsyn-65784f69cf-d8d4n",
+      "time": "2021-04-08T13:36:02.637858"
     }
   ]
 }

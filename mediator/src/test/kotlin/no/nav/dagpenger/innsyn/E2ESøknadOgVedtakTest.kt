@@ -38,21 +38,21 @@ internal class E2ESøknadOgVedtakTest {
         withMigratedDb {
             rapid.sendTestMessage(søknadAsJson)
             assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
-            assertEquals(6, PersonInspektør(person).uferdigeOppgaver)
-            assertEquals(2, PersonInspektør(person).ferdigeOppgaver)
+            assertEquals(3, PersonInspektør(person).uferdigeOppgaver)
+            assertEquals(1, PersonInspektør(person).ferdigeOppgaver)
 
             rapid.sendTestMessage(ettersendingAsJson)
             assertTrue(person.harUferdigeOppgaverAv(vedleggOppgave))
             assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
-            assertEquals(10, PersonInspektør(person).uferdigeOppgaver)
-            assertEquals(4, PersonInspektør(person).ferdigeOppgaver)
+            assertEquals(2, PersonInspektør(person).uferdigeOppgaver)
+            assertEquals(2, PersonInspektør(person).ferdigeOppgaver)
 
             rapid.sendTestMessage(vedtakAsJson)
             assertFalse(person.harUferdigeOppgaverAv(vedtakOppgave))
             assertFalse(person.harUferdigeOppgaverAv(søknadOppgave))
-            // assertFalse(person.harUferdigeOppgaverAv(vedleggOppgave))
-            assertEquals(9, PersonInspektør(person).uferdigeOppgaver)
-            assertEquals(5, PersonInspektør(person).ferdigeOppgaver)
+            assertTrue(person.harUferdigeOppgaverAv(vedleggOppgave))
+            assertEquals(1, PersonInspektør(person).uferdigeOppgaver)
+            assertEquals(3, PersonInspektør(person).ferdigeOppgaver)
 
             println(PersonJsonBuilder(person).resultat().toPrettyString())
         }

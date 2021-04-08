@@ -8,15 +8,22 @@ internal abstract class Innsendingsmelding(packet: JsonMessage) : Hendelsemeldin
     // override val fødselsnummer = packet["naturligIdent"].asText()
     override val fødselsnummer = packet["søknadsdata.aktoerId"].asText()
     protected val oppgaver = packet["søknadsdata.vedlegg"].map {
-        val vedleggId = it["vedleggId"].asInt().toString()
+        val vedleggId = it.vedleggIt
 
         if (it["innsendingsvalg"].asText() == "LastetOpp") {
-            vedleggOppgave.ferdig(vedleggId, beskrivelse(it))
+            vedleggOppgave.ferdig(vedleggId, it.beskrivelse)
         } else {
-            vedleggOppgave.ny(vedleggId, beskrivelse(it))
+            vedleggOppgave.ny(vedleggId, it.beskrivelse)
         }
     }.toSet()
-
-    private fun beskrivelse(vedlegg: JsonNode) =
-        "${vedlegg["navn"]?.let { it.asText() }} (${vedlegg["skjemaNummer"].asText()})"
 }
+
+private val JsonNode.vedleggIt
+    get() = listOf(
+        this["skjemaNummer"].asText(),
+        navn
+    ).joinToString(":")
+private val JsonNode.beskrivelse
+    get() = "$navn (${this["skjemaNummer"].asText()})"
+private val JsonNode.navn
+    get() = this["navn"]?.let { it.asText() }
