@@ -64,8 +64,9 @@ internal fun Application.innsynApi(
         authenticate {
             get("/soknad") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
+                val fnr = jwtPrincipal!!.payload!!.claims["pid"]
                 logger.info { "Fikk request." }
-                sikkerlogg.info { "Fikk request. Subject: ${jwtPrincipal!!.payload!!.subject}. JWT ser slik ut: ${jwtPrincipal!!.payload}" }
+                sikkerlogg.info { "Fikk request. Fnr: $fnr. Subject: ${jwtPrincipal!!.payload!!.subject}. JWT ser slik ut: ${jwtPrincipal!!.payload}" }
                 val person = personRepository.person(jwtPrincipal!!.payload!!.subject)
                 val harSendtSøknad = person.harFerdigeOppgaverAv(Dagpenger.søknadOppgave)
                 val harManglendeVedlegg = person.harUferdigeOppgaverAv(Dagpenger.vedleggOppgave)
