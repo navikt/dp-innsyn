@@ -16,8 +16,6 @@ import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakMottak
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
@@ -39,23 +37,29 @@ internal class E2ESøknadOgVedtakTest {
     fun `skal kunne motta søknad og vedtak`() {
         withMigratedDb {
             rapid.sendTestMessage(søknadAsJson)
-            assertEquals(1, PersonInspektør(person).behandlingskjeder)
-            assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
-            assertEquals(3, PersonInspektør(person).uferdigeOppgaver)
-            assertEquals(1, PersonInspektør(person).ferdigeOppgaver)
+            with(PersonInspektør(person)) {
+                assertEquals(1, behandlingskjeder)
+                assertEquals(1, vedtakOppgaver)
+                assertEquals(3, uferdigeOppgaver)
+                assertEquals(1, ferdigeOppgaver)
+            }
 
             rapid.sendTestMessage(ettersendingAsJson)
-            assertTrue(person.harUferdigeOppgaverAv(vedleggOppgave))
-            assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
-            assertEquals(2, PersonInspektør(person).uferdigeOppgaver)
-            assertEquals(2, PersonInspektør(person).ferdigeOppgaver)
+            with(PersonInspektør(person)) {
+                assertEquals(1, vedtakOppgaver)
+                assertEquals(2, vedleggOppgaver)
+                assertEquals(2, uferdigeOppgaver)
+                assertEquals(2, ferdigeOppgaver)
+            }
 
             rapid.sendTestMessage(vedtakAsJson)
-            assertFalse(person.harUferdigeOppgaverAv(vedtakOppgave))
-            assertFalse(person.harUferdigeOppgaverAv(søknadOppgave))
-            assertTrue(person.harUferdigeOppgaverAv(vedleggOppgave))
-            assertEquals(1, PersonInspektør(person).uferdigeOppgaver)
-            assertEquals(3, PersonInspektør(person).ferdigeOppgaver)
+            with(PersonInspektør(person)) {
+                assertEquals(1, vedtakOppgaver)
+                assertEquals(1, søknadOppgaver)
+                assertEquals(2, vedleggOppgaver)
+                assertEquals(1, uferdigeOppgaver)
+                assertEquals(3, ferdigeOppgaver)
+            }
 
             println(PersonJsonBuilder(person).resultat().toPrettyString())
         }
@@ -66,6 +70,9 @@ internal class E2ESøknadOgVedtakTest {
     private class PersonInspektør(person: Person) : PersonVisitor {
         var uferdigeOppgaver = 0
         var ferdigeOppgaver = 0
+        var søknadOppgaver = 0
+        var vedleggOppgaver = 0
+        var vedtakOppgaver = 0
         var behandlingskjeder = 0
 
         init {
@@ -86,6 +93,12 @@ internal class E2ESøknadOgVedtakTest {
             when (tilstand) {
                 Oppgave.OppgaveTilstand.Uferdig -> uferdigeOppgaver++
                 Oppgave.OppgaveTilstand.Ferdig -> ferdigeOppgaver++
+            }
+
+            when (id.type) {
+                søknadOppgave -> søknadOppgaver++
+                vedleggOppgave -> vedleggOppgaver++
+                vedtakOppgave -> vedtakOppgaver++
             }
         }
     }

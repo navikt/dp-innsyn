@@ -68,11 +68,7 @@ internal fun Application.innsynApi(
                 logger.info { "Fikk request." }
                 sikkerlogg.info { "Fikk request. Fnr: $fnr. Subject: ${jwtPrincipal!!.payload!!.subject}. JWT ser slik ut: ${jwtPrincipal!!.payload}" }
                 val person = personRepository.person(fnr)
-                val harSendtSøknad = person.harFerdigeOppgaverAv(Dagpenger.søknadOppgave)
-                val harManglendeVedlegg = person.harUferdigeOppgaverAv(Dagpenger.vedleggOppgave)
-                val harSøknadUnderBehandling = person.harUferdigeOppgaverAv(Dagpenger.vedleggOppgave)
 
-                sikkerlogg.info { "Personen har søkt: $harSendtSøknad, manglende vedlegg: $harManglendeVedlegg, og søknad under behandling: $harSøknadUnderBehandling" }
                 call.respondText { PersonJsonBuilder(person).resultat().toString() }
             }
         }

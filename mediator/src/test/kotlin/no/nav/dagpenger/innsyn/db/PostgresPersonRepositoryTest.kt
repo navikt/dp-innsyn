@@ -1,10 +1,14 @@
 package no.nav.dagpenger.innsyn.db
 
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
+import no.nav.dagpenger.innsyn.modell.Person
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
-import org.junit.jupiter.api.Assertions.assertTrue
+import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 
 internal class PostgresPersonRepositoryTest {
     private val repository = PostgresPersonRepository()
@@ -19,8 +23,28 @@ internal class PostgresPersonRepositoryTest {
             repository.lagre(person)
 
             repository.person(person.fnr).also {
-                assertTrue(it.harUferdigeOppgaverAv(testOppgave))
+                with(PersonInspektør(it)) {
+                    assertEquals(1, oppgaver)
+                }
             }
+        }
+    }
+
+    private class PersonInspektør(person: Person) : PersonVisitor {
+        var oppgaver = 0
+
+        init {
+            person.accept(this)
+        }
+
+        override fun preVisit(
+            oppgave: Oppgave,
+            id: Oppgave.OppgaveId,
+            beskrivelse: String,
+            opprettet: LocalDateTime,
+            tilstand: Oppgave.OppgaveTilstand
+        ) {
+            oppgaver++
         }
     }
 }

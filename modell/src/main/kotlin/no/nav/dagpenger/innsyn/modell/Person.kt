@@ -12,8 +12,7 @@ class Person constructor(
 ) {
     private val behandlingskjeder = mutableSetOf<Behandlingskjede>()
 
-    fun harUferdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Uferdig).isNotEmpty()
-    fun harFerdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Ferdig).isNotEmpty()
+    internal fun harUferdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Uferdig).isNotEmpty()
 
     fun håndter(hendelse: Hendelse) {
         if (behandlingskjeder.map { it.håndter(hendelse) }.none { it }) {
