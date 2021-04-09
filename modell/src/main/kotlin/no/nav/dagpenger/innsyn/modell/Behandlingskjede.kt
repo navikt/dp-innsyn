@@ -6,7 +6,7 @@ import no.nav.dagpenger.innsyn.modell.serde.BehandlingskjedeVisitor
 
 typealias BehandlingskjedeId = String
 
-class Plan internal constructor(
+class Behandlingskjede internal constructor(
     private val id: BehandlingskjedeId,
     private var oppgaver: Set<Oppgave>
 ) : Collection<Oppgave> {
@@ -25,7 +25,7 @@ class Plan internal constructor(
 
     private fun erRelevant(hendelse: Hendelse) = hendelse.behandlingskjedeId == id
 
-    private fun slåSammen(med: Plan) = (oppgaver subtract med.oppgaver) + med.oppgaver
+    private fun slåSammen(med: Behandlingskjede) = (oppgaver subtract med.oppgaver) + med.oppgaver
 
     override fun contains(element: Oppgave) = oppgaver.contains(element)
     override fun containsAll(elements: Collection<Oppgave>) = oppgaver.containsAll(elements)

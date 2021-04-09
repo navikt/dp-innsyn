@@ -5,6 +5,8 @@ import no.nav.dagpenger.innsyn.Dagpenger.vedleggOppgave
 import no.nav.dagpenger.innsyn.Dagpenger.vedtakOppgave
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
+import no.nav.dagpenger.innsyn.modell.Behandlingskjede
+import no.nav.dagpenger.innsyn.modell.BehandlingskjedeId
 import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.serde.PersonJsonBuilder
@@ -23,9 +25,9 @@ internal class E2ESøknadOgVedtakTest {
     private val rapid = TestRapid()
     private val personRepository = PostgresPersonRepository()
     private val personMediator = PersonMediator(personRepository)
-    private val søknadAsJson = javaClass.getResource("/søknadsinnsending.json").readText()
-    private val ettersendingAsJson = javaClass.getResource("/ettersending.json").readText()
-    private val vedtakAsJson = javaClass.getResource("/vedtak.json").readText()
+    private val søknadAsJson by lazy { javaClass.getResource("/søknadsinnsending.json").readText() }
+    private val ettersendingAsJson by lazy { javaClass.getResource("/ettersending.json").readText() }
+    private val vedtakAsJson by lazy { javaClass.getResource("/vedtak.json").readText() }
 
     init {
         SøknadMottak(rapid, personMediator)
@@ -37,6 +39,7 @@ internal class E2ESøknadOgVedtakTest {
     fun `skal kunne motta søknad og vedtak`() {
         withMigratedDb {
             rapid.sendTestMessage(søknadAsJson)
+            assertEquals(1, PersonInspektør(person).behandlingskjeder)
             assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
             assertEquals(3, PersonInspektør(person).uferdigeOppgaver)
             assertEquals(1, PersonInspektør(person).ferdigeOppgaver)
@@ -63,17 +66,21 @@ internal class E2ESøknadOgVedtakTest {
     private class PersonInspektør(person: Person) : PersonVisitor {
         var uferdigeOppgaver = 0
         var ferdigeOppgaver = 0
+        var behandlingskjeder = 0
 
         init {
             person.accept(this)
         }
 
+        override fun preVisit(behandlingskjede: Behandlingskjede, id: BehandlingskjedeId) {
+            behandlingskjeder++
+        }
+
         override fun preVisit(
             oppgave: Oppgave,
-            id: String,
+            id: Oppgave.OppgaveId,
             beskrivelse: String,
             opprettet: LocalDateTime,
-            oppgaveType: Oppgave.OppgaveType,
             tilstand: Oppgave.OppgaveTilstand
         ) {
             when (tilstand) {

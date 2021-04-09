@@ -10,7 +10,7 @@ import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 class Person constructor(
     val fnr: String
 ) {
-    private val behandlingskjeder = mutableSetOf<Plan>()
+    private val behandlingskjeder = mutableSetOf<Behandlingskjede>()
 
     fun harUferdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Uferdig).isNotEmpty()
     fun harFerdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Ferdig).isNotEmpty()

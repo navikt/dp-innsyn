@@ -3,6 +3,7 @@ package no.nav.dagpenger.innsyn.modell
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
 import no.nav.dagpenger.innsyn.modell.hendelser.Mangelbrev
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveId
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
@@ -76,22 +77,23 @@ internal class PersonTest {
     private class PersonInspektør(person: Person) : PersonVisitor {
         var uferdigeOppgaver = 0
         var ferdigeOppgaver = 0
-        val antallBehandlingskjeder get() = behandlingskjeder.size
-        private val behandlingskjeder = mutableSetOf<BehandlingskjedeId>()
+        var antallBehandlingskjeder = 0
 
         init {
             person.accept(this)
         }
 
+        override fun postVisit(behandlingskjede: Behandlingskjede, id: BehandlingskjedeId) {
+            antallBehandlingskjeder++
+        }
+
         override fun preVisit(
             oppgave: Oppgave,
-            id: String,
+            id: OppgaveId,
             beskrivelse: String,
             opprettet: LocalDateTime,
-            oppgaveType: OppgaveType,
             tilstand: OppgaveTilstand
         ) {
-            behandlingskjeder.add(id)
             when (tilstand) {
                 OppgaveTilstand.Uferdig -> uferdigeOppgaver++
                 OppgaveTilstand.Ferdig -> ferdigeOppgaver++

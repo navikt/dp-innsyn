@@ -2,10 +2,11 @@ package no.nav.dagpenger.innsyn.modell.serde
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
+import no.nav.dagpenger.innsyn.modell.Behandlingskjede
 import no.nav.dagpenger.innsyn.modell.BehandlingskjedeId
 import no.nav.dagpenger.innsyn.modell.Person
-import no.nav.dagpenger.innsyn.modell.Plan
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveId
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -27,24 +28,23 @@ class PersonJsonBuilder(person: Person) : PersonVisitor {
         root.put("oppgaver", planNode)
     }
 
-    override fun preVisit(behandlingskjede: Plan, id: BehandlingskjedeId) {
+    override fun preVisit(behandlingskjede: Behandlingskjede, id: BehandlingskjedeId) {
         behandlingskjedeId = id
     }
 
     override fun preVisit(
         oppgave: Oppgave,
-        id: String,
+        id: OppgaveId,
         beskrivelse: String,
         opprettet: LocalDateTime,
-        oppgaveType: Oppgave.OppgaveType,
         tilstand: OppgaveTilstand
     ) {
         planNode.addObject().also {
-            it.put("id", id)
+            it.put("id", id.indeks)
             it.put("behandlingskjedeId", behandlingskjedeId)
             it.put("beskrivelse", beskrivelse)
             it.put("opprettet", opprettet.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-            it.put("oppgaveType", oppgaveType.toString())
+            it.put("oppgaveType", id.type.toString())
             it.put("tilstand", tilstand.toString())
         }
     }

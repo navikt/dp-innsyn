@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS person
 (
-    person_id SERIAL,
+    person_id BIGSERIAL,
     fnr       CHAR(11) NOT NULL,
     PRIMARY KEY (person_id)
 );
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS behandlingskjede
 
 CREATE TABLE oppgave
 (
-    oppgave_id  SERIAL,
+    oppgave_id  BIGSERIAL,
     person_id   INT,
     id          VARCHAR(255) NOT NULL,
     beskrivelse VARCHAR(255),
