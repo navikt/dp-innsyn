@@ -2,7 +2,6 @@ package no.nav.dagpenger.innsyn.modell
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Hendelse
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand.Ferdig
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand.Uferdig
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
