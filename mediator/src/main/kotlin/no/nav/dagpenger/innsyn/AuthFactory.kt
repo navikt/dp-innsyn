@@ -22,17 +22,21 @@ object AuthFactory {
         val well_known_url by stringType
         val client_id by stringType
     }
-    private val openIdConfiguration: AzureAdOpenIdConfiguration =
-        runBlocking {
-            httpClient.get(properties[token_x.well_known_url])
-        }
 
-    val clientId: String = properties[token_x.client_id]
+    private val openIdConfiguration = runBlocking {
+        httpClient.get<AzureAdOpenIdConfiguration>(properties[token_x.well_known_url])
+    }
+    val clientId = properties[token_x.client_id]
     val issuer = openIdConfiguration.issuer
-    val jwkProvider: JwkProvider get() = JwkProviderBuilder(URL(openIdConfiguration.jwksUri))
-        .cached(10, 24, TimeUnit.HOURS) // cache up to 10 JWKs for 24 hours
-        .rateLimited(10, 1, TimeUnit.MINUTES) // if not cached, only allow max 10 different keys per minute to be fetched from external provider
-        .build()
+    val jwkProvider: JwkProvider
+        get() = JwkProviderBuilder(URL(openIdConfiguration.jwksUri))
+            .cached(10, 24, TimeUnit.HOURS) // cache up to 10 JWKs for 24 hours
+            .rateLimited(
+                10,
+                1,
+                TimeUnit.MINUTES
+            ) // if not cached, only allow max 10 different keys per minute to be fetched from external provider
+            .build()
 }
 
 private data class AzureAdOpenIdConfiguration(

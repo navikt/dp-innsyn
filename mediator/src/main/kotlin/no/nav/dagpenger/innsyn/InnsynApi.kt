@@ -41,21 +41,16 @@ internal fun Application.innsynApi(
     }
     install(Authentication) {
         jwt {
-            verifier(jwkProvider, issuer)
+            verifier(jwkProvider, issuer) {
+                withAudience(clientId)
+            }
             realm = appName
             validate { credentials ->
-                try {
-                    requireNotNull(credentials.payload.audience) {
-                        "Auth: Missing audience in token"
-                    }
-                    require(credentials.payload.audience.contains(clientId)) {
-                        "Auth: Valid audience not found in claims"
-                    }
-                    JWTPrincipal(credentials.payload)
-                } catch (e: Throwable) {
-                    logger.error(e) { "JWT validerte ikke" }
-                    null
+                requireNotNull(credentials.payload.claims["pid"]) {
+                    "Token må inneholde fødselsnummer for personen"
                 }
+
+                JWTPrincipal(credentials.payload)
             }
         }
     }
@@ -64,7 +59,7 @@ internal fun Application.innsynApi(
         authenticate {
             get("/soknad") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
-                val fnr = jwtPrincipal!!.payload!!.claims["pid"]!!.asString()
+                val fnr = jwtPrincipal!!.fnr
                 logger.info { "Fikk request." }
                 sikkerlogg.info { "Fikk request. Fnr: $fnr. Subject: ${jwtPrincipal!!.payload!!.subject}. JWT ser slik ut: ${jwtPrincipal!!.payload}" }
                 val person = personRepository.person(fnr)
@@ -74,3 +69,5 @@ internal fun Application.innsynApi(
         }
     }
 }
+
+private val JWTPrincipal.fnr get() = this.payload!!.claims["pid"]!!.asString()
