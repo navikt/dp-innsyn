@@ -1,0 +1,18 @@
+@startuml
+[*] --> Start
+Start --> UnderBehandling : Ny søknad
+UnderBehandling --> Avsluttet : Direkte avslag
+UnderBehandling --> Avsluttet : Avsluttet\npga duplikat
+UnderBehandling -> Løpende : Innvilgelse
+
+Løpende --> Utløpt : Periode oppbrukt
+Løpende --> Stanset : Tilbake i arbeid
+
+Stanset --> UnderBehandling : Gjenopptak
+
+Stanset -> Utløpt : Stanset i mer enn 52 uker
+
+Avsluttet --> UnderBehandling : Ettersending etter avslag på \n manglende dokumentasjon
+
+Utløpt --> [*]
+@enduml

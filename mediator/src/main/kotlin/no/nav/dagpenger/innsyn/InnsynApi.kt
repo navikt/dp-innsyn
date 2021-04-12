@@ -39,6 +39,7 @@ internal fun Application.innsynApi(
             ).contains(call.request.document())
         }
     }
+
     install(Authentication) {
         jwt {
             verifier(jwkProvider, issuer) {
