@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class InnsynApiTest {
-
     private val testIssuer = "test-issuer"
     private val jwtStub = JwtStub(testIssuer)
     private val clientId = "id"
@@ -30,7 +29,6 @@ internal class InnsynApiTest {
         }) {
             autentisert("/soknad")
         }.apply {
-
             assertEquals(200, response.status()?.value)
         }
     }
