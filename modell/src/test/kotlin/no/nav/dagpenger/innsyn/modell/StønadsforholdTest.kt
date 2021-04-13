@@ -13,23 +13,31 @@ import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime
 
 class StønadsforholdTest {
-
     @Test
     fun `Søknad, ettersending, vedtak skal gi hendelser i tidslinjen og endre tilstand`() {
-        Stønadsforhold().apply { håndter(søknad) }.also {
-            assertEquals(1, StønadsforholdInspektør(it).antallHendelser)
-            assertEquals(TilstandType.UNDER_BEHANDLING, StønadsforholdInspektør(it).tilstand.type)
-            it.håndter(ettersending).apply {
-                assertEquals(2, StønadsforholdInspektør(it).antallHendelser)
-                assertEquals(TilstandType.UNDER_BEHANDLING, StønadsforholdInspektør(it).tilstand.type)
+        Stønadsforhold().also {
+            it.håndter(søknad)
+            inspektør(it) {
+                assertEquals(1, antallHendelser)
+                assertEquals(TilstandType.UNDER_BEHANDLING, tilstand.type)
             }
-            it.håndter(innvilgetVedtak).apply {
-                assertEquals(3, StønadsforholdInspektør(it).antallHendelser)
-                assertEquals(TilstandType.LØPENDE, StønadsforholdInspektør(it).tilstand.type)
+
+            it.håndter(ettersending)
+            inspektør(it) {
+                assertEquals(2, antallHendelser)
+                assertEquals(TilstandType.UNDER_BEHANDLING, tilstand.type)
             }
-            it.håndter(stansVedtak).apply {
-                assertEquals(4, StønadsforholdInspektør(it).antallHendelser)
-                assertEquals(TilstandType.STANSET, StønadsforholdInspektør(it).tilstand.type)
+
+            it.håndter(innvilgetVedtak)
+            inspektør(it) {
+                assertEquals(3, antallHendelser)
+                assertEquals(TilstandType.LØPENDE, tilstand.type)
+            }
+
+            it.håndter(stansVedtak)
+            inspektør(it) {
+                assertEquals(4, antallHendelser)
+                assertEquals(TilstandType.STANSET, tilstand.type)
             }
         }
     }
@@ -39,6 +47,10 @@ class StønadsforholdTest {
         assertThrows<IllegalStateException> { Stønadsforhold().håndter(innvilgetVedtak) }
         assertThrows<IllegalStateException> { Stønadsforhold().håndter(ettersending) }
         assertThrows<IllegalStateException> { Stønadsforhold().håndter(saksbehandling) }
+    }
+
+    private fun inspektør(stønadsforhold: Stønadsforhold, block: StønadsforholdInspektør.() -> Unit) {
+        StønadsforholdInspektør(stønadsforhold).apply(block)
     }
 
     private class StønadsforholdInspektør(stønadsforhold: Stønadsforhold) : StønadsforholdVisitor {
@@ -63,11 +75,11 @@ class StønadsforholdTest {
         }
     }
 
-    val søknad = Søknad("1", emptySet())
-    val ettersending = Ettersending("1", emptySet())
-    val saksbehandling = Saksbehandling("3", "1", emptySet())
-    val mangelbrev = Mangelbrev("3", "1", emptySet())
-    val innvilgetVedtak = Vedtak("2", "1", emptySet(), Vedtak.Status.INNVILGET)
-    val stansVedtak = Vedtak("2", "1", emptySet(), Vedtak.Status.STANS)
-    val endringsVedtak = Vedtak("2", "1", emptySet(), Vedtak.Status.ENDRING)
+    private val søknad = Søknad("1", emptySet())
+    private val ettersending = Ettersending("1", emptySet())
+    private val saksbehandling = Saksbehandling("3", "1", emptySet())
+    private val mangelbrev = Mangelbrev("3", "1", emptySet())
+    private val innvilgetVedtak = Vedtak("2", "1", emptySet(), Vedtak.Status.INNVILGET)
+    private val stansVedtak = Vedtak("2", "1", emptySet(), Vedtak.Status.STANS)
+    private val endringsVedtak = Vedtak("2", "1", emptySet(), Vedtak.Status.ENDRING)
 }
