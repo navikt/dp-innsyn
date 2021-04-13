@@ -6,10 +6,11 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand.Uferdig
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 
-class Person constructor(
-    val fnr: String
+class Person private constructor(
+    val fnr: String,
+    private val behandlingskjeder: MutableSet<Behandlingskjede>
 ) {
-    private val behandlingskjeder = mutableSetOf<Behandlingskjede>()
+    constructor(fnr: String) : this(fnr, mutableSetOf())
 
     internal fun harUferdigeOppgaverAv(type: OppgaveType) = oppgaverAv(type, Uferdig).isNotEmpty()
 

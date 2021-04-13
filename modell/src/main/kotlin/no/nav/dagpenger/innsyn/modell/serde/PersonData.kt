@@ -19,6 +19,6 @@ class PersonData(
     val person = Person(fnr).also {
         it.javaClass.getDeclaredField("behandlingskjeder").apply {
             isAccessible = true
-        }.set(it, behandlingskjeder.toSet())
+        }.set(it, behandlingskjeder.toMutableSet())
     }
 }
