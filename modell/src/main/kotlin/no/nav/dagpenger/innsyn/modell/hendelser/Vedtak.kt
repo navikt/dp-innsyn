@@ -3,7 +3,7 @@ package no.nav.dagpenger.innsyn.modell.hendelser
 class Vedtak private constructor(
     private val vedtakId: String,
     val søknadId: String,
-    private val status: Status,
+    public val status: Status,
     oppgaver: Set<Oppgave>
 ) : Hendelse(søknadId, oppgaver) {
     constructor(
