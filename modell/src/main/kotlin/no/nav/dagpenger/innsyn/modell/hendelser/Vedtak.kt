@@ -7,27 +7,31 @@ class Vedtak private constructor(
     oppgaver: Set<Oppgave>
 ) : Hendelse(søknadId, oppgaver) {
     constructor(
-        vedtakId: String
+        vedtakId: String,
+        status: Status
     ) : this(
         vedtakId,
         "",
-        Status.INNVILGET,
+        status,
         emptySet()
     )
 
     constructor(
         vedtakId: String,
         søknadId: String,
-        oppgaver: Set<Oppgave>
+        oppgaver: Set<Oppgave>,
+        status: Status
     ) : this(
         vedtakId,
         søknadId,
-        Status.INNVILGET,
+        status,
         oppgaver
     )
 
     enum class Status {
         INNVILGET,
-        AVSLÅTT
+        AVSLÅTT,
+        STANS,
+        ENDRING
     }
 }

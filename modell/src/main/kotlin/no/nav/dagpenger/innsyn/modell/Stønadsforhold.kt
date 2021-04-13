@@ -13,15 +13,24 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Saksbehandling
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
+import no.nav.dagpenger.innsyn.modell.serde.StønadsforholdVisitor
 import java.time.LocalDateTime
 
 class Stønadsforhold private constructor(
-    public val tidslinje: Tidslinje,
-    public val oppgaver: List<Oppgave>,
-    public var tilstand: Tilstand,
+    private val tidslinje: MutableList<Hendelse>,
+    private val oppgaver: List<Oppgave>,
+    private var tilstand: Tilstand,
+    private val opprettet: LocalDateTime,
     private var oppdatert: LocalDateTime
 ) {
-    constructor() : this(Tidslinje(), mutableListOf(), Start, LocalDateTime.now())
+    constructor() : this(mutableListOf(), mutableListOf(), Start, LocalDateTime.now(), LocalDateTime.now())
+
+    fun accept(visitor: StønadsforholdVisitor) {
+        visitor.preVisit(this, tilstand, opprettet, oppdatert)
+        tidslinje.forEach { it.accept(visitor) }
+        oppgaver.forEach { it.accept(visitor) }
+        visitor.postVisit(this, tilstand, opprettet, oppdatert)
+    }
 
     fun håndter(søknad: Søknad) {
         tilstand.håndter(this, søknad)
@@ -70,13 +79,8 @@ class Stønadsforhold private constructor(
         override val type = START
 
         override fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad) {
-
             stønadsforhold.tilstand(søknad, UnderBehandling)
-
-            // Lag oppgaver for ettersending? Vedtak?
-            // oppgaver.leggTil(søknad.oppgaver)
-            // tidslinje.leggTil(Vedtak)
-            // UnderBehandling
+            stønadsforhold.tidslinje.add(søknad)
         }
     }
 
@@ -84,19 +88,26 @@ class Stønadsforhold private constructor(
         override val type = UNDER_BEHANDLING
 
         override fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad) {
-            // Nå har du bomma på redigeringsknappen
+            // Søkt på nytt?
         }
 
         override fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending) {
-            // Vedlegg har blitt ettersendt, oppdater oppgaveliste
+            stønadsforhold.tidslinje.add(ettersending)
         }
 
         override fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak) {
+            if (vedtak.status != Vedtak.Status.INNVILGET && vedtak.status != Vedtak.Status.AVSLÅTT) {
+                throw IllegalStateException("Forventet ikke vedtak av typen ${vedtak.status.name} i tilstanden ${type.name}")
+            }
 
-            if (vedtak.status == Vedtak.Status.INNVILGET) stønadsforhold.tilstand(vedtak, Løpende)
-            if (vedtak.status == Vedtak.Status.AVSLÅTT) stønadsforhold.tilstand(vedtak, Avslått)
-
-            // Vedtak er fattet, gå til løpende/avsluttet
+            if (vedtak.status == Vedtak.Status.INNVILGET) {
+                stønadsforhold.tilstand(vedtak, Løpende)
+                stønadsforhold.tidslinje.add(vedtak)
+            }
+            if (vedtak.status == Vedtak.Status.AVSLÅTT) {
+                stønadsforhold.tilstand(vedtak, Avslått)
+                stønadsforhold.tidslinje.add(vedtak)
+            }
         }
 
         override fun håndter(stønadsforhold: Stønadsforhold, mangelbrev: Mangelbrev) {
@@ -107,24 +118,12 @@ class Stønadsforhold private constructor(
     private object Løpende : Tilstand {
         override val type = LØPENDE
 
-        override fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad) {
-            // Harru bomma?
-            TODO("Not yet implemented")
-        }
-
-        override fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending) {
-            // Harru bomma?
-            TODO("Not yet implemented")
-        }
-
         override fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak) {
             // Endring/stans -> Løpende/Stanset/Avsluttet
-            TODO("Not yet implemented")
-        }
-
-        override fun håndter(stønadsforhold: Stønadsforhold, mangelbrev: Mangelbrev) {
-            // Harru bomma?
-            TODO("Not yet implemented")
+            if (vedtak.status == Vedtak.Status.STANS) {
+                stønadsforhold.tilstand(vedtak, Stanset)
+                stønadsforhold.tidslinje.add(vedtak)
+            }
         }
     }
 
