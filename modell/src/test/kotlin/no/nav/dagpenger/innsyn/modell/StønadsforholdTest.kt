@@ -49,9 +49,8 @@ class StønadsforholdTest {
         assertThrows<IllegalStateException> { Stønadsforhold().håndter(saksbehandling) }
     }
 
-    private fun inspektør(stønadsforhold: Stønadsforhold, block: StønadsforholdInspektør.() -> Unit) {
-        StønadsforholdInspektør(stønadsforhold).apply(block)
-    }
+    private fun <R> inspektør(stønadsforhold: Stønadsforhold, block: StønadsforholdInspektør.() -> R): R =
+        StønadsforholdInspektør(stønadsforhold).block()
 
     private class StønadsforholdInspektør(stønadsforhold: Stønadsforhold) : StønadsforholdVisitor {
         var antallHendelser = 0

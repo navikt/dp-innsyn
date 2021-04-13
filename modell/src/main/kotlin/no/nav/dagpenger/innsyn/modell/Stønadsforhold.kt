@@ -23,7 +23,13 @@ class Stønadsforhold private constructor(
     private val opprettet: LocalDateTime,
     private var oppdatert: LocalDateTime
 ) {
-    constructor() : this(mutableListOf(), mutableListOf(), Start, LocalDateTime.now(), LocalDateTime.now())
+    constructor() : this(
+        tidslinje = mutableListOf(),
+        oppgaver = mutableListOf(),
+        tilstand = Start,
+        opprettet = LocalDateTime.now(),
+        oppdatert = LocalDateTime.now()
+    )
 
     fun accept(visitor: StønadsforholdVisitor) {
         visitor.preVisit(this, tilstand, opprettet, oppdatert)
@@ -54,6 +60,7 @@ class Stønadsforhold private constructor(
 
     interface Tilstand {
         val type: TilstandType
+
         fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad) {
             throw IllegalStateException("forventet ikke søknad i tilstanden ${type.name}")
         }
