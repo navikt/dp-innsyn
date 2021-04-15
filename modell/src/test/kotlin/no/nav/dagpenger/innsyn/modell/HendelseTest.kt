@@ -11,20 +11,22 @@ import java.time.LocalDateTime
 class HendelseTest {
     @Test
     fun `NAV har mottatt din søknad om dagpenger`() {
-        val hendelse = HendelseA()
-        hendelse.fullfør()
-        assertEquals(hendelse.status(), FERDIG)
-        assertTrue(LocalDateTime.now().plusDays(1).isAfter(hendelse.fullført))
+        val planlagtHendelse = HendelseA.planlagt(HendelseType.Søknad)
+        val fullførtHendelse = HendelseA.ferdig(HendelseType.Søknad)
+        planlagtHendelse.fullfør(fullførtHendelse)
+
+        assertEquals(planlagtHendelse.status(), FERDIG)
+        assertTrue(LocalDateTime.now().plusDays(1).isAfter(planlagtHendelse.fullført))
     }
 
     @Test
     fun `Når man sender inn de to siste vedleggene blir hele dokumentasjon-hendelsen FERDIG`() {
-        val vedleggA = HendelseA().also { it.fullfør() }
-        val vedleggB = HendelseA().also { it.fullfør() }
-        val vedleggC = HendelseA()
-        val vedleggD = HendelseA()
-
-        val dokumentasjon = HendelseA(
+        val vedleggA = HendelseA.ferdig(HendelseType.Ettersending)
+        val vedleggB = HendelseA.ferdig(HendelseType.Ettersending)
+        val vedleggC = HendelseA.planlagt(HendelseType.Ettersending)
+        val vedleggD = HendelseA.planlagt(HendelseType.Ettersending)
+        val dokumentasjon = HendelseA.planlagt(
+            type = HendelseType.Ettersending,
             frist = LocalDateTime.now().plusDays(14),
             delHendelser = listOf(
                 vedleggA,
@@ -39,8 +41,8 @@ class HendelseTest {
         assertEquals(dokumentasjon.delHendelser.filter { it.status() == FERDIG }.size, 2)
         assertEquals(dokumentasjon.delHendelser.filter { it.status() == PLANLAGT }.size, 2)
 
-        vedleggC.fullfør()
-        vedleggD.fullfør()
+        vedleggC.fullfør(HendelseA.ferdig(HendelseType.Ettersending))
+        vedleggD.fullfør(HendelseA.ferdig(HendelseType.Ettersending))
 
         assertEquals(4, dokumentasjon.delHendelser.filter { it.status() == FERDIG }.size)
         assertEquals(0, dokumentasjon.delHendelser.filter { it.status() == PLANLAGT }.size)
@@ -48,34 +50,84 @@ class HendelseTest {
     }
 
     @Test
-    fun `Når saken er ferdig behandlet vil du få varsel på SMS`() {
-        val hendelse = HendelseA(
-            frist = LocalDateTime.now().plusDays(14)
-        )
-        assertEquals(hendelse.status(), PLANLAGT)
-        assertTrue(LocalDateTime.now().isBefore(hendelse.frist))
+    fun `sortere hendelser`() {
+        val h1 = HendelseA.planlagt(HendelseType.Vedtak, frist = LocalDateTime.now().plusDays(14).withNano(0))
+        val h2 = HendelseA.ferdig(HendelseType.Vedtak)
+        // val h3 = HendelseA.påbegynt(frist = LocalDateTime.now().plusDays(14).withNano(0))
+        val h4 = HendelseA.planlagt(HendelseType.Vedtak, frist = LocalDateTime.now().plusDays(10).withNano(0))
+        // val h5 = HendelseA.påbegynt(frist = LocalDateTime.now().plusDays(10).withNano(0))
+        // val hendelser = listOf(h1, h2, h3, h4, h5)
+        // assertEquals(listOf(h2, h5, h4, h3, h1), hendelser.sorted())
+        val hendelser = listOf(h1, h2, h4)
+        assertEquals(listOf(h2, h4, h1), hendelser.sorted())
     }
 
     @Test
-    fun `sortere hendelser`() {
-        val h1 = HendelseA(status = PLANLAGT, frist = LocalDateTime.now().plusDays(14).withNano(0))
-        val h2 = HendelseA(status = FERDIG, fullført = LocalDateTime.now().minusDays(2))
-        val h3 = HendelseA(status = PÅBEGYNT, frist = LocalDateTime.now().plusDays(14).withNano(0))
-        val h4 = HendelseA(status = PLANLAGT, frist = LocalDateTime.now().plusDays(10).withNano(0))
-        val h5 = HendelseA(status = PÅBEGYNT, frist = LocalDateTime.now().plusDays(10).withNano(0))
+    fun `mangelbrev`() {
+        val søknad = HendelseA.ferdig(type = HendelseType.Søknad)
+        val planlagtVedtak = HendelseA.planlagt(type = HendelseType.Vedtak)
+        val hendelser = mutableListOf(søknad, planlagtVedtak)
+        // Saksbehandler finner mangler og sender mangelbrev
+        val mangelbrev = HendelseA.ferdig(type = HendelseType.Mangelbrev)
+        val forventetEttersending = HendelseA.planlagt(type = HendelseType.Ettersending)
 
-        val hendelser = listOf(h1, h2, h3, h4, h5)
-        assertEquals(listOf(h2, h5, h4, h3, h1), hendelser.sorted())
+        hendelser.add(mangelbrev)
+        hendelser.add(forventetEttersending)
+        // Søker ettersender
+        val ettersending = HendelseA.ferdig(type = HendelseType.Ettersending)
+        hendelser.findLast {
+            it.type == HendelseType.Ettersending
+        }?.fullfør(ettersending)
+
+        assertEquals(4, hendelser.size)
+        assertEquals(ettersending, forventetEttersending.løstAv)
+        // Søker får vedtak
+        val vedtak = HendelseA.ferdig(type = HendelseType.Vedtak)
+        hendelser.findLast {
+            it.type == HendelseType.Vedtak
+        }?.fullfør(vedtak)
+
+        assertEquals(4, hendelser.size)
+        assertEquals(vedtak, planlagtVedtak.løstAv)
     }
 }
 
-class HendelseA(
-    var fullført: LocalDateTime? = null,
+enum class HendelseType {
+    Søknad,
+    Vedtak,
+    Ettersending,
+    Mangelbrev
+}
+
+class HendelseA private constructor(
+    val type: HendelseType,
+    val fullført1: LocalDateTime? = null,
     var status: Status = PLANLAGT,
     val frist: LocalDateTime? = null,
-    val delHendelser: List<HendelseA> = emptyList()
+    val delHendelser: List<HendelseA> = emptyList(),
+    var løstAv: HendelseA? = null,
 ) : Comparable<HendelseA> {
+    val fullført get() = if (løstAv != null) løstAv!!.fullført1 else fullført1
+
+    companion object {
+        fun planlagt(type: HendelseType, frist: LocalDateTime? = null, delHendelser: List<HendelseA> = emptyList()) =
+            HendelseA(
+                type = type,
+                status = PLANLAGT,
+                frist = frist,
+                delHendelser = delHendelser
+            )
+
+        fun ferdig(type: HendelseType) = HendelseA(
+            type = type,
+            fullført1 = LocalDateTime.now(),
+            status = FERDIG
+        )
+    }
+
     fun status(): Status {
+        if (løstAv != null) return løstAv!!.status()
+
         if (delHendelser.isNotEmpty()) {
             return when {
                 delHendelser.all { it.status() == FERDIG } -> FERDIG
@@ -83,12 +135,14 @@ class HendelseA(
                 else -> PLANLAGT
             }
         }
+
         return status
     }
 
-    fun fullfør() {
-        fullført = LocalDateTime.now()
-        status = FERDIG
+    fun fullfør(hendelseA: HendelseA) {
+        if (status == FERDIG) throw IllegalStateException("Kan ikke fullføre allerede ferdig hendelse")
+        if (hendelseA.status != FERDIG) throw IllegalStateException("Kan ikke fullføre med uferdig hendelse")
+        løstAv = hendelseA
     }
 
     enum class Status {
