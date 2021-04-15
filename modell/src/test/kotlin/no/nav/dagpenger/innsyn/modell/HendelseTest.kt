@@ -3,7 +3,6 @@ package no.nav.dagpenger.innsyn.modell
 import no.nav.dagpenger.innsyn.modell.HendelseA.Status.FERDIG
 import no.nav.dagpenger.innsyn.modell.HendelseA.Status.PLANLAGT
 import no.nav.dagpenger.innsyn.modell.HendelseA.Status.PÅBEGYNT
-import no.nav.dagpenger.innsyn.modell.hendelser.Hendelse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
