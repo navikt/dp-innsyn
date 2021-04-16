@@ -16,7 +16,7 @@ class HendelseTest {
         planlagtHendelse.fullfør(fullførtHendelse)
 
         assertEquals(planlagtHendelse.status(), FERDIG)
-        assertTrue(LocalDateTime.now().plusDays(1).isAfter(planlagtHendelse.fullført))
+        assertTrue(LocalDateTime.now().plusDays(1).isAfter(planlagtHendelse.fullført()))
     }
 
     @Test
@@ -63,7 +63,7 @@ class HendelseTest {
     }
 
     @Test
-    fun `mangelbrev`() {
+    fun mangelbrev() {
         val søknad = HendelseA.ferdig(type = HendelseType.Søknad)
         val planlagtVedtak = HendelseA.planlagt(type = HendelseType.Vedtak)
         val hendelser = mutableListOf(søknad, planlagtVedtak)
@@ -101,54 +101,73 @@ enum class HendelseType {
 
 class HendelseA private constructor(
     val type: HendelseType,
-    val fullført1: LocalDateTime? = null,
-    var status: Status = PLANLAGT,
+    private val fullført: LocalDateTime? = null,
     val frist: LocalDateTime? = null,
     val delHendelser: List<HendelseA> = emptyList(),
     var løstAv: HendelseA? = null,
+    private var tilstand: Tilstand = Planlagt
 ) : Comparable<HendelseA> {
-    val fullført get() = if (løstAv != null) løstAv!!.fullført1 else fullført1
-
     companion object {
         fun planlagt(type: HendelseType, frist: LocalDateTime? = null, delHendelser: List<HendelseA> = emptyList()) =
             HendelseA(
                 type = type,
-                status = PLANLAGT,
                 frist = frist,
                 delHendelser = delHendelser
             )
 
         fun ferdig(type: HendelseType) = HendelseA(
             type = type,
-            fullført1 = LocalDateTime.now(),
-            status = FERDIG
+            fullført = LocalDateTime.now(),
+            tilstand = Fullført
         )
     }
 
-    fun status(): Status {
-        if (løstAv != null) return løstAv!!.status()
-
-        if (delHendelser.isNotEmpty()) {
-            return when {
-                delHendelser.all { it.status() == FERDIG } -> FERDIG
-                delHendelser.any { it.status() == FERDIG } -> PÅBEGYNT
-                else -> PLANLAGT
-            }
-        }
-
-        return status
-    }
-
-    fun fullfør(hendelseA: HendelseA) {
-        if (status == FERDIG) throw IllegalStateException("Kan ikke fullføre allerede ferdig hendelse")
-        if (hendelseA.status != FERDIG) throw IllegalStateException("Kan ikke fullføre med uferdig hendelse")
-        løstAv = hendelseA
-    }
+    fun status() = tilstand.status(this)
+    fun fullført() = tilstand.fullført(this)
+    fun fullfør(løstAv: HendelseA) = tilstand.fullfør(this, løstAv)
 
     enum class Status {
         PLANLAGT,
         PÅBEGYNT,
         FERDIG,
+    }
+
+    private interface Tilstand {
+        fun fullført(hendelse: HendelseA): LocalDateTime?
+        fun status(hendelse: HendelseA): Status
+        fun fullfør(hendelse: HendelseA, løstAv: HendelseA)
+    }
+
+    private object Planlagt : Tilstand {
+        override fun fullført(hendelse: HendelseA): LocalDateTime? = null
+
+        override fun status(hendelse: HendelseA): Status {
+            if (hendelse.delHendelser.isNotEmpty()) {
+                return when {
+                    hendelse.delHendelser.all { it.status() == FERDIG } -> FERDIG
+                    hendelse.delHendelser.any { it.status() == FERDIG } -> PÅBEGYNT
+                    else -> PLANLAGT
+                }
+            }
+
+            return PLANLAGT
+        }
+
+        override fun fullfør(hendelse: HendelseA, løstAv: HendelseA) {
+            if (løstAv.status() != FERDIG) throw IllegalStateException("Kan ikke fullføre med uferdig hendelse")
+            hendelse.løstAv = løstAv
+            hendelse.tilstand = Fullført
+        }
+    }
+
+    private object Fullført : Tilstand {
+        override fun fullført(hendelse: HendelseA): LocalDateTime? = hendelse.løstAv?.fullført ?: hendelse.fullført
+
+        override fun status(hendelse: HendelseA) = FERDIG
+
+        override fun fullfør(hendelse: HendelseA, løstAv: HendelseA) {
+            throw IllegalStateException("Kan ikke fullføre allerede ferdig hendelse")
+        }
     }
 
     override fun compareTo(other: HendelseA) = when (sorteringsDato().compareTo(other.sorteringsDato())) {
@@ -163,6 +182,6 @@ class HendelseA private constructor(
     private fun sorteringsDato() = when (status()) {
         PLANLAGT -> frist!!
         PÅBEGYNT -> frist!!
-        FERDIG -> fullført!!
+        FERDIG -> fullført()!!
     }
 }
