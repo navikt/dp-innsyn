@@ -1,22 +1,47 @@
 package no.nav.dagpenger.innsyn.modell.serde
 
-import no.nav.dagpenger.innsyn.modell.Behandlingskjede
-import no.nav.dagpenger.innsyn.modell.BehandlingskjedeId
 import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.Stønadsforhold
-import no.nav.dagpenger.innsyn.modell.hendelser.Hendelse
+import no.nav.dagpenger.innsyn.modell.Stønadsid
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
 import java.time.LocalDateTime
 
-interface PersonVisitor : BehandlingskjedeVisitor {
+interface PersonVisitor : StønadsforholdVisitor {
     fun preVisit(person: Person, fnr: String) {}
     fun postVisit(person: Person, fnr: String) {}
 }
 
-interface BehandlingskjedeVisitor : OppgaveVisitor {
-    fun preVisit(behandlingskjede: Behandlingskjede, id: BehandlingskjedeId) {}
-    fun postVisit(behandlingskjede: Behandlingskjede, id: BehandlingskjedeId) {}
+
+interface StønadsforholdVisitor : OppgaveVisitor, StønadsidVisitor {
+    fun preVisit(
+        stønadsforhold: Stønadsforhold,
+        tilstand: Stønadsforhold.Tilstand,
+        opprettet: LocalDateTime,
+        oppdatert: LocalDateTime
+    ) {
+    }
+
+    fun postVisit(
+        stønadsforhold: Stønadsforhold,
+        tilstand: Stønadsforhold.Tilstand,
+        opprettet: LocalDateTime,
+        oppdatert: LocalDateTime
+    ) {
+    }
+}
+
+interface StønadsidVisitor{
+    fun preVisit(
+        stønadsid: Stønadsid,
+        internId: String,
+        eksternId: String
+    ){}
+    fun postVisit(
+        stønadsid: Stønadsid,
+        internId: String,
+        eksternId: String
+    ){}
 }
 
 interface OppgaveVisitor {
@@ -37,24 +62,4 @@ interface OppgaveVisitor {
         tilstand: OppgaveTilstand
     ) {
     }
-}
-
-interface StønadsforholdVisitor : HendelseVisitor, OppgaveVisitor {
-    fun preVisit(
-        stønadsforhold: Stønadsforhold,
-        tilstand: Stønadsforhold.Tilstand,
-        opprettet: LocalDateTime,
-        oppdatert: LocalDateTime
-    ) {}
-    fun postVisit(
-        stønadsforhold: Stønadsforhold,
-        tilstand: Stønadsforhold.Tilstand,
-        opprettet: LocalDateTime,
-        oppdatert: LocalDateTime
-    ) {}
-}
-
-interface HendelseVisitor {
-    fun preVisit(hendelse: Hendelse, behandlingskjedeId: BehandlingskjedeId) {}
-    fun postVisit(hendelse: Hendelse, behandlingskjedeId: BehandlingskjedeId) {}
 }

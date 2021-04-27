@@ -5,9 +5,9 @@ import no.nav.dagpenger.innsyn.Dagpenger.vedleggOppgave
 import no.nav.dagpenger.innsyn.Dagpenger.vedtakOppgave
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
-import no.nav.dagpenger.innsyn.modell.Behandlingskjede
-import no.nav.dagpenger.innsyn.modell.BehandlingskjedeId
 import no.nav.dagpenger.innsyn.modell.Person
+import no.nav.dagpenger.innsyn.modell.Stønadsforhold
+import no.nav.dagpenger.innsyn.modell.Stønadsid
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.serde.PersonJsonBuilder
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
@@ -38,7 +38,7 @@ internal class E2ESøknadOgVedtakTest {
         withMigratedDb {
             rapid.sendTestMessage(søknadAsJson)
             with(PersonInspektør(person)) {
-                assertEquals(1, behandlingskjeder)
+                assertEquals(1, stønadsforhold)
                 assertEquals(1, vedtakOppgaver)
                 assertEquals(3, uferdigeOppgaver)
                 assertEquals(1, ferdigeOppgaver)
@@ -73,14 +73,19 @@ internal class E2ESøknadOgVedtakTest {
         var søknadOppgaver = 0
         var vedleggOppgaver = 0
         var vedtakOppgaver = 0
-        var behandlingskjeder = 0
+        var stønadsforhold = 0
 
         init {
             person.accept(this)
         }
 
-        override fun preVisit(behandlingskjede: Behandlingskjede, id: BehandlingskjedeId) {
-            behandlingskjeder++
+        override fun preVisit(
+            stønadsforhold: Stønadsforhold,
+            tilstand: Stønadsforhold.Tilstand,
+            opprettet: LocalDateTime,
+            oppdatert: LocalDateTime
+        ) {
+            this.stønadsforhold++
         }
 
         override fun preVisit(

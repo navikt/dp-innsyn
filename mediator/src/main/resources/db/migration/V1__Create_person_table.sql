@@ -6,29 +6,32 @@ CREATE TABLE IF NOT EXISTS person
 );
 CREATE UNIQUE INDEX IF NOT EXISTS person_fnr_uindex ON person (fnr);
 
-CREATE TABLE IF NOT EXISTS behandlingskjede
+CREATE TABLE IF NOT EXISTS stønadsforhold
 (
-    id         VARCHAR(255) NOT NULL,
-    oppgave_id VARCHAR(255) NOT NULL,
-    person_id  INT,
-    PRIMARY KEY (id, oppgave_id, person_id),
-    CONSTRAINT fk_person
-        FOREIGN KEY (person_id)
-            REFERENCES person (person_id)
+    id         BIGSERIAL NOT NULL,
+    intern_id VARCHAR(255) NOT NULL,
+    person_id  BIGINT NOT NULL,
+    PRIMARY KEY (id)
 );
+CREATE UNIQUE INDEX IF NOT EXISTS stønadsforhold_person_uindex ON stønadsforhold(intern_id, person_id);
 
-CREATE TABLE oppgave
+CREATE TABLE IF NOT EXISTS oppgave
 (
     oppgave_id  BIGSERIAL,
-    person_id   INT,
+    stønadsforhold_id BIGINT NOT NULL,
     id          VARCHAR(255) NOT NULL,
     beskrivelse VARCHAR(255),
     opprettet   TIMESTAMP    NOT NULL,
     type        VARCHAR(255) NOT NULL,
     tilstand    VARCHAR(255) NOT NULL,
-    PRIMARY KEY (oppgave_id),
-    CONSTRAINT fk_person
-        FOREIGN KEY (person_id)
-            REFERENCES person (person_id)
+    PRIMARY KEY (oppgave_id)
 );
-CREATE UNIQUE INDEX IF NOT EXISTS oppgave_person_uindex ON oppgave (person_id, id, type);
+
+CREATE TABLE IF NOT EXISTS eksternid(
+    id BIGSERIAL,
+    intern_id BIGINT NOT NULL,
+    ekstern_id VARCHAR(255) NOT NULL,
+    CONSTRAINT fk_stønadsid
+        FOREIGN KEY (intern_id)
+            REFERENCES stønadsforhold (id)
+);

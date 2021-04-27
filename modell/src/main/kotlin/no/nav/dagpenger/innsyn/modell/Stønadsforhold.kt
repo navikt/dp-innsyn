@@ -17,188 +17,203 @@ import no.nav.dagpenger.innsyn.modell.serde.StønadsforholdVisitor
 import java.time.LocalDateTime
 
 class Stønadsforhold private constructor(
-    private val tidslinje: MutableList<Hendelse>,
-    private val oppgaver: List<Oppgave>,
+    private val tidslinje: MutableSet<Oppgave>,
     private var tilstand: Tilstand,
     private val opprettet: LocalDateTime,
-    private var oppdatert: LocalDateTime
+    private var oppdatert: LocalDateTime,
+    private val stønadsid: Stønadsid
 ) {
     constructor() : this(
-        tidslinje = mutableListOf(),
-        oppgaver = mutableListOf(),
+        tidslinje = mutableSetOf(),
         tilstand = Start,
         opprettet = LocalDateTime.now(),
-        oppdatert = LocalDateTime.now()
+        oppdatert = LocalDateTime.now(),
+        stønadsid = Stønadsid()
     )
 
     fun accept(visitor: StønadsforholdVisitor) {
         visitor.preVisit(this, tilstand, opprettet, oppdatert)
+        stønadsid.accept(visitor)
         tidslinje.forEach { it.accept(visitor) }
-        oppgaver.forEach { it.accept(visitor) }
         visitor.postVisit(this, tilstand, opprettet, oppdatert)
     }
 
-    fun håndter(søknad: Søknad) {
-        tilstand.håndter(this, søknad)
+    fun håndter(hendelse: Hendelse): Boolean {
+        return when (hendelse) {
+            is Søknad -> håndter(hendelse)
+            is Ettersending -> håndter(hendelse)
+            is Vedtak -> håndter(hendelse)
+            is Mangelbrev -> håndter(hendelse)
+            is Saksbehandling -> håndter(hendelse)
+            else -> false
+        }
     }
 
-    fun håndter(ettersending: Ettersending) {
-        tilstand.håndter(this, ettersending)
+    fun håndter(søknad: Søknad): Boolean {
+        if (!stønadsid.håndter(søknad)) return false
+        return tilstand.håndter(this, søknad)
     }
 
-    fun håndter(vedtak: Vedtak) {
-        tilstand.håndter(this, vedtak)
+    fun håndter(ettersending: Ettersending): Boolean {
+        if (!stønadsid.håndter(ettersending)) return false
+        return tilstand.håndter(this, ettersending)
     }
 
-    fun håndter(mangelbrev: Mangelbrev) {
-        tilstand.håndter(this, mangelbrev)
+    fun håndter(vedtak: Vedtak): Boolean {
+        if (!stønadsid.håndter(vedtak)) return false
+        return tilstand.håndter(this, vedtak)
     }
 
-    fun håndter(saksbehandling: Saksbehandling) {
-        tilstand.håndter(this, saksbehandling)
+    fun håndter(mangelbrev: Mangelbrev): Boolean {
+        if (!stønadsid.håndter(mangelbrev)) return false
+        return tilstand.håndter(this, mangelbrev)
+    }
+
+    fun håndter(saksbehandling: Saksbehandling): Boolean {
+        if (!stønadsid.håndter(saksbehandling)) return false
+        return tilstand.håndter(this, saksbehandling)
     }
 
     interface Tilstand {
         val type: TilstandType
 
-        fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad) {
-            throw IllegalStateException("forventet ikke søknad i tilstanden ${type.name}")
-        }
+        fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad) = false
 
-        fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending) {
-            throw IllegalStateException("forventet ikke ettersending i tilstanden ${type.name}")
-        }
+        fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending) = false
 
-        fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak) {
-            throw IllegalStateException("forventet ikke vedtak i tilstanden ${type.name}")
-        }
+        fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak) = false
 
-        fun håndter(stønadsforhold: Stønadsforhold, mangelbrev: Mangelbrev) {
-            throw IllegalStateException("forventet ikke mangelbrev i tilstanden ${type.name}")
-        }
+        fun håndter(stønadsforhold: Stønadsforhold, mangelbrev: Mangelbrev) = false
 
-        fun håndter(stønadsforhold: Stønadsforhold, saksbehandling: Saksbehandling) {
-            throw IllegalStateException("forventet ikke saksbehandling i tilstanden ${type.name}")
-        }
+        fun håndter(stønadsforhold: Stønadsforhold, saksbehandling: Saksbehandling) = false
     }
 
-    private object Start : Tilstand {
+    internal object Start : Tilstand {
         override val type = START
 
-        override fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad) {
+        override fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad): Boolean {
             stønadsforhold.tilstand(søknad, UnderBehandling)
-            stønadsforhold.tidslinje.add(søknad)
+            stønadsforhold.tidslinje.addAll(søknad.oppgaver)
+            return true
         }
     }
 
-    private object UnderBehandling : Tilstand {
+    internal object UnderBehandling : Tilstand {
         override val type = UNDER_BEHANDLING
 
-        override fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad) {
-            // Søkt på nytt?
+        override fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending): Boolean {
+            stønadsforhold.tidslinje.removeAll(ettersending.oppgaver)
+            stønadsforhold.tidslinje.addAll(ettersending.oppgaver)
+            return true
         }
 
-        override fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending) {
-            stønadsforhold.tidslinje.add(ettersending)
-        }
-
-        override fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak) {
+        override fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak): Boolean {
             if (vedtak.status != Vedtak.Status.INNVILGET && vedtak.status != Vedtak.Status.AVSLÅTT) {
                 throw IllegalStateException("Forventet ikke vedtak av typen ${vedtak.status.name} i tilstanden ${type.name}")
             }
 
+            stønadsforhold.tidslinje.removeAll(vedtak.oppgaver)
             if (vedtak.status == Vedtak.Status.INNVILGET) {
                 stønadsforhold.tilstand(vedtak, Løpende)
-                stønadsforhold.tidslinje.add(vedtak)
+                stønadsforhold.tidslinje.addAll(vedtak.oppgaver)
             }
             if (vedtak.status == Vedtak.Status.AVSLÅTT) {
                 stønadsforhold.tilstand(vedtak, Avslått)
-                stønadsforhold.tidslinje.add(vedtak)
+                stønadsforhold.tidslinje.addAll(vedtak.oppgaver)
             }
+            return true
         }
 
-        override fun håndter(stønadsforhold: Stønadsforhold, mangelbrev: Mangelbrev) {
+        override fun håndter(stønadsforhold: Stønadsforhold, mangelbrev: Mangelbrev): Boolean {
             // Noe mangler, lag oppgave og vent på ettersending
+            return true
         }
     }
 
-    private object Løpende : Tilstand {
+    internal object Løpende : Tilstand {
         override val type = LØPENDE
 
-        override fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak) {
+        override fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak) =
             // Endring/stans -> Løpende/Stanset/Avsluttet
-            if (vedtak.status == Vedtak.Status.STANS) {
-                stønadsforhold.tilstand(vedtak, Stanset)
-                stønadsforhold.tidslinje.add(vedtak)
+            when (vedtak.status) {
+                Vedtak.Status.STANS -> {
+                    stønadsforhold.tilstand(vedtak, Stanset)
+                    stønadsforhold.tidslinje.addAll(vedtak.oppgaver)
+                    true
+                }
+                else -> false
             }
+
+        override fun håndter(stønadsforhold: Stønadsforhold, mangelbrev: Mangelbrev): Boolean {
+            throw IllegalStateException("Forventet ikke mangelbrev i tilstanden ${type.name}")
         }
     }
 
-    private object Stanset : Tilstand {
+    internal object Stanset : Tilstand {
         override val type = STANSET
 
-        override fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad) {
+        override fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad): Boolean {
             // Gjenopptak? -> UnderBehandling
             TODO("Not yet implemented")
         }
 
-        override fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending) {
+        override fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending): Boolean {
             // Her skulle du nok sendt søknad først?
             TODO("Not yet implemented")
         }
 
-        override fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak) {
+        override fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak): Boolean {
             // Gjenopptak innvilget (bør ikke skje, saken skal være i UnderBehandling-state)
             TODO("Not yet implemented")
         }
 
-        override fun håndter(stønadsforhold: Stønadsforhold, mangelbrev: Mangelbrev) {
+        override fun håndter(stønadsforhold: Stønadsforhold, mangelbrev: Mangelbrev): Boolean {
             // Harru bomma? Søknad burde kommet først
             TODO("Not yet implemented")
         }
     }
 
-    private object Avslått : Tilstand {
+    internal object Avslått : Tilstand {
         override val type = AVSLÅTT
 
-        override fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad) {
+        override fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad): Boolean {
             // Nytt stønadsforhold
             TODO("Not yet implemented")
         }
 
-        override fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending) {
+        override fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending): Boolean {
             // Ny vurdering -> UnderBehandling
             TODO("Not yet implemented")
         }
 
-        override fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak) {
+        override fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak): Boolean {
             TODO("Not yet implemented")
         }
 
-        override fun håndter(stønadsforhold: Stønadsforhold, mangelbrev: Mangelbrev) {
+        override fun håndter(stønadsforhold: Stønadsforhold, mangelbrev: Mangelbrev): Boolean {
             TODO("Not yet implemented")
         }
     }
 
-    private object Utløpt : Tilstand {
+    internal object Utløpt : Tilstand {
         override val type = UTLØPT
 
-        override fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad) {
+        override fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad): Boolean {
             // Feil.
             TODO("Not yet implemented")
         }
 
-        override fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending) {
+        override fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending): Boolean {
             // Feil.
             TODO("Not yet implemented")
         }
 
-        override fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak) {
+        override fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak): Boolean {
             // Feil.
             TODO("Not yet implemented")
         }
 
-        override fun håndter(stønadsforhold: Stønadsforhold, mangelbrev: Mangelbrev) {
+        override fun håndter(stønadsforhold: Stønadsforhold, mangelbrev: Mangelbrev): Boolean {
             // Feil.
             TODO("Not yet implemented")
         }
@@ -210,3 +225,4 @@ class Stønadsforhold private constructor(
         oppdatert = LocalDateTime.now()
     }
 }
+

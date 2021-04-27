@@ -1,5 +1,6 @@
 package no.nav.dagpenger.innsyn.modell.serde
 
+import no.nav.dagpenger.innsyn.modell.Stønadsid
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveId
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
@@ -9,6 +10,7 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 
 class OppgaveData(
+    val stønadsid: String,
     indeks: Int,
     id: String,
     beskrivelse: String,

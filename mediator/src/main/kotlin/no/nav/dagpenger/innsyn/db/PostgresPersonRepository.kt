@@ -5,23 +5,21 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.dataSource
-import no.nav.dagpenger.innsyn.modell.Behandlingskjede
-import no.nav.dagpenger.innsyn.modell.BehandlingskjedeId
 import no.nav.dagpenger.innsyn.modell.Person
+import no.nav.dagpenger.innsyn.modell.Stønadsid
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveId
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
 import no.nav.dagpenger.innsyn.modell.serde.OppgaveData
 import no.nav.dagpenger.innsyn.modell.serde.PersonData
-import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import java.time.LocalDateTime
 
 class PostgresPersonRepository : PersonRepository {
     override fun person(fnr: String): Person = getPerson(fnr) ?: lagPerson(fnr)
 
     override fun lagre(person: Person): Boolean {
-        val visitor = OppgaveVisitor(person)
-        val kjeder = visitor.kjeder
+        val visitor = PersonVisitor(person)
+        val stønadsforhold = visitor.stønadsforhold
         val oppgaver = visitor.oppgaver
 
         return using(sessionOf(dataSource)) { session ->
@@ -33,37 +31,34 @@ class PostgresPersonRepository : PersonRepository {
                         mapOf("fnr" to person.fnr)
                     ).asUpdate
                 )
+                stønadsforhold.map { internId ->
+                    tx.run(
+                        queryOf(
+                            //language=PostgreSQL
+                            """INSERT INTO stønadsforhold(intern_id, person_id)
+                            VALUES (:internId, :personId)
+                            ON CONFLICT (intern_id, person_id) DO NOTHING 
+                            """.trimIndent(),
+                            mapOf(
+                                "internId" to internId,
+                                "personId" to personId
+                            )
+                        ).asUpdate
+                    )
+                }
                 oppgaver.map {
                     tx.run(
                         queryOf(
                             //language=PostgreSQL
-                            """INSERT INTO oppgave (person_id, id, beskrivelse, opprettet, type, tilstand)
-                                VALUES (:personId, :id, :beskrivelse, :opprettet, :type, :tilstand)
-                                ON CONFLICT (person_id, id, type) DO UPDATE SET tilstand = :tilstand
+                            """INSERT INTO oppgave (id, stønadsforhold_id, beskrivelse, opprettet, type, tilstand)
+                                VALUES (:id, (SELECT id FROM stønadsforhold WHERE intern_id = :stønadsforholdId), :beskrivelse, :opprettet, :type, :tilstand)
+                                ON CONFLICT (id, type) DO UPDATE SET tilstand = :tilstand
                             """.trimIndent(),
-                            mapOf("personId" to personId) + it
+                            it
                         ).asUpdate
                     )
                 }.all { it == 1 }
-                kjeder.map { (kjedeId, oppgaveId) ->
-                    tx.run(
-                        queryOf(
-                            //language=PostgreSQL
-                            """INSERT INTO behandlingskjede(id, oppgave_id, person_id)
-                            VALUES (:id, (SELECT oppgave_id
-                                          FROM oppgave
-                                          WHERE id = :oppgaveId AND type = :oppgaveType AND person_id = :personId), :personId)
-                            ON CONFLICT (id, oppgave_id, person_id) DO NOTHING 
-                            """.trimIndent(),
-                            mapOf(
-                                "personId" to personId,
-                                "id" to kjedeId,
-                                "oppgaveId" to oppgaveId.first,
-                                "oppgaveType" to oppgaveId.second
-                            )
-                        ).asUpdate
-                    )
-                }.all { it == 1 }
+
             }
         }
     }
@@ -74,55 +69,57 @@ class PostgresPersonRepository : PersonRepository {
         using(sessionOf(dataSource)) { session ->
             session.run(selectPerson(fnr))?.let {
                 val oppgaver = hentOppgaver(session, it)
-                val kjeder = hentKjeder(session, it)
-                PersonData(fnr, kjeder, oppgaver).person
+                val stønadsforhold = hentStønadsforhold(session, it)
+                PersonData(fnr, stønadsforhold, oppgaver).person
             }
         }
 
-    private fun hentKjeder(session: Session, personId: Int) = session.run(
+    private fun hentStønadsforhold(session: Session, personId: Int) = session.run(
         queryOf(
             //language=PostgreSQL
-            "SELECT id, oppgave_id FROM behandlingskjede WHERE person_id=?",
+            "SELECT intern_id FROM stønadsforhold WHERE person_id=?",
             personId
         ).map { row ->
-            row.string("id") to row.string("oppgave_id")
+            row.string("intern_id")
         }.asList
-    ).groupBy({ it.first }, { it.second })
+    )
 
-    private fun hentOppgaver(session: Session, personId: Int): Map<String, Oppgave> = session.run(
+    private fun hentOppgaver(session: Session, personId: Int): List<OppgaveData> = session.run(
         queryOf(
             //language=PostgreSQL
-            "SELECT oppgave_id, id, beskrivelse, opprettet, type, tilstand FROM oppgave WHERE person_id=?",
+            "SELECT oppgave_id, stønadsforhold_id, id, beskrivelse, opprettet, type, tilstand FROM oppgave WHERE stønadsforhold_id IN (SELECT intern_id FROM stønadsforhold WHERE person_id =?)",
             personId
         ).map { row ->
-            row.string("oppgave_id") to
                 OppgaveData(
+                    row.string("stønadsforhold"),
                     row.int("oppgave_id"),
                     row.string("id"),
                     row.string("beskrivelse"),
                     row.localDateTime("opprettet"),
                     row.string("type"),
                     row.string("tilstand")
-                ).oppgave
+                )
         }.asList
-    ).associateBy({ it.first }, { it.second })
+    )
 
     private fun selectPerson(fnr: String) = //language=PostgreSQL
         queryOf(
             "SELECT person_id FROM person WHERE fnr = ?", fnr
         ).map { it.int(1) }.asSingle
 
-    private class OppgaveVisitor(person: Person) : PersonVisitor {
+    private class PersonVisitor(person: Person) :
+        no.nav.dagpenger.innsyn.modell.serde.PersonVisitor {
         val oppgaver = mutableListOf<Map<String, Any>>()
-        lateinit var aktivKjede: String
-        val kjeder = mutableListOf<Pair<String, Pair<String, String>>>()
+        lateinit var aktivtStønadsforhold: String
+        val stønadsforhold = mutableSetOf<String>()
 
         init {
             person.accept(this)
         }
 
-        override fun preVisit(behandlingskjede: Behandlingskjede, id: BehandlingskjedeId) {
-            aktivKjede = id
+        override fun preVisit(stønadsid: Stønadsid, internId: String, eksternId: String) {
+            aktivtStønadsforhold = internId
+            stønadsforhold.add(internId)
         }
 
         override fun preVisit(
@@ -132,11 +129,10 @@ class PostgresPersonRepository : PersonRepository {
             opprettet: LocalDateTime,
             tilstand: OppgaveTilstand
         ) {
-            kjeder.add(aktivKjede to (id.id to id.type.toString()))
-
             oppgaver.add(
                 mapOf(
                     "id" to id.id,
+                    "stønadsforholdId" to aktivtStønadsforhold,
                     "beskrivelse" to beskrivelse,
                     "opprettet" to opprettet,
                     "type" to id.type.toString(),
