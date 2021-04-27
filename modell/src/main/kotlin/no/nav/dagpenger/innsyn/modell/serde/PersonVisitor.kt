@@ -6,6 +6,7 @@ import no.nav.dagpenger.innsyn.modell.Stønadsid
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
 import java.time.LocalDateTime
+import java.util.UUID
 
 interface PersonVisitor : StønadsforholdVisitor {
     fun preVisit(person: Person, fnr: String) {}
@@ -29,12 +30,12 @@ interface StønadsforholdVisitor : OppgaveVisitor, StønadsidVisitor {
 interface StønadsidVisitor {
     fun preVisit(
         stønadsid: Stønadsid,
-        internId: String,
+        internId: UUID,
         eksternId: String
     ) {}
     fun postVisit(
         stønadsid: Stønadsid,
-        internId: String,
+        internId: UUID,
         eksternId: String
     ) {}
 }

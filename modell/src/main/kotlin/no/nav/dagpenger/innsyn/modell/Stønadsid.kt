@@ -6,12 +6,13 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Saksbehandling
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.StønadsidVisitor
+import java.util.UUID
 
 class Stønadsid(
-    private val internId: String,
+    private val internId: UUID,
     private val eksterneIder: MutableList<String>
 ) {
-    constructor() : this("", mutableListOf())
+    constructor() : this(UUID.randomUUID(), mutableListOf())
 
     fun håndter(søknad: Søknad): Boolean {
         eksterneIder.add(søknad.søknadId)

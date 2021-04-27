@@ -1,5 +1,6 @@
 package no.nav.dagpenger.innsyn.db
 
+import kotliquery.Query
 import kotliquery.Session
 import kotliquery.queryOf
 import kotliquery.sessionOf
@@ -16,65 +17,19 @@ import no.nav.dagpenger.innsyn.modell.serde.PersonData
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import no.nav.dagpenger.innsyn.modell.serde.StønadsforholdData
 import java.time.LocalDateTime
+import java.util.UUID
 
 class PostgresPersonRepository : PersonRepository {
     override fun person(fnr: String): Person = getPerson(fnr) ?: lagPerson(fnr)
 
     override fun lagre(person: Person): Boolean {
         val visitor = PersonLagrer(person)
-        val stønadsforhold = visitor.stønadsforhold
-        val eksterneIder = visitor.eksterneIder
-        val oppgaver = visitor.oppgaver
 
         return using(sessionOf(dataSource)) { session ->
             session.transaction { tx ->
-                val personId = tx.run(
-                    queryOf(
-                        //language=PostgreSQL
-                        "INSERT INTO person (fnr) VALUES (:fnr) ON CONFLICT (fnr) DO UPDATE SET fnr = :fnr",
-                        mapOf("fnr" to person.fnr)
-                    ).asUpdate
-                )
-                stønadsforhold.map { data ->
-                    tx.run(
-                        queryOf(
-                            //language=PostgreSQL
-                            """INSERT INTO stønadsforhold(intern_id, person_id, tilstand)
-                            VALUES (:internId, :personId, :tilstand)
-                            ON CONFLICT (intern_id, person_id) DO UPDATE SET tilstand = :tilstand
-                            """.trimIndent(),
-                            data + mapOf(
-                                "personId" to personId,
-                            )
-                        ).asUpdate
-                    )
-                }
-                eksterneIder.map { (internId, eksternId) ->
-                    tx.run(
-                        queryOf(
-                            //language=PostgreSQL
-                            """INSERT INTO stønadsid(stønadsforhold_id, ekstern_id)
-                            VALUES ((SELECT id FROM stønadsforhold WHERE intern_id = :internId), :eksternId)
-                            ON CONFLICT (stønadsforhold_id, ekstern_id) DO NOTHING
-                            """.trimIndent(),
-                            mapOf(
-                                "internId" to internId,
-                                "eksternId" to eksternId,
-                            )
-                        ).asUpdate
-                    )
-                }
-                oppgaver.map {
-                    tx.run(
-                        queryOf(
-                            //language=PostgreSQL
-                            """INSERT INTO oppgave (id, stønadsforhold_id, beskrivelse, opprettet, type, tilstand)
-                                VALUES (:id, (SELECT id FROM stønadsforhold WHERE intern_id = :stonadsforholdId), :beskrivelse, :opprettet, :type, :tilstand)
-                                ON CONFLICT (id, type, stønadsforhold_id) DO UPDATE SET tilstand = :tilstand
-                            """.trimIndent(),
-                            it
-                        ).asUpdate
-                    )
+                visitor.queries.map {
+                    println("Running $it")
+                    tx.run(it.asUpdate)
                 }.all { it == 1 }
             }
         }
@@ -94,30 +49,38 @@ class PostgresPersonRepository : PersonRepository {
     private fun hentStønadsforhold(session: Session, personId: Int) = session.run(
         queryOf(
             //language=PostgreSQL
-            "SELECT id, intern_id, tilstand FROM stønadsforhold WHERE person_id=?",
+            "SELECT stønadsforhold_id, tilstand FROM stønadsforhold WHERE person_id=?",
             personId
         ).map { row ->
-            StønadsforholdData(hentStønadsid(session, row.string("intern_id")), hentOppgaver(session, row.int("id")), row.string("tilstand"))
+            val stønadsforholdId = UUID.fromString(row.string("stønadsforhold_id"))
+            StønadsforholdData(
+                hentStønadsid(session, stønadsforholdId),
+                hentOppgaver(session, stønadsforholdId),
+                row.string("tilstand")
+            )
         }.asList
     )
 
-    private fun hentStønadsid(session: Session, internId: String) = session.run(
+    private fun hentStønadsid(session: Session, stønadsforholdId: UUID) = session.run(
         queryOf(
             //language=PostgreSQL
-            "SELECT ekstern_id FROM stønadsid WHERE stønadsforhold_id=(SELECT id FROM stønadsforhold WHERE intern_id=?)",
-            internId
+            "SELECT ekstern_id FROM stønadsid WHERE stønadsforhold_id = ?",
+            stønadsforholdId
         ).map { row ->
             row.string("ekstern_id")
         }.asList
     ).run {
-        Stønadsid(internId, this.toMutableList())
+        Stønadsid(stønadsforholdId, this.toMutableList())
     }
 
-    private fun hentOppgaver(session: Session, internId: Int): List<OppgaveData> = session.run(
+    private fun hentOppgaver(session: Session, stønadsforholdId: UUID): List<OppgaveData> = session.run(
         queryOf(
             //language=PostgreSQL
-            "SELECT oppgave_id, id, beskrivelse, opprettet, type, tilstand FROM oppgave WHERE stønadsforhold_id =?",
-            internId
+            """SELECT oppgave_id, id, beskrivelse, opprettet, type, tilstand
+                FROM oppgave
+                WHERE stønadsforhold_id = ?
+            """.trimIndent(),
+            stønadsforholdId
         ).map { row ->
             OppgaveData(
                 row.int("oppgave_id"),
@@ -136,18 +99,58 @@ class PostgresPersonRepository : PersonRepository {
         ).map { it.int(1) }.asSingle
 
     private class PersonLagrer(person: Person) : PersonVisitor {
-        var eksterneIder = mutableListOf<Pair<String, String>>()
-        val oppgaver = mutableListOf<Map<String, Any>>()
-        lateinit var aktivtStønadsforhold: String
-        val stønadsforhold = mutableListOf<Map<String, Any>>()
+        val queries = mutableListOf<Query>()
+        private lateinit var fnr: String
+        private lateinit var aktivtStønadsforhold: UUID
+        private lateinit var tilstand: String
 
         init {
             person.accept(this)
         }
 
-        override fun preVisit(stønadsid: Stønadsid, internId: String, eksternId: String) {
+        override fun preVisit(person: Person, fnr: String) {
+            this.fnr = fnr
+            queries.add(
+                queryOf( //language=PostgreSQL
+                    "INSERT INTO person (fnr) VALUES (:fnr) ON CONFLICT DO NOTHING",
+                    mapOf("fnr" to fnr)
+                )
+            )
+        }
+
+        override fun preVisit(stønadsforhold: Stønadsforhold, tilstand: Stønadsforhold.Tilstand) {
+            this.tilstand = tilstand.type.toString()
+        }
+
+        override fun preVisit(stønadsid: Stønadsid, internId: UUID, eksternId: String) {
             aktivtStønadsforhold = internId
-            eksterneIder.add(internId to eksternId)
+            queries.add(
+                queryOf(
+                    //language=PostgreSQL
+                    """INSERT INTO stønadsforhold(stønadsforhold_id, person_id, tilstand)
+                        VALUES (:stonadsforhold, (SELECT person_id FROM person WHERE fnr = :fnr), :tilstand)
+                        ON CONFLICT (stønadsforhold_id) DO UPDATE SET tilstand = :tilstand
+                    """.trimIndent(),
+                    mapOf(
+                        "stonadsforhold" to aktivtStønadsforhold,
+                        "fnr" to fnr,
+                        "tilstand" to tilstand
+                    )
+                )
+            )
+            queries.add(
+                queryOf(
+                    //language=PostgreSQL
+                    """INSERT INTO stønadsid(stønadsforhold_id, ekstern_id)
+                        VALUES (:stonadsforholdId, :eksternId)
+                        ON CONFLICT (stønadsforhold_id, ekstern_id) DO NOTHING
+                    """.trimIndent(),
+                    mapOf(
+                        "stonadsforholdId" to internId,
+                        "eksternId" to eksternId,
+                    )
+                )
+            )
         }
 
         override fun preVisit(
@@ -157,23 +160,20 @@ class PostgresPersonRepository : PersonRepository {
             opprettet: LocalDateTime,
             tilstand: OppgaveTilstand
         ) {
-            oppgaver.add(
-                mapOf(
-                    "id" to id.id,
-                    "stonadsforholdId" to aktivtStønadsforhold,
-                    "beskrivelse" to beskrivelse,
-                    "opprettet" to opprettet,
-                    "type" to id.type.toString(),
-                    "tilstand" to tilstand.toString()
-                )
-            )
-        }
-
-        override fun postVisit(stønadsforhold: Stønadsforhold, tilstand: Stønadsforhold.Tilstand) {
-            this.stønadsforhold.add(
-                mapOf(
-                    "internId" to aktivtStønadsforhold,
-                    "tilstand" to tilstand.type.toString()
+            queries.add(
+                queryOf( //language=PostgreSQL
+                    """INSERT INTO oppgave (id, stønadsforhold_id, beskrivelse, opprettet, type, tilstand)
+                        VALUES (:id, :stonadsforhold, :beskrivelse, :opprettet, :type, :tilstand)
+                        ON CONFLICT (id, type, stønadsforhold_id) DO UPDATE SET tilstand = :tilstand
+                    """.trimIndent(),
+                    mapOf(
+                        "id" to id.id,
+                        "stonadsforhold" to aktivtStønadsforhold,
+                        "beskrivelse" to beskrivelse,
+                        "opprettet" to opprettet,
+                        "type" to id.type.toString(),
+                        "tilstand" to tilstand.toString()
+                    )
                 )
             )
         }
