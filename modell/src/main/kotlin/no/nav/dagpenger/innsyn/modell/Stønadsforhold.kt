@@ -14,28 +14,23 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Saksbehandling
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.StønadsforholdVisitor
-import java.time.LocalDateTime
 
 class Stønadsforhold private constructor(
+    private val stønadsid: Stønadsid,
     private val tidslinje: MutableSet<Oppgave>,
-    private var tilstand: Tilstand,
-    private val opprettet: LocalDateTime,
-    private var oppdatert: LocalDateTime,
-    private val stønadsid: Stønadsid
+    private var tilstand: Tilstand
 ) {
     constructor() : this(
+        stønadsid = Stønadsid(),
         tidslinje = mutableSetOf(),
-        tilstand = Start,
-        opprettet = LocalDateTime.now(),
-        oppdatert = LocalDateTime.now(),
-        stønadsid = Stønadsid()
+        tilstand = Start
     )
 
     fun accept(visitor: StønadsforholdVisitor) {
-        visitor.preVisit(this, tilstand, opprettet, oppdatert)
+        visitor.preVisit(this, tilstand)
         stønadsid.accept(visitor)
         tidslinje.forEach { it.accept(visitor) }
-        visitor.postVisit(this, tilstand, opprettet, oppdatert)
+        visitor.postVisit(this, tilstand)
     }
 
     fun håndter(hendelse: Hendelse): Boolean {
@@ -222,7 +217,6 @@ class Stønadsforhold private constructor(
     private fun tilstand(hendelse: Hendelse, nyTilstand: Tilstand) {
         if (tilstand == nyTilstand) return
         tilstand = nyTilstand
-        oppdatert = LocalDateTime.now()
     }
 }
 

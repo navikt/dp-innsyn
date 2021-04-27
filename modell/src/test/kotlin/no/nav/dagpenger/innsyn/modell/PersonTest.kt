@@ -94,9 +94,7 @@ internal class PersonTest {
 
         override fun postVisit(
             stønadsforhold: Stønadsforhold,
-            tilstand: Stønadsforhold.Tilstand,
-            opprettet: LocalDateTime,
-            oppdatert: LocalDateTime
+            tilstand: Stønadsforhold.Tilstand
         ) {
             antallStønadsforhold++
         }

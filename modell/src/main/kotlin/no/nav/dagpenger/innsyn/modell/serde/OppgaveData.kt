@@ -10,7 +10,6 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 
 class OppgaveData(
-    val stønadsid: String,
     indeks: Int,
     id: String,
     beskrivelse: String,

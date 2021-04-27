@@ -29,9 +29,7 @@ class PersonJsonBuilder(person: Person) : PersonVisitor {
 
     override fun preVisit(
         stønadsforhold: Stønadsforhold,
-        tilstand: Stønadsforhold.Tilstand,
-        opprettet: LocalDateTime,
-        oppdatert: LocalDateTime
+        tilstand: Stønadsforhold.Tilstand
     ) {
         stønadsforholdId = "1"
     }

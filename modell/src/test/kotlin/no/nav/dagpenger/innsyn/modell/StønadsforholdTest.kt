@@ -9,7 +9,6 @@ import no.nav.dagpenger.innsyn.modell.serde.StønadsforholdVisitor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 
 class StønadsforholdTest {
     @Test
@@ -56,9 +55,7 @@ class StønadsforholdTest {
 
         override fun preVisit(
             stønadsforhold: Stønadsforhold,
-            tilstand: Stønadsforhold.Tilstand,
-            opprettet: LocalDateTime,
-            oppdatert: LocalDateTime
+            tilstand: Stønadsforhold.Tilstand
         ) {
             this.tilstand = tilstand
         }

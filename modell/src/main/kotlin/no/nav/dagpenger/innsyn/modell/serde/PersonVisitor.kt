@@ -16,17 +16,13 @@ interface PersonVisitor : StønadsforholdVisitor {
 interface StønadsforholdVisitor : OppgaveVisitor, StønadsidVisitor {
     fun preVisit(
         stønadsforhold: Stønadsforhold,
-        tilstand: Stønadsforhold.Tilstand,
-        opprettet: LocalDateTime,
-        oppdatert: LocalDateTime
+        tilstand: Stønadsforhold.Tilstand
     ) {
     }
 
     fun postVisit(
         stønadsforhold: Stønadsforhold,
-        tilstand: Stønadsforhold.Tilstand,
-        opprettet: LocalDateTime,
-        oppdatert: LocalDateTime
+        tilstand: Stønadsforhold.Tilstand
     ) {
     }
 }

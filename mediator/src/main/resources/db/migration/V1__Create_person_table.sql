@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS stønadsforhold
     id         BIGSERIAL NOT NULL,
     intern_id VARCHAR(255) NOT NULL,
     person_id  BIGINT NOT NULL,
+    tilstand VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 );
 CREATE UNIQUE INDEX IF NOT EXISTS stønadsforhold_person_uindex ON stønadsforhold(intern_id, person_id);
