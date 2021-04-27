@@ -219,4 +219,3 @@ class Stønadsforhold private constructor(
         tilstand = nyTilstand
     }
 }
-

@@ -12,7 +12,6 @@ interface PersonVisitor : StønadsforholdVisitor {
     fun postVisit(person: Person, fnr: String) {}
 }
 
-
 interface StønadsforholdVisitor : OppgaveVisitor, StønadsidVisitor {
     fun preVisit(
         stønadsforhold: Stønadsforhold,
@@ -27,17 +26,17 @@ interface StønadsforholdVisitor : OppgaveVisitor, StønadsidVisitor {
     }
 }
 
-interface StønadsidVisitor{
+interface StønadsidVisitor {
     fun preVisit(
         stønadsid: Stønadsid,
         internId: String,
         eksternId: String
-    ){}
+    ) {}
     fun postVisit(
         stønadsid: Stønadsid,
         internId: String,
         eksternId: String
-    ){}
+    ) {}
 }
 
 interface OppgaveVisitor {

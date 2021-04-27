@@ -5,7 +5,6 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Mangelbrev
 import no.nav.dagpenger.innsyn.modell.hendelser.Saksbehandling
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
-import no.nav.dagpenger.innsyn.modell.serde.StønadsforholdVisitor
 import no.nav.dagpenger.innsyn.modell.serde.StønadsidVisitor
 
 class Stønadsid(

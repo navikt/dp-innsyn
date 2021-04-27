@@ -7,17 +7,17 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 
 class StønadsforholdData(
-    private val internId: String,
-    private val oppgaver: List<OppgaveData>,
-    private val tilstandString: String,
+    stønadsid: Stønadsid,
+    oppgaver: List<OppgaveData>,
+    tilstandString: String,
 ) {
-    private val etfintnavn = oppgaver.map { it.oppgave }.toMutableSet()
-    private val stønadsid = Stønadsid(internId, mutableListOf())
-    internal val stønadsforhold: Stønadsforhold
-        get() =
-            Stønadsforhold::class.primaryConstructor!!.apply {
-                isAccessible = true
-            }.call(stønadsid, etfintnavn, parseTilstand(TilstandType.valueOf(tilstandString)))
+    internal val stønadsforhold: Stønadsforhold by lazy {
+        val oppgaver = oppgaver.map { it.oppgave }.toMutableSet()
+
+        Stønadsforhold::class.primaryConstructor!!.apply {
+            isAccessible = true
+        }.call(stønadsid, oppgaver, parseTilstand(TilstandType.valueOf(tilstandString)))
+    }
 
     private fun parseTilstand(tilstandType: TilstandType) =
         when (tilstandType) {
