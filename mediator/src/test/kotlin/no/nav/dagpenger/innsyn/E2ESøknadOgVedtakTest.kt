@@ -14,6 +14,7 @@ import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakMottak
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -64,6 +65,17 @@ internal class E2ESøknadOgVedtakTest {
         }
     }
 
+    @Test
+    fun `2 søknader skal gi 2 stønadsforhold`(){
+        withMigratedDb {
+            rapid.sendTestMessage(søknadsJson("123"))
+            rapid.sendTestMessage(søknadsJson("456"))
+            with(PersonInspektør(person)){
+                assertEquals(2, stønadsforhold)
+            }
+        }
+    }
+
     private val person get() = personRepository.person("10108099999")
 
     private class PersonInspektør(person: Person) : PersonVisitor {
@@ -105,3 +117,15 @@ internal class E2ESøknadOgVedtakTest {
         }
     }
 }
+
+@Language("JSON")
+private fun søknadsJson(søknadsId: String) = """{
+  "søknadsdata": {
+    "brukerBehandlingId": $søknadsId,
+    "aktoerId": "10108099999"
+  },
+  "journalpostId": "493355115",
+  "henvendelsestype": "NY_SØKNAD",
+  "aktørId": "1819645303073",
+  "naturligIdent": "10108099999"
+}"""
