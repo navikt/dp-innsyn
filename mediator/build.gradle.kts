@@ -23,4 +23,5 @@ dependencies {
 
     testImplementation(Ktor.library("server-test-host"))
     testImplementation(TestContainers.postgresql)
+    testImplementation(Mockk.mockk)
 }

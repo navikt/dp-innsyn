@@ -54,6 +54,7 @@ internal class E2ESøknadOgVedtakTest {
 
             rapid.sendTestMessage(vedtakAsJson)
             with(PersonInspektør(person)) {
+                assertEquals(1, stønadsforhold)
                 assertEquals(1, vedtakOppgaver)
                 assertEquals(1, søknadOppgaver)
                 assertEquals(2, vedleggOppgaver)

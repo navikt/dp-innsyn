@@ -18,17 +18,20 @@ internal class VedtakMottak(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate { it.demandKey("vedtakId") }
-            validate { it.demandKey("fødselsnummer") }
-            validate { it.demandKey("søknadId") }
+            validate { it.demandKey("after.VEDTAK_ID") }
+            validate { it.demandKey("tokens.FODSELSNR") }
+            validate { it.demandKey("after.SAK_ID") }
+            validate { it.requireAny("after.VEDTAKTYPEKODE", listOf("O", "G")) }
+            validate { it.requireAny("after.UTFALLKODE", listOf("JA", "NEI")) }
+            validate { it.interestedIn("after", "tokens") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val fnr = packet["fødselsnummer"].asText()
-        val søknadId = packet["søknadId"].asText()
+        val fnr = packet["tokens"]["FODSELSNR"].asText()
+        val vedtakId = packet["after"]["VEDTAK_ID"].asText()
 
-        sikkerlogg.info { "Mottok nytt vedtak ($søknadId) for person ($fnr)." }
+        sikkerlogg.info { "Mottok nytt vedtak med id $vedtakId for person ($fnr)." }
 
         Vedtaksmelding(packet).also {
             personMediator.håndter(it.vedtak, it)

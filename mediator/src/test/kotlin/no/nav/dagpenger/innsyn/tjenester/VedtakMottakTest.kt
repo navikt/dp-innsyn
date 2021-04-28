@@ -1,10 +1,30 @@
 package no.nav.dagpenger.innsyn.tjenester
 
+import io.mockk.confirmVerified
+import io.mockk.mockk
+import io.mockk.verify
+import no.nav.dagpenger.innsyn.PersonMediator
+import no.nav.dagpenger.innsyn.melding.Vedtaksmelding
+import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
+import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-internal class VedtakMottakTest {
+class VedtakMottakTest {
+    private val testRapid = TestRapid()
+    private val personMediator = mockk<PersonMediator>(relaxed = true)
+
+    @BeforeEach
+    internal fun setUp() {
+        testRapid.reset()
+    }
+
     @Test
-    fun ` `() {
+    fun `vi kan motta vedtak`() {
+        VedtakMottak(testRapid, personMediator)
+        testRapid.sendTestMessage(vedtakJson)
+        verify { personMediator.håndter(any<Vedtak>(), any<Vedtaksmelding>()) }
+        confirmVerified(personMediator)
     }
 }
 
@@ -19,8 +39,9 @@ private val vedtakJson = """{
   },
   "after": {
     "VEDTAK_ID": 29501880,
+    "SAK_ID": 123,
     "VEDTAKSTATUSKODE": "IVERK",
-    "VEDTAKTYPEKODE": "E",
+    "VEDTAKTYPEKODE": "O",
     "UTFALLKODE": "JA",
     "RETTIGHETKODE": "DAGO",
     "PERSON_ID": 4124685,
