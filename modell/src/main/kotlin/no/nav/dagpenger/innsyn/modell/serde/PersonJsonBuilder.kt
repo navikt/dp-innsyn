@@ -2,9 +2,8 @@ package no.nav.dagpenger.innsyn.modell.serde
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import no.nav.dagpenger.innsyn.modell.Behandlingskjede
-import no.nav.dagpenger.innsyn.modell.BehandlingskjedeId
 import no.nav.dagpenger.innsyn.modell.Person
+import no.nav.dagpenger.innsyn.modell.Stønadsforhold
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveId
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
@@ -15,7 +14,7 @@ class PersonJsonBuilder(person: Person) : PersonVisitor {
     private val mapper = ObjectMapper()
     private val root: ObjectNode = mapper.createObjectNode()
     private val planNode = mapper.createArrayNode()
-    private lateinit var behandlingskjedeId: BehandlingskjedeId
+    private lateinit var stønadsforholdId: String
 
     init {
         person.accept(this)
@@ -28,8 +27,11 @@ class PersonJsonBuilder(person: Person) : PersonVisitor {
         root.put("oppgaver", planNode)
     }
 
-    override fun preVisit(behandlingskjede: Behandlingskjede, id: BehandlingskjedeId) {
-        behandlingskjedeId = id
+    override fun preVisit(
+        stønadsforhold: Stønadsforhold,
+        tilstand: Stønadsforhold.Tilstand
+    ) {
+        stønadsforholdId = "1"
     }
 
     override fun preVisit(
@@ -41,7 +43,7 @@ class PersonJsonBuilder(person: Person) : PersonVisitor {
     ) {
         planNode.addObject().also {
             it.put("id", id.indeks)
-            it.put("behandlingskjedeId", behandlingskjedeId)
+            it.put("stønadsforholdId", stønadsforholdId)
             it.put("beskrivelse", beskrivelse)
             it.put("opprettet", opprettet.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
             it.put("oppgaveType", id.type.toString())

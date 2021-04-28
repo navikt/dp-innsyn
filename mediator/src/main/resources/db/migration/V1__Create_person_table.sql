@@ -1,34 +1,34 @@
 CREATE TABLE IF NOT EXISTS person
 (
-    person_id BIGSERIAL,
-    fnr       CHAR(11) NOT NULL,
-    PRIMARY KEY (person_id)
+    person_id BIGSERIAL PRIMARY KEY,
+    fnr       CHAR(11) NOT NULL
 );
 CREATE UNIQUE INDEX IF NOT EXISTS person_fnr_uindex ON person (fnr);
 
-CREATE TABLE IF NOT EXISTS behandlingskjede
+CREATE TABLE IF NOT EXISTS stønadsforhold
 (
-    id         VARCHAR(255) NOT NULL,
-    oppgave_id VARCHAR(255) NOT NULL,
-    person_id  INT,
-    PRIMARY KEY (id, oppgave_id, person_id),
-    CONSTRAINT fk_person
-        FOREIGN KEY (person_id)
-            REFERENCES person (person_id)
+    stønadsforhold_id UUID PRIMARY KEY,
+    person_id         BIGINT REFERENCES person,
+    tilstand          VARCHAR(255) NOT NULL
 );
+CREATE UNIQUE INDEX IF NOT EXISTS stønadsforhold_person_uindex ON stønadsforhold (stønadsforhold_id, person_id);
 
-CREATE TABLE oppgave
+CREATE TABLE IF NOT EXISTS oppgave
 (
-    oppgave_id  BIGSERIAL,
-    person_id   INT,
-    id          VARCHAR(255) NOT NULL,
-    beskrivelse VARCHAR(255),
-    opprettet   TIMESTAMP    NOT NULL,
-    type        VARCHAR(255) NOT NULL,
-    tilstand    VARCHAR(255) NOT NULL,
-    PRIMARY KEY (oppgave_id),
-    CONSTRAINT fk_person
-        FOREIGN KEY (person_id)
-            REFERENCES person (person_id)
+    oppgave_id        BIGSERIAL PRIMARY KEY ,
+    stønadsforhold_id UUID REFERENCES stønadsforhold,
+    id                VARCHAR(255) NOT NULL,
+    beskrivelse       VARCHAR(255),
+    opprettet         TIMESTAMP    NOT NULL,
+    type              VARCHAR(255) NOT NULL,
+    tilstand          VARCHAR(255) NOT NULL
 );
-CREATE UNIQUE INDEX IF NOT EXISTS oppgave_person_uindex ON oppgave (person_id, id, type);
+CREATE UNIQUE INDEX IF NOT EXISTS oppgave_stønadsforhold_uindex ON oppgave (stønadsforhold_id, id, type);
+
+CREATE TABLE IF NOT EXISTS stønadsid
+(
+    id                BIGSERIAL,
+    stønadsforhold_id UUID REFERENCES stønadsforhold,
+    ekstern_id        VARCHAR(255) NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS stønadsid_uindex ON stønadsid (stønadsforhold_id, ekstern_id);

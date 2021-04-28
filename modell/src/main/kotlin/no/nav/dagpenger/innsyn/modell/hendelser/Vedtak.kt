@@ -2,28 +2,29 @@ package no.nav.dagpenger.innsyn.modell.hendelser
 
 class Vedtak private constructor(
     private val vedtakId: String,
-    val søknadId: String,
+    val fagsakId: String,
     public val status: Status,
     oppgaver: Set<Oppgave>
-) : Hendelse(søknadId, oppgaver) {
+) : Hendelse(oppgaver) {
     constructor(
         vedtakId: String,
+        fagsakId: String,
         status: Status
     ) : this(
         vedtakId,
-        "",
+        fagsakId,
         status,
         emptySet()
     )
 
     constructor(
         vedtakId: String,
-        søknadId: String,
+        fagsakId: String,
         oppgaver: Set<Oppgave>,
         status: Status
     ) : this(
         vedtakId,
-        søknadId,
+        fagsakId,
         status,
         oppgaver
     )
