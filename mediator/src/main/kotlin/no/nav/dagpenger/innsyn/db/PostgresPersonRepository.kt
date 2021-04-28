@@ -28,9 +28,8 @@ class PostgresPersonRepository : PersonRepository {
         return using(sessionOf(dataSource)) { session ->
             session.transaction { tx ->
                 visitor.queries.map {
-                    println("Running $it")
                     tx.run(it.asUpdate)
-                }.all { it == 1 }
+                }.all { it >= 1 }
             }
         }
     }
