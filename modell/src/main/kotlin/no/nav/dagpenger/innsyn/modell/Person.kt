@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.modell
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Hendelse
+import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 
 class Person private constructor(
@@ -11,7 +12,7 @@ class Person private constructor(
 
     fun håndter(hendelse: Hendelse) {
         if (stønadsforhold.map { it.håndter(hendelse) }.none { it }) {
-            stønadsforhold.add(Stønadsforhold().also { it.håndter(hendelse) })
+            if(hendelse is Søknad) stønadsforhold.add(Stønadsforhold().also { it.håndter(hendelse) })
         }
     }
 

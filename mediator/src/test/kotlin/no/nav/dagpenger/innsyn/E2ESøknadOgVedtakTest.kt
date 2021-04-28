@@ -76,6 +76,16 @@ internal class E2ESøknadOgVedtakTest {
         }
     }
 
+    @Test
+    fun `vedtak uten søknad først`(){
+        withMigratedDb {
+            rapid.sendTestMessage(vedtakAsJson)
+            with(PersonInspektør(person)){
+                assertEquals(0, stønadsforhold)
+            }
+        }
+    }
+
     private val person get() = personRepository.person("10108099999")
 
     private class PersonInspektør(person: Person) : PersonVisitor {
