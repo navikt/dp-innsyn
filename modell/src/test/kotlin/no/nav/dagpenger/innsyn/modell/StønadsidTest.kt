@@ -7,12 +7,14 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class StønadsidTest {
 
     @Test
     fun `Like stønadsider skal være like `() {
-        assertEquals(Stønadsid(), Stønadsid())
+        val uuid = UUID.randomUUID()
+        assertEquals(Stønadsid(uuid, mutableListOf()), Stønadsid(uuid, mutableListOf()))
     }
 
     @Test
