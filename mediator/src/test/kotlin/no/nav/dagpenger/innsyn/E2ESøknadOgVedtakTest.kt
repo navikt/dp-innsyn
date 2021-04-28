@@ -66,21 +66,21 @@ internal class E2ESøknadOgVedtakTest {
     }
 
     @Test
-    fun `2 søknader skal gi 2 stønadsforhold`(){
+    fun `2 søknader skal gi 2 stønadsforhold`() {
         withMigratedDb {
             rapid.sendTestMessage(søknadsJson("123"))
             rapid.sendTestMessage(søknadsJson("456"))
-            with(PersonInspektør(person)){
+            with(PersonInspektør(person)) {
                 assertEquals(2, stønadsforhold)
             }
         }
     }
 
     @Test
-    fun `vedtak uten søknad først`(){
+    fun `vedtak uten søknad først`() {
         withMigratedDb {
             rapid.sendTestMessage(vedtakAsJson)
-            with(PersonInspektør(person)){
+            with(PersonInspektør(person)) {
                 assertEquals(0, stønadsforhold)
             }
         }

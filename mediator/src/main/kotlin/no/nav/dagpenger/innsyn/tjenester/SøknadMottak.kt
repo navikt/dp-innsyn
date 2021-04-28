@@ -21,7 +21,7 @@ internal class SøknadMottak(
             validate { it.demandKey("søknadsdata.aktoerId") }
             validate { it.demandKey("journalpostId") }
             validate { it.demandKey("søknadsdata.brukerBehandlingId") }
-            validate { it.requireAny ("henvendelsestype", listOf("NY_SØKNAD", "GJENOPPTAK")) }
+            validate { it.requireAny("henvendelsestype", listOf("NY_SØKNAD", "GJENOPPTAK")) }
             validate { it.interestedIn("søknadsdata.vedlegg") }
         }.register(this)
     }

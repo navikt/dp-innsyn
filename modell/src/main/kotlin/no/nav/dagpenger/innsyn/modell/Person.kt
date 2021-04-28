@@ -12,7 +12,7 @@ class Person private constructor(
 
     fun håndter(hendelse: Hendelse) {
         if (stønadsforhold.map { it.håndter(hendelse) }.none { it }) {
-            if(hendelse is Søknad) stønadsforhold.add(Stønadsforhold().also { it.håndter(hendelse) })
+            if (hendelse is Søknad) stønadsforhold.add(Stønadsforhold().also { it.håndter(hendelse) })
         }
     }
 
