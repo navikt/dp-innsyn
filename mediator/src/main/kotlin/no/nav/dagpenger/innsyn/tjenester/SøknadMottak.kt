@@ -23,6 +23,7 @@ internal class SøknadMottak(
             validate { it.demandKey("søknadsdata.brukerBehandlingId") }
             validate { it.requireAny("henvendelsestype", listOf("NY_SØKNAD", "GJENOPPTAK")) }
             validate { it.interestedIn("søknadsdata.vedlegg") }
+            validate { it.forbid("ferdigBehandlet") }
         }.register(this)
     }
 

@@ -785,7 +785,6 @@
   ],
   "oppfyllerMinsteinntekt": false,
   "koronaregelverkMinsteinntektBrukt": true,
-  "ferdigBehandlet": true,
   "system_participating_services": [
     {
       "service": "dp-innsyn",
