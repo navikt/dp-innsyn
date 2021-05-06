@@ -1,9 +1,12 @@
 {
-  "system_read_count": 2,
-  "system_started": "2021-04-08T13:34:17.940312",
-  "system_correlation_id": "01F2RM5WJMSMH4SGFY4X93SSC1",
-  "toggleBehandleNySøknad": true,
-  "søknadsdata": {
+  "@id": "98638d1d-9b75-4802-abb2-8b7f1a08948f",
+  "@opprettet": "2021-05-06T09:39:03.638555",
+  "journalpostId": "12455",
+  "datoRegistrert": "2021-05-06T09:39:03.62863",
+  "type": "NySøknad",
+  "fødselsnummer": "10108099999",
+  "aktørId": "1234455",
+  "søknadsData": {
     "soknadId": 11610.0,
     "soknadsType": "dagpenger.ordinaer",
     "skjemaNummer": "NAV 04-01.03",
@@ -751,45 +754,6 @@
     "journalpostId": "493355115",
     "journalRegistrertDato": "2021-04-08T13:34:13"
   },
-  "journalpostId": "493355115",
-  "hovedskjemaId": "NAV 04-01.03",
-  "dokumenter": [
-    {
-      "tittel": "Søknad om dagpenger (ikke permittert)",
-      "dokumentInfoId": "515154408",
-      "brevkode": "NAV 04-01.03"
-    },
-    {
-      "tittel": "Kvitteringsside for dokumentinnsending",
-      "dokumentInfoId": "515154409",
-      "brevkode": "L7"
-    }
-  ],
-  "henvendelsestype": "NY_SØKNAD",
-  "datoRegistrert": "2021-04-08T13:34:13",
-  "aktørId": "1819645303073",
-  "naturligIdent": "10108099999",
-  "avsenderNavn": "KRAFTIG GAPAHUK",
-  "behandlendeEnhet": "4450",
-  "system_breadcrumbs": [
-    {
-      "appId": "dagpenger-joark-mottak",
-      "dateTime": "2021-04-08T13:34:17.940461",
-      "instance": "about:blank"
-    },
-    {
-      "appId": "dagpenger-journalforing-ferdigstill",
-      "dateTime": "2021-04-08T13:34:18.240961",
-      "instance": "about:blank"
-    }
-  ],
-  "oppfyllerMinsteinntekt": false,
-  "koronaregelverkMinsteinntektBrukt": true,
-  "system_participating_services": [
-    {
-      "service": "dp-innsyn",
-      "instance": "dp-innsyn-65784f69cf-d8d4n",
-      "time": "2021-04-08T13:34:26.952305"
-    }
-  ]
+  "@event_name": "innsending_mottatt",
+  "system_read_count": 0
 }

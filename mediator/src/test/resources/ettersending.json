@@ -1,9 +1,13 @@
 {
-  "system_read_count": 1,
-  "system_started": "2021-04-08T13:36:02.348274",
-  "system_correlation_id": "01F2RM92HCE61J70DRB4DC46VG",
-  "toggleBehandleNySøknad": true,
-  "søknadsdata": {
+  "@id": "1a746d75-892a-436b-9003-b093ff68c7d6",
+  "@opprettet": "2021-05-06T09:36:19.358953",
+  "journalpostId": "12455",
+  "datoRegistrert": "2021-05-06T09:36:19.34842",
+  "type": "Ettersending",
+  "fødselsnummer": "10108099999",
+  "aktørId": "1234455",
+  "fagsakId": "29501780",
+  "søknadsData": {
     "soknadId": 11611,
     "soknadsType": "dagpenger.ordinaer",
     "skjemaNummer": "NAV 04-01.03",
@@ -428,43 +432,6 @@
     "journalpostId": "493355116",
     "journalRegistrertDato": "2021-04-08T13:35:56"
   },
-  "journalpostId": "493355116",
-  "hovedskjemaId": "NAVe 04-01.03",
-  "dokumenter": [
-    {
-      "tittel": "Ettersendelse til søknad om dagpenger ved arbeidsledighet (ikke permittert)",
-      "dokumentInfoId": "515154410",
-      "brevkode": "NAVe 04-01.03"
-    },
-    {
-      "tittel": "Dokumentasjon av andre ytelser: Vartpenger",
-      "dokumentInfoId": "515154411",
-      "brevkode": "K1"
-    },
-    {
-      "tittel": "Kvitteringsside for dokumentinnsending",
-      "dokumentInfoId": "515154412",
-      "brevkode": "L7"
-    }
-  ],
-  "henvendelsestype": "ETTERSENDELSE",
-  "datoRegistrert": "2021-04-08T13:35:56",
-  "aktørId": "1819645303073",
-  "naturligIdent": "10108099999",
-  "avsenderNavn": "KRAFTIG GAPAHUK",
-  "behandlendeEnhet": "4450",
-  "system_breadcrumbs": [
-    {
-      "appId": "dagpenger-joark-mottak",
-      "dateTime": "2021-04-08T13:36:02.348486",
-      "instance": "about:blank"
-    }
-  ],
-  "system_participating_services": [
-    {
-      "service": "dp-innsyn",
-      "instance": "dp-innsyn-65784f69cf-d8d4n",
-      "time": "2021-04-08T13:36:02.637858"
-    }
-  ]
+  "@event_name": "innsending_mottatt",
+  "system_read_count": 0
 }

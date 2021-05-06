@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.modell
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
+import no.nav.dagpenger.innsyn.modell.hendelser.Journalføring
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -19,7 +20,7 @@ class StønadsidTest {
 
     @Test
     fun `skal håndtere ettersendinger tilhørende rett søknad`() {
-        val hendelse = Søknad("1", emptySet(), "")
+        val hendelse = Søknad("1", "journalpostId", emptySet())
         val stønadsid = Stønadsid()
 
         assertTrue(stønadsid.håndter(hendelse))
@@ -34,10 +35,12 @@ class StønadsidTest {
 
     @Test
     fun `skal håndtere vedtak tilhørende rett søknad`() {
-        val hendelse = Søknad("1", emptySet(), "9")
+        val søknad = Søknad("1", "journalpostId", emptySet())
+        val journalført = Journalføring("journalpostId", "9", emptySet())
         val stønadsid = Stønadsid()
 
-        assertTrue(stønadsid.håndter(hendelse))
+        assertTrue(stønadsid.håndter(søknad))
+        assertTrue(stønadsid.håndter(journalført))
 
         val annetVedtak = Vedtak("2", "5", Vedtak.Status.ENDRING)
         assertFalse(stønadsid.håndter(annetVedtak))

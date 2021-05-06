@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.modell
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
+import no.nav.dagpenger.innsyn.modell.hendelser.Journalføring
 import no.nav.dagpenger.innsyn.modell.hendelser.Mangelbrev
 import no.nav.dagpenger.innsyn.modell.hendelser.Saksbehandling
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
@@ -16,7 +17,13 @@ class Stønadsid(
 
     fun håndter(søknad: Søknad): Boolean {
         eksterneIder.add(søknad.søknadId)
-        eksterneIder.add(søknad.fagsakId)
+        eksterneIder.add(søknad.journalpostId)
+        return true
+    }
+
+    fun håndter(journalføring: Journalføring): Boolean {
+        if (!eksterneIder.contains(journalføring.journalpostId)) return false
+        eksterneIder.add(journalføring.fagsakId)
         return true
     }
 

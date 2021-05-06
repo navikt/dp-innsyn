@@ -1,16 +1,16 @@
 package no.nav.dagpenger.innsyn.melding
 
 import no.nav.dagpenger.innsyn.Dagpenger.søknadOppgave
-import no.nav.dagpenger.innsyn.Dagpenger.vedtakOppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.helse.rapids_rivers.JsonMessage
 
 internal class Søknadsmelding(packet: JsonMessage) : Innsendingsmelding(packet) {
-    private val søknadId = packet["søknadsdata.brukerBehandlingId"].asText()
+    private val søknadId = packet["søknadsData.brukerBehandlingId"].asText()
+    private val journalpostId = packet["journalpostId"].asText()
     internal val søknad
         get() = Søknad(
             søknadId,
-            setOf(søknadOppgave.ferdig(søknadId, "")) + oppgaver + vedtakOppgave.ny("123", ""),
-            "123"
+            journalpostId,
+            setOf(søknadOppgave.ferdig(søknadId, "Du har søkt dagpenger")) + oppgaver
         )
 }

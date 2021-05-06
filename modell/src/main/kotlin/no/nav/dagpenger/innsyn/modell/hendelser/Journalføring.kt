@@ -1,7 +1,7 @@
 package no.nav.dagpenger.innsyn.modell.hendelser
 
-class Søknad(
-    internal val søknadId: String,
+class Journalføring(
     internal val journalpostId: String,
+    internal val fagsakId: String,
     oppgaver: Set<Oppgave>
-) : Innsending(søknadId, oppgaver)
+) : Hendelse(oppgaver)

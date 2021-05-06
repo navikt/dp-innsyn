@@ -1,0 +1,15 @@
+{
+  "@id": "1a746d75-892a-436b-9003-b093ff68c7d6",
+  "@opprettet": "2021-05-06T09:36:19.358953",
+  "journalpostId": "12455",
+  "datoRegistrert": "2021-05-06T09:36:19.34842",
+  "type": "NySøknad",
+  "fødselsnummer": "10108099999",
+  "aktørId": "1234455",
+  "fagsakId": "29501780",
+  "søknadsData": {
+    "test": "test"
+  },
+  "@event_name": "innsending_ferdigstilt",
+  "system_read_count": 0
+}

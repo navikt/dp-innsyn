@@ -7,7 +7,6 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveId
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
-import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -33,29 +32,19 @@ internal class PersonTest {
     }
 
     @Test
-    fun `Søknad uten vedlegg og deretter innsendte vedlegg også vedtak`() {
+    fun `Søknad uten vedlegg og deretter innsendte vedlegg `() {
         Person("ident").also { person ->
-            person.håndter(søknad("id", manglerVedleggOppgave("vedleggA") + manglerVedtakOppgave()))
+            person.håndter(søknad("id", manglerVedleggOppgave("vedleggA")))
 
-            // assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
-            assertEquals(2, PersonInspektør(person).uferdigeOppgaver)
-            // assertTrue(person.harUferdigeOppgaverAv(vedleggOppgave))
+            assertEquals(1, PersonInspektør(person).uferdigeOppgaver)
 
             person.håndter(ettersending("id", ferdigVedleggOppgave("vedleggB")))
-            // assertTrue(person.harUferdigeOppgaverAv(vedleggOppgave))
             assertEquals(1, PersonInspektør(person).ferdigeOppgaver)
-            assertEquals(2, PersonInspektør(person).uferdigeOppgaver)
+            assertEquals(1, PersonInspektør(person).uferdigeOppgaver)
 
             person.håndter(ettersending("id", ferdigVedleggOppgave("vedleggA")))
-            // assertTrue(person.harUferdigeOppgaverAv(vedtakOppgave))
             assertEquals(2, PersonInspektør(person).ferdigeOppgaver)
-            assertEquals(1, PersonInspektør(person).uferdigeOppgaver)
-            // assertFalse(person.harUferdigeOppgaverAv(vedleggOppgave))
-
-            person.håndter(vedtak("id"))
             assertEquals(0, PersonInspektør(person).uferdigeOppgaver)
-            assertEquals(3, PersonInspektør(person).ferdigeOppgaver)
-            // assertFalse(person.harUferdigeOppgaverAv(vedtakOppgave))
         }
     }
 
@@ -64,16 +53,12 @@ internal class PersonTest {
         Person("ident").also { person ->
             person.håndter(søknad("id", manglerVedtakOppgave()))
             person.håndter(mangelbrev("id"))
-            // assertTrue(person.harUferdigeOppgaverAv(mangelbrevOppgave))
             assertEquals(1, PersonInspektør(person).uferdigeOppgaver)
         }
     }
 
-    private fun søknad(id: String, oppgaver: Set<Oppgave>) = Søknad(id, oppgaver, "")
+    private fun søknad(id: String, oppgaver: Set<Oppgave>) = Søknad(id, "journalpostId", oppgaver)
     private fun ettersending(id: String, oppgaver: Set<Oppgave>) = Ettersending(id, oppgaver)
-    private fun vedtak(søknadId: String) =
-        Vedtak("1", "", setOf(vedtakOppgave.ferdig("vedtak", "")), Vedtak.Status.INNVILGET)
-
     private fun mangelbrev(søknadId: String) = Mangelbrev("id", søknadId, setOf(mangelbrevOppgave.ny("", "")))
     private fun manglerVedtakOppgave() = setOf(vedtakOppgave.ny("vedtak", ""))
     private fun manglerVedleggOppgave(navn: String) = setOf(vedleggOppgave.ny(navn, ""))

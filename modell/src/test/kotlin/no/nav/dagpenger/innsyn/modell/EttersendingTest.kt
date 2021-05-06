@@ -19,7 +19,7 @@ internal class EttersendingTest {
         }
     }
 
-    private fun søknad(id: String, oppgaver: Set<Oppgave>) = Søknad(id, oppgaver, "")
+    private fun søknad(id: String, oppgaver: Set<Oppgave>) = Søknad(id, "journalpostId", oppgaver)
     private fun ettersending(id: String, oppgaver: Set<Oppgave>) = Ettersending(id, oppgaver)
     private fun manglerEttersendingOppgave() = setOf(testOppgave.ny("1", ""))
 

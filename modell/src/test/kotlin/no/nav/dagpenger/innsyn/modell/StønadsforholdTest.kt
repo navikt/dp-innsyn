@@ -61,7 +61,7 @@ class StønadsforholdTest {
         }
     }
 
-    private val søknad = Søknad("1", emptySet(), "")
+    private val søknad = Søknad("1", "journalpostId", emptySet())
     private val ettersending = Ettersending("1", emptySet())
     private val saksbehandling = Saksbehandling("3", "1", emptySet())
     private val mangelbrev = Mangelbrev("3", "1", emptySet())

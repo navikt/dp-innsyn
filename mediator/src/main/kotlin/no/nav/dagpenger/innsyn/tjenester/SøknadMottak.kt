@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.tjenester
 
 import mu.KotlinLogging
+import mu.withLoggingContext
 import no.nav.dagpenger.innsyn.PersonMediator
 import no.nav.dagpenger.innsyn.melding.Søknadsmelding
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -18,24 +19,30 @@ internal class SøknadMottak(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate { it.demandKey("søknadsdata.aktoerId") }
+            validate { it.demandValue("@event_name", "innsending_mottatt") }
+            validate { it.demandKey("fødselsnummer") }
             validate { it.demandKey("journalpostId") }
-            validate { it.demandKey("søknadsdata.brukerBehandlingId") }
-            validate { it.requireAny("henvendelsestype", listOf("NY_SØKNAD", "GJENOPPTAK")) }
-            validate { it.interestedIn("søknadsdata.vedlegg") }
-            validate { it.forbid("ferdigBehandlet") }
+            validate { it.demandKey("søknadsData.brukerBehandlingId") }
+            validate { it.requireAny("type", listOf("NySøknad", "Gjenopptak")) }
+            validate { it.interestedIn("søknadsData.vedlegg") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val fnr = packet["søknadsdata.aktoerId"].asText()
-        val søknadId = packet["søknadsdata.brukerBehandlingId"].asText()
+        val fnr = packet["fødselsnummer"].asText()
+        val søknadId = packet["søknadsData.brukerBehandlingId"].asText()
+        val journalpostId = packet["journalpostId"].asText()
 
-        sikkerlogg.info { "Mottok ny søknad ($søknadId) for person ($fnr)." }
-        sikkerlogg.info { "SØKNAD: ${packet.toJson()}" }
+        withLoggingContext(
+            "søknadId" to søknadId,
+            "journalpostId" to journalpostId
+        ) {
+            logg.info { "Mottok ny søknad." }
+            sikkerlogg.info { "Mottok ny søknad for person $fnr: ${packet.toJson()}" }
 
-        Søknadsmelding(packet).also {
-            personMediator.håndter(it.søknad, it)
+            Søknadsmelding(packet).also {
+                personMediator.håndter(it.søknad, it)
+            }
         }
     }
 

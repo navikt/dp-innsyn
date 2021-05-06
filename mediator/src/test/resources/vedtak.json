@@ -1,4 +1,3 @@
-
 {
   "table": "SIAMO.VEDTAK",
   "op_type": "I",
@@ -10,7 +9,7 @@
   },
   "after": {
     "VEDTAK_ID": 29501880,
-    "SAK_ID": 123,
+    "SAK_ID": 29501780,
     "VEDTAKSTATUSKODE": "IVERK",
     "VEDTAKTYPEKODE": "O",
     "UTFALLKODE": "JA",

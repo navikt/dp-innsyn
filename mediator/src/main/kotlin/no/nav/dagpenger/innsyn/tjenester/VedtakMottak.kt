@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.tjenester
 
 import mu.KotlinLogging
+import mu.withLoggingContext
 import no.nav.dagpenger.innsyn.PersonMediator
 import no.nav.dagpenger.innsyn.melding.Vedtaksmelding
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -30,11 +31,18 @@ internal class VedtakMottak(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val fnr = packet["tokens"]["FODSELSNR"].asText()
         val vedtakId = packet["after"]["VEDTAK_ID"].asText()
+        val sakId = packet["after"]["SAK_ID"].asText()
 
-        sikkerlogg.info { "Mottok nytt vedtak med id $vedtakId for person ($fnr)." }
+        withLoggingContext(
+            "fagsakId" to sakId,
+            "vedtakId" to vedtakId
+        ) {
+            logg.info { "Mottok nytt vedtak" }
+            sikkerlogg.info { "Mottok nytt vedtak for person $fnr: ${packet.toJson()}" }
 
-        Vedtaksmelding(packet).also {
-            personMediator.håndter(it.vedtak, it)
+            Vedtaksmelding(packet).also {
+                personMediator.håndter(it.vedtak, it)
+            }
         }
     }
 

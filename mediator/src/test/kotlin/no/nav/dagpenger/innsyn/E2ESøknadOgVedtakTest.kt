@@ -7,10 +7,12 @@ import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
 import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.Stønadsforhold
+import no.nav.dagpenger.innsyn.modell.Stønadsid
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.serde.PersonJsonBuilder
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
+import no.nav.dagpenger.innsyn.tjenester.JournalførtMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakMottak
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -18,17 +20,20 @@ import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
+import java.util.UUID
 
 internal class E2ESøknadOgVedtakTest {
     private val rapid = TestRapid()
     private val personRepository = PostgresPersonRepository()
     private val personMediator = PersonMediator(personRepository)
-    private val søknadAsJson by lazy { javaClass.getResource("/søknadsinnsending.json").readText() }
+    private val søknadAsJson by lazy { javaClass.getResource("/søknad_mottatt.json").readText() }
+    private val journalførtAsJson by lazy { javaClass.getResource("/journalført.json").readText() }
     private val ettersendingAsJson by lazy { javaClass.getResource("/ettersending.json").readText() }
     private val vedtakAsJson by lazy { javaClass.getResource("/vedtak.json").readText() }
 
     init {
         SøknadMottak(rapid, personMediator)
+        JournalførtMottak(rapid, personMediator)
         EttersendingMottak(rapid, personMediator)
         VedtakMottak(rapid, personMediator)
     }
@@ -38,10 +43,18 @@ internal class E2ESøknadOgVedtakTest {
         withMigratedDb {
             rapid.sendTestMessage(søknadAsJson)
             with(PersonInspektør(person)) {
+                assertEquals(2, eksterneIder.size)
                 assertEquals(1, stønadsforhold)
+                assertEquals(0, vedtakOppgaver)
+                assertEquals(2, uferdigeOppgaver)
+                assertEquals(1, ferdigeOppgaver)
+            }
+
+            rapid.sendTestMessage(journalførtAsJson)
+            with(PersonInspektør(person)) {
+                assertEquals(3, eksterneIder.size)
                 assertEquals(1, vedtakOppgaver)
                 assertEquals(3, uferdigeOppgaver)
-                assertEquals(1, ferdigeOppgaver)
             }
 
             rapid.sendTestMessage(ettersendingAsJson)
@@ -90,6 +103,7 @@ internal class E2ESøknadOgVedtakTest {
     private val person get() = personRepository.person("10108099999")
 
     private class PersonInspektør(person: Person) : PersonVisitor {
+        val eksterneIder = mutableSetOf<String>()
         var uferdigeOppgaver = 0
         var ferdigeOppgaver = 0
         var søknadOppgaver = 0
@@ -106,6 +120,10 @@ internal class E2ESøknadOgVedtakTest {
             tilstand: Stønadsforhold.Tilstand
         ) {
             this.stønadsforhold++
+        }
+
+        override fun preVisit(stønadsid: Stønadsid, internId: UUID, eksternId: String) {
+            eksterneIder.add(eksternId)
         }
 
         override fun preVisit(
@@ -131,12 +149,17 @@ internal class E2ESøknadOgVedtakTest {
 
 @Language("JSON")
 private fun søknadsJson(søknadsId: String) = """{
-  "søknadsdata": {
+  "@id": "98638d1d-9b75-4802-abb2-8b7f1a08948f",
+  "@opprettet": "2021-05-06T09:39:03.638555",
+  "journalpostId": "12455",
+  "datoRegistrert": "2021-05-06T09:39:03.62863",
+  "type": "NySøknad",
+  "fødselsnummer": "10108099999",
+  "aktørId": "1234455",
+    "søknadsData": {
     "brukerBehandlingId": $søknadsId,
     "aktoerId": "10108099999"
   },
-  "journalpostId": "493355115",
-  "henvendelsestype": "NY_SØKNAD",
-  "aktørId": "1819645303073",
-  "naturligIdent": "10108099999"
+  "@event_name": "innsending_mottatt",
+  "system_read_count": 0
 }"""

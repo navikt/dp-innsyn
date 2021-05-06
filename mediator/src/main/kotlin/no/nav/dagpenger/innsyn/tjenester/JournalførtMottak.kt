@@ -3,7 +3,7 @@ package no.nav.dagpenger.innsyn.tjenester
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.innsyn.PersonMediator
-import no.nav.dagpenger.innsyn.melding.Ettersendingsmelding
+import no.nav.dagpenger.innsyn.melding.Journalførtmelding
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
@@ -13,35 +13,33 @@ import no.nav.helse.rapids_rivers.River
 private val logg = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
-internal class EttersendingMottak(
+internal class JournalførtMottak(
     rapidsConnection: RapidsConnection,
     private val personMediator: PersonMediator
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "innsending_mottatt") }
-            validate { it.demandKey("fødselsnummer") }
+            validate { it.demandValue("@event_name", "innsending_ferdigstilt") }
+            validate { it.demandKey("fagsakId") }
             validate { it.demandKey("journalpostId") }
-            validate { it.requireKey("søknadsData.behandlingskjedeId") }
-            validate { it.requireAny("type", listOf("Ettersending")) }
-            validate { it.interestedIn("søknadsData.vedlegg") }
+            validate { it.requireKey("fødselsnummer") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val fnr = packet["fødselsnummer"].asText()
-        val søknadId = packet["søknadsData.behandlingskjedeId"].asText()
         val journalpostId = packet["journalpostId"].asText()
+        val fagsakId = packet["fagsakId"].asText()
 
         withLoggingContext(
-            "søknadId" to søknadId,
-            "journalpostId" to journalpostId
+            "journalpostId" to journalpostId,
+            "fagsakId" to fagsakId
         ) {
-            logg.info { "Mottok ny ettersending." }
-            sikkerlogg.info { "Mottok ny ettersending for person $fnr: ${packet.toJson()}" }
+            logg.info { "Mottok ferdig journalføring." }
+            sikkerlogg.info { "Mottok ferdig journalføring ($fnr): ${packet.toJson()}" }
 
-            Ettersendingsmelding(packet).also {
-                personMediator.håndter(it.ettersending, it)
+            Journalførtmelding(packet).also {
+                personMediator.håndter(it.journalføring, it)
             }
         }
     }

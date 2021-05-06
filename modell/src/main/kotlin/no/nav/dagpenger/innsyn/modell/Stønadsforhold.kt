@@ -8,6 +8,7 @@ import no.nav.dagpenger.innsyn.modell.TilstandType.UNDER_BEHANDLING
 import no.nav.dagpenger.innsyn.modell.TilstandType.UTLØPT
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
 import no.nav.dagpenger.innsyn.modell.hendelser.Hendelse
+import no.nav.dagpenger.innsyn.modell.hendelser.Journalføring
 import no.nav.dagpenger.innsyn.modell.hendelser.Mangelbrev
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Saksbehandling
@@ -36,6 +37,7 @@ class Stønadsforhold private constructor(
     fun håndter(hendelse: Hendelse): Boolean {
         return when (hendelse) {
             is Søknad -> håndter(hendelse)
+            is Journalføring -> håndter(hendelse)
             is Ettersending -> håndter(hendelse)
             is Vedtak -> håndter(hendelse)
             is Mangelbrev -> håndter(hendelse)
@@ -47,6 +49,11 @@ class Stønadsforhold private constructor(
     fun håndter(søknad: Søknad): Boolean {
         if (!stønadsid.håndter(søknad)) return false
         return tilstand.håndter(this, søknad)
+    }
+
+    fun håndter(journalføring: Journalføring): Boolean {
+        if (!stønadsid.håndter(journalføring)) return false
+        return tilstand.håndter(this, journalføring)
     }
 
     fun håndter(ettersending: Ettersending): Boolean {
@@ -74,6 +81,8 @@ class Stønadsforhold private constructor(
 
         fun håndter(stønadsforhold: Stønadsforhold, søknad: Søknad) = false
 
+        fun håndter(stønadsforhold: Stønadsforhold, journalføring: Journalføring) = false
+
         fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending) = false
 
         fun håndter(stønadsforhold: Stønadsforhold, vedtak: Vedtak) = false
@@ -99,6 +108,11 @@ class Stønadsforhold private constructor(
         override fun håndter(stønadsforhold: Stønadsforhold, ettersending: Ettersending): Boolean {
             stønadsforhold.tidslinje.removeAll(ettersending.oppgaver)
             stønadsforhold.tidslinje.addAll(ettersending.oppgaver)
+            return true
+        }
+
+        override fun håndter(stønadsforhold: Stønadsforhold, journalføring: Journalføring): Boolean {
+            stønadsforhold.tidslinje.addAll(journalføring.oppgaver)
             return true
         }
 
