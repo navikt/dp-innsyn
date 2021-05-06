@@ -47,4 +47,8 @@ internal class JournalførtMottak(
     override fun onError(problems: MessageProblems, context: MessageContext) {
         logg.error { problems }
     }
+
+    override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
+        logg.error { error }
+    }
 }
