@@ -61,8 +61,6 @@ internal fun Application.innsynApi(
             get("/soknad") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
-                logger.info { "Fikk request." }
-                sikkerlogg.info { "Fikk request. Fnr: $fnr. Subject: ${jwtPrincipal!!.payload!!.subject}. JWT ser slik ut: ${jwtPrincipal!!.payload}" }
                 val person = personRepository.person(fnr)
 
                 call.respondText { PersonJsonBuilder(person).resultat().toString() }
