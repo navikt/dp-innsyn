@@ -4,6 +4,7 @@ import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.clean
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
+import no.nav.dagpenger.innsyn.tjenester.JournalførtMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakMottak
 import no.nav.helse.rapids_rivers.RapidApplication
@@ -18,6 +19,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
         innsynApi(personRepository, AuthFactory.jwkProvider, AuthFactory.issuer, AuthFactory.clientId)
     }.build().apply {
         SøknadMottak(this, personMediator)
+        JournalførtMottak(this, personMediator)
         EttersendingMottak(this, personMediator)
         VedtakMottak(this, personMediator)
     }
