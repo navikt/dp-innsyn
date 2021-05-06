@@ -6,6 +6,7 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.dataSource
+import no.nav.dagpenger.innsyn.modell.EksternId
 import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.ProsessId
 import no.nav.dagpenger.innsyn.modell.Søknadsprosess
@@ -63,10 +64,13 @@ class PostgresPersonRepository : PersonRepository {
     private fun hentProsessId(session: Session, stønadsforholdId: UUID) = session.run(
         queryOf(
             //language=PostgreSQL
-            "SELECT ekstern_id FROM prosess_id WHERE søknadsprosess_id = ?",
+            "SELECT ekstern_id, ekstern_type FROM prosess_id WHERE søknadsprosess_id = ?",
             stønadsforholdId
         ).map { row ->
-            row.string("ekstern_id")
+            EksternId(
+                row.string("ekstern_type"),
+                row.string("ekstern_id"),
+            )
         }.asList
     ).run {
         ProsessId(stønadsforholdId, this.toMutableList())
@@ -121,7 +125,7 @@ class PostgresPersonRepository : PersonRepository {
             this.tilstand = tilstand.type.toString()
         }
 
-        override fun preVisit(stønadsid: ProsessId, internId: UUID, eksternId: String) {
+        override fun preVisit(stønadsid: ProsessId, internId: UUID, eksternId: EksternId) {
             aktivtStønadsforhold = internId
             queries.add(
                 queryOf(
@@ -140,13 +144,14 @@ class PostgresPersonRepository : PersonRepository {
             queries.add(
                 queryOf(
                     //language=PostgreSQL
-                    """INSERT INTO prosess_id(søknadsprosess_id, ekstern_id)
-                        VALUES (:stonadsforholdId, :eksternId)
-                        ON CONFLICT (søknadsprosess_id, ekstern_id) DO NOTHING
+                    """INSERT INTO prosess_id(søknadsprosess_id, ekstern_type, ekstern_id)
+                        VALUES (:stonadsforholdId, :eksternType, :eksternId)
+                        ON CONFLICT (søknadsprosess_id, ekstern_type, ekstern_id) DO NOTHING
                     """.trimIndent(),
                     mapOf(
                         "stonadsforholdId" to internId,
-                        "eksternId" to eksternId,
+                        "eksternType" to eksternId.type,
+                        "eksternId" to eksternId.id,
                     )
                 )
             )

@@ -1,5 +1,6 @@
 package no.nav.dagpenger.innsyn.modell.serde
 
+import no.nav.dagpenger.innsyn.modell.EksternId
 import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.ProsessId
 import no.nav.dagpenger.innsyn.modell.Søknadsprosess
@@ -31,12 +32,12 @@ interface StønadsidVisitor {
     fun preVisit(
         stønadsid: ProsessId,
         internId: UUID,
-        eksternId: String
+        eksternId: EksternId
     ) {}
     fun postVisit(
         stønadsid: ProsessId,
         internId: UUID,
-        eksternId: String
+        eksternId: EksternId
     ) {}
 }
 

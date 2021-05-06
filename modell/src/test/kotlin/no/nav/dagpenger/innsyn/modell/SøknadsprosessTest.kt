@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.modell
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
+import no.nav.dagpenger.innsyn.modell.hendelser.Journalføring
 import no.nav.dagpenger.innsyn.modell.hendelser.Mangelbrev
 import no.nav.dagpenger.innsyn.modell.hendelser.Saksbehandling
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
@@ -15,6 +16,7 @@ class SøknadsprosessTest {
     fun `Søknad, ettersending, vedtak skal gi hendelser i tidslinjen og endre tilstand`() {
         Søknadsprosess().also {
             it.håndter(søknad)
+            it.håndter(ferdigstilt)
             inspektør(it) {
                 assertEquals(TilstandType.UNDER_BEHANDLING, tilstand.type)
             }
@@ -62,6 +64,7 @@ class SøknadsprosessTest {
     }
 
     private val søknad = Søknad("1", "journalpostId", emptySet())
+    private val ferdigstilt = Journalføring("journalpostId", "1", emptySet())
     private val ettersending = Ettersending("1", emptySet())
     private val saksbehandling = Saksbehandling("3", "1", emptySet())
     private val mangelbrev = Mangelbrev("3", "1", emptySet())

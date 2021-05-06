@@ -5,6 +5,7 @@ import no.nav.dagpenger.innsyn.Dagpenger.vedleggOppgave
 import no.nav.dagpenger.innsyn.Dagpenger.vedtakOppgave
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
+import no.nav.dagpenger.innsyn.modell.EksternId
 import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.ProsessId
 import no.nav.dagpenger.innsyn.modell.Søknadsprosess
@@ -103,7 +104,7 @@ internal class E2ESøknadOgVedtakTest {
     private val person get() = personRepository.person("10108099999")
 
     private class PersonInspektør(person: Person) : PersonVisitor {
-        val eksterneIder = mutableSetOf<String>()
+        val eksterneIder = mutableSetOf<EksternId>()
         var uferdigeOppgaver = 0
         var ferdigeOppgaver = 0
         var søknadOppgaver = 0
@@ -122,7 +123,7 @@ internal class E2ESøknadOgVedtakTest {
             this.stønadsforhold++
         }
 
-        override fun preVisit(stønadsid: ProsessId, internId: UUID, eksternId: String) {
+        override fun preVisit(stønadsid: ProsessId, internId: UUID, eksternId: EksternId) {
             eksterneIder.add(eksternId)
         }
 
