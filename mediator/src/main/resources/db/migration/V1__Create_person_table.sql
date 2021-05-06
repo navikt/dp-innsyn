@@ -5,30 +5,30 @@ CREATE TABLE IF NOT EXISTS person
 );
 CREATE UNIQUE INDEX IF NOT EXISTS person_fnr_uindex ON person (fnr);
 
-CREATE TABLE IF NOT EXISTS stønadsforhold
+CREATE TABLE IF NOT EXISTS søknadsprosesser
 (
-    stønadsforhold_id UUID PRIMARY KEY,
+    søknadsprosess_id UUID PRIMARY KEY,
     person_id         BIGINT REFERENCES person,
     tilstand          VARCHAR(255) NOT NULL
 );
-CREATE UNIQUE INDEX IF NOT EXISTS stønadsforhold_person_uindex ON stønadsforhold (stønadsforhold_id, person_id);
+CREATE UNIQUE INDEX IF NOT EXISTS søknadsprosess_person_uindex ON søknadsprosesser (søknadsprosess_id, person_id);
 
 CREATE TABLE IF NOT EXISTS oppgave
 (
     oppgave_id        BIGSERIAL PRIMARY KEY ,
-    stønadsforhold_id UUID REFERENCES stønadsforhold,
+    søknadsprosess_id UUID REFERENCES søknadsprosesser,
     id                VARCHAR(255) NOT NULL,
     beskrivelse       VARCHAR(255),
     opprettet         TIMESTAMP    NOT NULL,
     type              VARCHAR(255) NOT NULL,
     tilstand          VARCHAR(255) NOT NULL
 );
-CREATE UNIQUE INDEX IF NOT EXISTS oppgave_stønadsforhold_uindex ON oppgave (stønadsforhold_id, id, type);
+CREATE UNIQUE INDEX IF NOT EXISTS oppgave_søknadsprosess_uindex ON oppgave (søknadsprosess_id, id, type);
 
-CREATE TABLE IF NOT EXISTS stønadsid
+CREATE TABLE IF NOT EXISTS prosess_id
 (
     id                BIGSERIAL,
-    stønadsforhold_id UUID REFERENCES stønadsforhold,
+    søknadsprosess_id UUID REFERENCES søknadsprosesser,
     ekstern_id        VARCHAR(255) NOT NULL
 );
-CREATE UNIQUE INDEX IF NOT EXISTS stønadsid_uindex ON stønadsid (stønadsforhold_id, ekstern_id);
+CREATE UNIQUE INDEX IF NOT EXISTS prosess_id_uindex ON prosess_id (søknadsprosess_id, ekstern_id);

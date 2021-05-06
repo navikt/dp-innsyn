@@ -1,8 +1,8 @@
 package no.nav.dagpenger.innsyn.modell.serde
 
 import no.nav.dagpenger.innsyn.modell.Person
-import no.nav.dagpenger.innsyn.modell.Stønadsforhold
-import no.nav.dagpenger.innsyn.modell.Stønadsid
+import no.nav.dagpenger.innsyn.modell.ProsessId
+import no.nav.dagpenger.innsyn.modell.Søknadsprosess
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
 import java.time.LocalDateTime
@@ -15,26 +15,26 @@ interface PersonVisitor : StønadsforholdVisitor {
 
 interface StønadsforholdVisitor : OppgaveVisitor, StønadsidVisitor {
     fun preVisit(
-        stønadsforhold: Stønadsforhold,
-        tilstand: Stønadsforhold.Tilstand
+        søknadsprosess: Søknadsprosess,
+        tilstand: Søknadsprosess.Tilstand
     ) {
     }
 
     fun postVisit(
-        stønadsforhold: Stønadsforhold,
-        tilstand: Stønadsforhold.Tilstand
+        søknadsprosess: Søknadsprosess,
+        tilstand: Søknadsprosess.Tilstand
     ) {
     }
 }
 
 interface StønadsidVisitor {
     fun preVisit(
-        stønadsid: Stønadsid,
+        stønadsid: ProsessId,
         internId: UUID,
         eksternId: String
     ) {}
     fun postVisit(
-        stønadsid: Stønadsid,
+        stønadsid: ProsessId,
         internId: UUID,
         eksternId: String
     ) {}

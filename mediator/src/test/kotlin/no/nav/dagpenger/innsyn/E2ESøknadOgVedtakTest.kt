@@ -6,8 +6,8 @@ import no.nav.dagpenger.innsyn.Dagpenger.vedtakOppgave
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
 import no.nav.dagpenger.innsyn.modell.Person
-import no.nav.dagpenger.innsyn.modell.Stønadsforhold
-import no.nav.dagpenger.innsyn.modell.Stønadsid
+import no.nav.dagpenger.innsyn.modell.ProsessId
+import no.nav.dagpenger.innsyn.modell.Søknadsprosess
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.serde.PersonJsonBuilder
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
@@ -116,13 +116,13 @@ internal class E2ESøknadOgVedtakTest {
         }
 
         override fun preVisit(
-            stønadsforhold: Stønadsforhold,
-            tilstand: Stønadsforhold.Tilstand
+            søknadsprosess: Søknadsprosess,
+            tilstand: Søknadsprosess.Tilstand
         ) {
             this.stønadsforhold++
         }
 
-        override fun preVisit(stønadsid: Stønadsid, internId: UUID, eksternId: String) {
+        override fun preVisit(stønadsid: ProsessId, internId: UUID, eksternId: String) {
             eksterneIder.add(eksternId)
         }
 

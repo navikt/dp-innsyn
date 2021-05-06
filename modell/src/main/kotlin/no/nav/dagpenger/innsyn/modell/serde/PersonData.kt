@@ -4,14 +4,14 @@ import no.nav.dagpenger.innsyn.modell.Person
 
 class PersonData(
     fnr: String,
-    stønadsforhold: List<StønadsforholdData>,
+    søknadsprosess: List<SøknadsprosessData>,
 ) {
-    private val stønadsforhold by lazy { stønadsforhold.map { it.stønadsforhold }.toMutableSet() }
+    private val søknadsprosesser by lazy { søknadsprosess.map { it.søknadsprosess }.toMutableSet() }
     val person: Person by lazy {
         Person(fnr).also {
-            it.javaClass.getDeclaredField("stønadsforhold").apply {
+            it.javaClass.getDeclaredField("søknadsprosesser").apply {
                 isAccessible = true
-            }.set(it, this.stønadsforhold)
+            }.set(it, this.søknadsprosesser)
         }
     }
 }

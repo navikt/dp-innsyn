@@ -6,19 +6,19 @@ import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 
 class Person private constructor(
     val fnr: String,
-    private val stønadsforhold: MutableSet<Stønadsforhold>
+    private val søknadsprosesser: MutableSet<Søknadsprosess>
 ) {
     constructor(fnr: String) : this(fnr, mutableSetOf())
 
     fun håndter(hendelse: Hendelse) {
-        if (stønadsforhold.map { it.håndter(hendelse) }.none { it }) {
-            if (hendelse is Søknad) stønadsforhold.add(Stønadsforhold().also { it.håndter(hendelse) })
+        if (søknadsprosesser.map { it.håndter(hendelse) }.none { it }) {
+            if (hendelse is Søknad) søknadsprosesser.add(Søknadsprosess().also { it.håndter(hendelse) })
         }
     }
 
     fun accept(visitor: PersonVisitor) {
         visitor.preVisit(this, fnr)
-        stønadsforhold.forEach { it.accept(visitor) }
+        søknadsprosesser.forEach { it.accept(visitor) }
         visitor.postVisit(this, fnr)
     }
 }

@@ -3,7 +3,7 @@ package no.nav.dagpenger.innsyn.modell.serde
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import no.nav.dagpenger.innsyn.modell.Person
-import no.nav.dagpenger.innsyn.modell.Stønadsid
+import no.nav.dagpenger.innsyn.modell.ProsessId
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveId
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
@@ -28,7 +28,7 @@ class PersonJsonBuilder(person: Person) : PersonVisitor {
         root.put("oppgaver", planNode)
     }
 
-    override fun preVisit(stønadsid: Stønadsid, internId: UUID, eksternId: String) {
+    override fun preVisit(stønadsid: ProsessId, internId: UUID, eksternId: String) {
         stønadsforholdId = internId
     }
 

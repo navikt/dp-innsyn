@@ -7,15 +7,15 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.innsyn.modell.Person
-import no.nav.dagpenger.innsyn.modell.Stønadsforhold
-import no.nav.dagpenger.innsyn.modell.Stønadsid
+import no.nav.dagpenger.innsyn.modell.ProsessId
+import no.nav.dagpenger.innsyn.modell.Søknadsprosess
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveId
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
 import no.nav.dagpenger.innsyn.modell.serde.OppgaveData
 import no.nav.dagpenger.innsyn.modell.serde.PersonData
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
-import no.nav.dagpenger.innsyn.modell.serde.StønadsforholdData
+import no.nav.dagpenger.innsyn.modell.serde.SøknadsprosessData
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -39,37 +39,37 @@ class PostgresPersonRepository : PersonRepository {
     private fun getPerson(fnr: String): Person? =
         using(sessionOf(dataSource)) { session ->
             session.run(selectPerson(fnr))?.let {
-                val stønadsforhold = hentStønadsforhold(session, it)
+                val stønadsforhold = hentSøknadsprosess(session, it)
 
                 PersonData(fnr, stønadsforhold).person
             }
         }
 
-    private fun hentStønadsforhold(session: Session, personId: Int) = session.run(
+    private fun hentSøknadsprosess(session: Session, personId: Int) = session.run(
         queryOf(
             //language=PostgreSQL
-            "SELECT stønadsforhold_id, tilstand FROM stønadsforhold WHERE person_id=?",
+            "SELECT søknadsprosess_id, tilstand FROM søknadsprosesser WHERE person_id=?",
             personId
         ).map { row ->
-            val stønadsforholdId = UUID.fromString(row.string("stønadsforhold_id"))
-            StønadsforholdData(
-                hentStønadsid(session, stønadsforholdId),
+            val stønadsforholdId = UUID.fromString(row.string("søknadsprosess_id"))
+            SøknadsprosessData(
+                hentProsessId(session, stønadsforholdId),
                 hentOppgaver(session, stønadsforholdId),
                 row.string("tilstand")
             )
         }.asList
     )
 
-    private fun hentStønadsid(session: Session, stønadsforholdId: UUID) = session.run(
+    private fun hentProsessId(session: Session, stønadsforholdId: UUID) = session.run(
         queryOf(
             //language=PostgreSQL
-            "SELECT ekstern_id FROM stønadsid WHERE stønadsforhold_id = ?",
+            "SELECT ekstern_id FROM prosess_id WHERE søknadsprosess_id = ?",
             stønadsforholdId
         ).map { row ->
             row.string("ekstern_id")
         }.asList
     ).run {
-        Stønadsid(stønadsforholdId, this.toMutableList())
+        ProsessId(stønadsforholdId, this.toMutableList())
     }
 
     private fun hentOppgaver(session: Session, stønadsforholdId: UUID): List<OppgaveData> = session.run(
@@ -77,7 +77,7 @@ class PostgresPersonRepository : PersonRepository {
             //language=PostgreSQL
             """SELECT oppgave_id, id, beskrivelse, opprettet, type, tilstand
                 FROM oppgave
-                WHERE stønadsforhold_id = ?
+                WHERE søknadsprosess_id = ?
             """.trimIndent(),
             stønadsforholdId
         ).map { row ->
@@ -117,18 +117,18 @@ class PostgresPersonRepository : PersonRepository {
             )
         }
 
-        override fun preVisit(stønadsforhold: Stønadsforhold, tilstand: Stønadsforhold.Tilstand) {
+        override fun preVisit(søknadsprosess: Søknadsprosess, tilstand: Søknadsprosess.Tilstand) {
             this.tilstand = tilstand.type.toString()
         }
 
-        override fun preVisit(stønadsid: Stønadsid, internId: UUID, eksternId: String) {
+        override fun preVisit(stønadsid: ProsessId, internId: UUID, eksternId: String) {
             aktivtStønadsforhold = internId
             queries.add(
                 queryOf(
                     //language=PostgreSQL
-                    """INSERT INTO stønadsforhold(stønadsforhold_id, person_id, tilstand)
+                    """INSERT INTO søknadsprosesser(søknadsprosess_id, person_id, tilstand)
                         VALUES (:stonadsforhold, (SELECT person_id FROM person WHERE fnr = :fnr), :tilstand)
-                        ON CONFLICT (stønadsforhold_id) DO UPDATE SET tilstand = :tilstand
+                        ON CONFLICT (søknadsprosess_id) DO UPDATE SET tilstand = :tilstand
                     """.trimIndent(),
                     mapOf(
                         "stonadsforhold" to aktivtStønadsforhold,
@@ -140,9 +140,9 @@ class PostgresPersonRepository : PersonRepository {
             queries.add(
                 queryOf(
                     //language=PostgreSQL
-                    """INSERT INTO stønadsid(stønadsforhold_id, ekstern_id)
+                    """INSERT INTO prosess_id(søknadsprosess_id, ekstern_id)
                         VALUES (:stonadsforholdId, :eksternId)
-                        ON CONFLICT (stønadsforhold_id, ekstern_id) DO NOTHING
+                        ON CONFLICT (søknadsprosess_id, ekstern_id) DO NOTHING
                     """.trimIndent(),
                     mapOf(
                         "stonadsforholdId" to internId,
@@ -161,9 +161,9 @@ class PostgresPersonRepository : PersonRepository {
         ) {
             queries.add(
                 queryOf( //language=PostgreSQL
-                    """INSERT INTO oppgave (id, stønadsforhold_id, beskrivelse, opprettet, type, tilstand)
+                    """INSERT INTO oppgave (id, søknadsprosess_id, beskrivelse, opprettet, type, tilstand)
                         VALUES (:id, :stonadsforhold, :beskrivelse, :opprettet, :type, :tilstand)
-                        ON CONFLICT (id, type, stønadsforhold_id) DO UPDATE SET tilstand = :tilstand
+                        ON CONFLICT (id, type, søknadsprosess_id) DO UPDATE SET tilstand = :tilstand
                     """.trimIndent(),
                     mapOf(
                         "id" to id.id,

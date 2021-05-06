@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 
-class StønadsforholdTest {
+class SøknadsprosessTest {
     @Test
     fun `Søknad, ettersending, vedtak skal gi hendelser i tidslinjen og endre tilstand`() {
-        Stønadsforhold().also {
+        Søknadsprosess().also {
             it.håndter(søknad)
             inspektør(it) {
                 assertEquals(TilstandType.UNDER_BEHANDLING, tilstand.type)
@@ -38,24 +38,24 @@ class StønadsforholdTest {
 
     @Test
     fun `Skal returnere false i tilstand start`() {
-        assertFalse(Stønadsforhold().håndter(innvilgetVedtak))
-        assertFalse(Stønadsforhold().håndter(ettersending))
-        assertFalse(Stønadsforhold().håndter(saksbehandling))
+        assertFalse(Søknadsprosess().håndter(innvilgetVedtak))
+        assertFalse(Søknadsprosess().håndter(ettersending))
+        assertFalse(Søknadsprosess().håndter(saksbehandling))
     }
 
-    private fun <R> inspektør(stønadsforhold: Stønadsforhold, block: StønadsforholdInspektør.() -> R): R =
-        StønadsforholdInspektør(stønadsforhold).block()
+    private fun <R> inspektør(søknadsprosess: Søknadsprosess, block: StønadsforholdInspektør.() -> R): R =
+        StønadsforholdInspektør(søknadsprosess).block()
 
-    private class StønadsforholdInspektør(stønadsforhold: Stønadsforhold) : StønadsforholdVisitor {
-        lateinit var tilstand: Stønadsforhold.Tilstand
+    private class StønadsforholdInspektør(søknadsprosess: Søknadsprosess) : StønadsforholdVisitor {
+        lateinit var tilstand: Søknadsprosess.Tilstand
 
         init {
-            stønadsforhold.accept(this)
+            søknadsprosess.accept(this)
         }
 
         override fun preVisit(
-            stønadsforhold: Stønadsforhold,
-            tilstand: Stønadsforhold.Tilstand
+            søknadsprosess: Søknadsprosess,
+            tilstand: Søknadsprosess.Tilstand
         ) {
             this.tilstand = tilstand
         }

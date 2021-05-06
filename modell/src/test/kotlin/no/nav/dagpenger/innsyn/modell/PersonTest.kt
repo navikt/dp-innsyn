@@ -78,8 +78,8 @@ internal class PersonTest {
         }
 
         override fun postVisit(
-            stønadsforhold: Stønadsforhold,
-            tilstand: Stønadsforhold.Tilstand
+            søknadsprosess: Søknadsprosess,
+            tilstand: Søknadsprosess.Tilstand
         ) {
             antallStønadsforhold++
         }

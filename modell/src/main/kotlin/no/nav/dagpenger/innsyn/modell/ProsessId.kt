@@ -9,7 +9,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.StønadsidVisitor
 import java.util.UUID
 
-class Stønadsid(
+class ProsessId(
     private val internId: UUID,
     private val eksterneIder: MutableList<String>
 ) {
@@ -45,7 +45,7 @@ class Stønadsid(
         return true
     }
 
-    override fun equals(other: Any?) = other is Stønadsid && internId == other.internId
+    override fun equals(other: Any?) = other is ProsessId && internId == other.internId
 
     fun accept(visitor: StønadsidVisitor) {
         eksterneIder.forEach { visitor.preVisit(this, internId, it) }

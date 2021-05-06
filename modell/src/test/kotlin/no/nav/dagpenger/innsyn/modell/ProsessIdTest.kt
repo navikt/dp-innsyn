@@ -10,18 +10,18 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class StønadsidTest {
+class ProsessIdTest {
 
     @Test
     fun `Like stønadsider skal være like `() {
         val uuid = UUID.randomUUID()
-        assertEquals(Stønadsid(uuid, mutableListOf()), Stønadsid(uuid, mutableListOf()))
+        assertEquals(ProsessId(uuid, mutableListOf()), ProsessId(uuid, mutableListOf()))
     }
 
     @Test
     fun `skal håndtere ettersendinger tilhørende rett søknad`() {
         val hendelse = Søknad("1", "journalpostId", emptySet())
-        val stønadsid = Stønadsid()
+        val stønadsid = ProsessId()
 
         assertTrue(stønadsid.håndter(hendelse))
         assertTrue(stønadsid.håndter(hendelse))
@@ -37,7 +37,7 @@ class StønadsidTest {
     fun `skal håndtere vedtak tilhørende rett søknad`() {
         val søknad = Søknad("1", "journalpostId", emptySet())
         val journalført = Journalføring("journalpostId", "9", emptySet())
-        val stønadsid = Stønadsid()
+        val stønadsid = ProsessId()
 
         assertTrue(stønadsid.håndter(søknad))
         assertTrue(stønadsid.håndter(journalført))
