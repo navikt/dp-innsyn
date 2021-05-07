@@ -11,7 +11,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
 private val logg = KotlinLogging.logger {}
-private val sikkerlogg = KotlinLogging.logger("tjenestekall")
+private val sikkerlogg = KotlinLogging.logger("tjenestekall.JournalførtMottak")
 
 internal class JournalførtMottak(
     rapidsConnection: RapidsConnection,
