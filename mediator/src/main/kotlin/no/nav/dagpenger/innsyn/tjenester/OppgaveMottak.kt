@@ -18,7 +18,7 @@ internal class OppgaveMottak(
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("table", "SIAMO.OPPGAVE_LOGG") }
-            validate { it.requireKey("after") }
+            validate { it.requireKey("after", "tokens") }
         }.register(this)
     }
 
