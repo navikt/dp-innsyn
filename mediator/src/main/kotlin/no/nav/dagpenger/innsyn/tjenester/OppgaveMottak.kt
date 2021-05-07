@@ -18,15 +18,13 @@ internal class OppgaveMottak(
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("table", "SIAMO.OPPGAVE_LOGG") }
-            validate { it.requireKey("after", "tokens") }
+            validate { it.requireKey("after") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val fnr = packet["tokens"]["FODSELSNR"].asText()
-
         logg.info { "Mottok oppgavelogg" }
-        sikkerlogg.info { "Mottok oppgave for $fnr: ${packet.toJson()}" }
+        sikkerlogg.info { "Mottok oppgave: ${packet.toJson()}" }
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {
