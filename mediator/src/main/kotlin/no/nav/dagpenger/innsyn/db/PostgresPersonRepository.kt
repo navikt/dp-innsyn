@@ -81,7 +81,7 @@ class PostgresPersonRepository : PersonRepository {
             //language=PostgreSQL
             """SELECT oppgave_id, id, beskrivelse, opprettet, type, tilstand
                 FROM oppgave
-                WHERE søknadsprosess_id = ?
+                WHERE søknadsprosess_id = ? ORDER BY opprettet
             """.trimIndent(),
             stønadsforholdId
         ).map { row ->
