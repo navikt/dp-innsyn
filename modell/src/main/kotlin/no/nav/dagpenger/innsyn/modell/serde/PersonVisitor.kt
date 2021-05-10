@@ -9,26 +9,23 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
 import java.time.LocalDateTime
 import java.util.UUID
 
-interface PersonVisitor : StønadsforholdVisitor {
+interface PersonVisitor : SøknadsprosessVisitor {
     fun preVisit(person: Person, fnr: String) {}
     fun postVisit(person: Person, fnr: String) {}
 }
 
-interface StønadsforholdVisitor : OppgaveVisitor, StønadsidVisitor {
+interface SøknadsprosessVisitor : OppgaveVisitor, ProsessIdVisitor {
     fun preVisit(
         søknadsprosess: Søknadsprosess,
         tilstand: Søknadsprosess.Tilstand
-    ) {
-    }
-
+    ) {}
     fun postVisit(
         søknadsprosess: Søknadsprosess,
         tilstand: Søknadsprosess.Tilstand
-    ) {
-    }
+    ) {}
 }
 
-interface StønadsidVisitor {
+interface ProsessIdVisitor {
     fun preVisit(
         stønadsid: ProsessId,
         internId: UUID,
@@ -48,15 +45,12 @@ interface OppgaveVisitor {
         beskrivelse: String,
         opprettet: LocalDateTime,
         tilstand: OppgaveTilstand
-    ) {
-    }
-
+    ) {}
     fun postVisit(
         oppgave: Oppgave,
         id: Oppgave.OppgaveId,
         beskrivelse: String,
         opprettet: LocalDateTime,
         tilstand: OppgaveTilstand
-    ) {
-    }
+    ) {}
 }

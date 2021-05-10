@@ -1,7 +1,7 @@
 package no.nav.dagpenger.innsyn.melding
 
-import no.nav.dagpenger.innsyn.Dagpenger.vedtakOppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Journalføring
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.vedtakOppgave
 import no.nav.helse.rapids_rivers.JsonMessage
 
 internal class Journalførtmelding(private val packet: JsonMessage) : Hendelsemelding(packet) {

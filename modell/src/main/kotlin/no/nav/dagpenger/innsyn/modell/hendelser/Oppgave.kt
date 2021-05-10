@@ -46,6 +46,13 @@ class Oppgave private constructor(
     }
 
     class OppgaveType(private val type: String) {
+
+        companion object {
+            val søknadOppgave = OppgaveType("Søke om dagpenger")
+            val vedleggOppgave = OppgaveType("Vedlegg")
+            val vedtakOppgave = OppgaveType("Få vedtak")
+        }
+
         fun ny(id: String, beskrivelse: String) =
             Oppgave(OppgaveId(id, this), beskrivelse, LocalDateTime.now(), Uferdig)
 

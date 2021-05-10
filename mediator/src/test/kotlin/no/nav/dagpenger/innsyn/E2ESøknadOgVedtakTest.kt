@@ -1,8 +1,5 @@
 package no.nav.dagpenger.innsyn
 
-import no.nav.dagpenger.innsyn.Dagpenger.søknadOppgave
-import no.nav.dagpenger.innsyn.Dagpenger.vedleggOppgave
-import no.nav.dagpenger.innsyn.Dagpenger.vedtakOppgave
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
 import no.nav.dagpenger.innsyn.modell.EksternId
@@ -10,8 +7,11 @@ import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.ProsessId
 import no.nav.dagpenger.innsyn.modell.Søknadsprosess
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
-import no.nav.dagpenger.innsyn.modell.serde.PersonJsonBuilder
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.søknadOppgave
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.vedleggOppgave
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.vedtakOppgave
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
+import no.nav.dagpenger.innsyn.modell.serde.SøknadListeJsonBuilder
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.JournalførtMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
@@ -76,7 +76,7 @@ internal class E2ESøknadOgVedtakTest {
                 assertEquals(3, ferdigeOppgaver)
             }
 
-            println(PersonJsonBuilder(person).resultat().toPrettyString())
+            println(SøknadListeJsonBuilder(person).resultat().toPrettyString())
         }
     }
 

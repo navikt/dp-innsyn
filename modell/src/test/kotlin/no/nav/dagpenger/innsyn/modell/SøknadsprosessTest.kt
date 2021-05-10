@@ -6,7 +6,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Mangelbrev
 import no.nav.dagpenger.innsyn.modell.hendelser.Saksbehandling
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
-import no.nav.dagpenger.innsyn.modell.serde.StønadsforholdVisitor
+import no.nav.dagpenger.innsyn.modell.serde.SøknadsprosessVisitor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
@@ -45,10 +45,10 @@ class SøknadsprosessTest {
         assertFalse(Søknadsprosess().håndter(saksbehandling))
     }
 
-    private fun <R> inspektør(søknadsprosess: Søknadsprosess, block: StønadsforholdInspektør.() -> R): R =
-        StønadsforholdInspektør(søknadsprosess).block()
+    private fun <R> inspektør(søknadsprosess: Søknadsprosess, block: SøknadsprosessInspektør.() -> R): R =
+        SøknadsprosessInspektør(søknadsprosess).block()
 
-    private class StønadsforholdInspektør(søknadsprosess: Søknadsprosess) : StønadsforholdVisitor {
+    private class SøknadsprosessInspektør(søknadsprosess: Søknadsprosess) : SøknadsprosessVisitor {
         lateinit var tilstand: Søknadsprosess.Tilstand
 
         init {

@@ -14,7 +14,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Saksbehandling
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
-import no.nav.dagpenger.innsyn.modell.serde.StønadsforholdVisitor
+import no.nav.dagpenger.innsyn.modell.serde.SøknadsprosessVisitor
 
 class Søknadsprosess private constructor(
     private val prosessId: ProsessId,
@@ -27,7 +27,7 @@ class Søknadsprosess private constructor(
         tilstand = Start
     )
 
-    fun accept(visitor: StønadsforholdVisitor) {
+    fun accept(visitor: SøknadsprosessVisitor) {
         visitor.preVisit(this, tilstand)
         prosessId.accept(visitor)
         tidslinje.forEach { it.accept(visitor) }

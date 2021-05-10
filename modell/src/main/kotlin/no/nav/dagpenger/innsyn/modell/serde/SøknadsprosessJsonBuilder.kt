@@ -5,18 +5,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import no.nav.dagpenger.innsyn.modell.EksternId
 import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.ProsessId
+import no.nav.dagpenger.innsyn.modell.Søknadsprosess
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveId
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-class PersonJsonBuilder(person: Person) : PersonVisitor {
+class SøknadsprosessJsonBuilder(person: Person, private val internId: UUID) : PersonVisitor {
+
+    private lateinit var søknadstidspunkt: LocalDateTime
+    private var ignore: Boolean = true
     private val mapper = ObjectMapper()
     private val root: ObjectNode = mapper.createObjectNode()
-    private val planNode = mapper.createArrayNode()
-    private lateinit var stønadsforholdId: UUID
+    private val oppgaver = mapper.createArrayNode()
 
     init {
         person.accept(this)
@@ -24,29 +25,36 @@ class PersonJsonBuilder(person: Person) : PersonVisitor {
 
     fun resultat() = root
 
-    override fun preVisit(person: Person, fnr: String) {
-        // root.put("fnr", fnr)
-        root.put("oppgaver", planNode)
-    }
-
     override fun preVisit(stønadsid: ProsessId, internId: UUID, eksternId: EksternId) {
-        stønadsforholdId = internId
+        if (internId == this.internId) {
+            ignore = false
+        }
     }
 
     override fun preVisit(
         oppgave: Oppgave,
-        id: OppgaveId,
+        id: Oppgave.OppgaveId,
         beskrivelse: String,
         opprettet: LocalDateTime,
-        tilstand: OppgaveTilstand
+        tilstand: Oppgave.OppgaveTilstand
     ) {
-        planNode.addObject().also {
+        if (ignore) return
+        oppgaver.addObject().also {
             it.put("id", id.indeks)
-            it.put("stønadsforholdId", stønadsforholdId.toString())
             it.put("beskrivelse", beskrivelse)
             it.put("opprettet", opprettet.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
             it.put("oppgaveType", id.type.toString())
             it.put("tilstand", tilstand.toString())
         }
+
+        if (id.type == Oppgave.OppgaveType.søknadOppgave) {
+            søknadstidspunkt = opprettet
+        }
+    }
+
+    override fun postVisit(søknadsprosess: Søknadsprosess, tilstand: Søknadsprosess.Tilstand) {
+        root.put("id", internId.toString())
+        root.put("søknadstidspunkt", søknadstidspunkt.toString())
+        root.put("oppgaver", oppgaver)
     }
 }

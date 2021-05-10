@@ -17,8 +17,10 @@ import io.ktor.routing.routing
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.Configuration.appName
 import no.nav.dagpenger.innsyn.db.PersonRepository
-import no.nav.dagpenger.innsyn.modell.serde.PersonJsonBuilder
+import no.nav.dagpenger.innsyn.modell.serde.SøknadListeJsonBuilder
+import no.nav.dagpenger.innsyn.modell.serde.SøknadsprosessJsonBuilder
 import org.slf4j.event.Level
+import java.util.UUID
 
 private val logger = KotlinLogging.logger { }
 private val sikkerlogg = KotlinLogging.logger("tjenestekall")
@@ -58,12 +60,19 @@ internal fun Application.innsynApi(
 
     routing {
         authenticate {
-            get("/soknad") {
+            get("/soknader") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
                 val person = personRepository.person(fnr)
 
-                call.respondText { PersonJsonBuilder(person).resultat().toString() }
+                call.respondText { SøknadListeJsonBuilder(person).resultat().toString() }
+            }
+            get("/soknader/{id}") {
+                val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
+                val fnr = jwtPrincipal!!.fnr
+                val person = personRepository.person(fnr)
+
+                call.respondText { SøknadsprosessJsonBuilder(person, UUID.fromString(call.parameters["id"])).resultat().toString() }
             }
         }
     }

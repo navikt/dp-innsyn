@@ -1,7 +1,7 @@
 package no.nav.dagpenger.innsyn.melding
 
 import com.fasterxml.jackson.databind.JsonNode
-import no.nav.dagpenger.innsyn.Dagpenger.vedleggOppgave
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.vedleggOppgave
 import no.nav.helse.rapids_rivers.JsonMessage
 
 internal abstract class Innsendingsmelding(packet: JsonMessage) : Hendelsemelding(packet) {

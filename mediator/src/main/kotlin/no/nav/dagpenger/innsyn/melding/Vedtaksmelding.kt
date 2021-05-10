@@ -1,9 +1,8 @@
 package no.nav.dagpenger.innsyn.melding
 
-import no.nav.dagpenger.innsyn.Dagpenger.vedtakOppgave
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.vedtakOppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.helse.rapids_rivers.JsonMessage
-import java.lang.IllegalArgumentException
 
 internal class Vedtaksmelding(private val packet: JsonMessage) : Hendelsemelding(packet) {
 
@@ -13,10 +12,11 @@ internal class Vedtaksmelding(private val packet: JsonMessage) : Hendelsemelding
 
     override val fødselsnummer: String = packet["tokens"]["FODSELSNR"].asText()
 
-    private val status get() =
-        when (packet["after"]["UTFALLKODE"].asText()) {
-            "JA" -> Vedtak.Status.INNVILGET
-            "NEI" -> Vedtak.Status.AVSLÅTT
-            else -> throw IllegalArgumentException("Ukjent utfallskode")
-        }
+    private val status
+        get() =
+            when (packet["after"]["UTFALLKODE"].asText()) {
+                "JA" -> Vedtak.Status.INNVILGET
+                "NEI" -> Vedtak.Status.AVSLÅTT
+                else -> throw IllegalArgumentException("Ukjent utfallskode")
+            }
 }
