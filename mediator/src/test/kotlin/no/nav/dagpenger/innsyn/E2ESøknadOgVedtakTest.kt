@@ -12,6 +12,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.ve
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.vedtakOppgave
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import no.nav.dagpenger.innsyn.modell.serde.SøknadListeJsonBuilder
+import no.nav.dagpenger.innsyn.modell.serde.SøknadsprosessJsonBuilder
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.JournalførtMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
@@ -75,8 +76,8 @@ internal class E2ESøknadOgVedtakTest {
                 assertEquals(1, uferdigeOppgaver)
                 assertEquals(3, ferdigeOppgaver)
             }
-
-            println(SøknadListeJsonBuilder(person).resultat().toPrettyString())
+            val internId = UUID.fromString(SøknadListeJsonBuilder(person).resultat().first()["id"].asText())
+            println(SøknadsprosessJsonBuilder(person, internId).resultat().toPrettyString())
         }
     }
 
