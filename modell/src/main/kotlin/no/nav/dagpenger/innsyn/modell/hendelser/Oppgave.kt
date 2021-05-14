@@ -46,18 +46,17 @@ class Oppgave private constructor(
     }
 
     class OppgaveType(private val type: String) {
-
         companion object {
             val søknadOppgave = OppgaveType("Søke om dagpenger")
             val vedleggOppgave = OppgaveType("Vedlegg")
             val vedtakOppgave = OppgaveType("Få vedtak")
         }
 
-        fun ny(id: String, beskrivelse: String) =
-            Oppgave(OppgaveId(id, this), beskrivelse, LocalDateTime.now(), Uferdig)
+        fun ny(id: String, beskrivelse: String, opprettet: LocalDateTime = LocalDateTime.now()) =
+            Oppgave(OppgaveId(id, this), beskrivelse, opprettet, Uferdig)
 
-        fun ferdig(id: String, beskrivelse: String) =
-            Oppgave(OppgaveId(id, this), beskrivelse, LocalDateTime.now(), Ferdig)
+        fun ferdig(id: String, beskrivelse: String, opprettet: LocalDateTime = LocalDateTime.now()) =
+            Oppgave(OppgaveId(id, this), beskrivelse, opprettet, Ferdig)
 
         override fun equals(other: Any?) = other is OppgaveType && type == other.type
         override fun toString() = type

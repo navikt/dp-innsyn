@@ -20,8 +20,14 @@ internal class EttersendingMottak(
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "innsending_mottatt") }
-            validate { it.demandKey("fødselsnummer") }
-            validate { it.demandKey("journalpostId") }
+            validate { it.demandValue("@event_name", "innsending_mottatt") }
+            validate {
+                it.requireKey(
+                    "fødselsnummer",
+                    "journalpostId",
+                    "datoRegistrert",
+                )
+            }
             validate { it.requireKey("søknadsData.behandlingskjedeId") }
             validate { it.requireAny("type", listOf("Ettersending")) }
             validate { it.interestedIn("søknadsData.vedlegg") }

@@ -19,9 +19,15 @@ internal class VedtakMottak(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate { it.demandKey("after.VEDTAK_ID") }
-            validate { it.demandKey("tokens.FODSELSNR") }
-            validate { it.demandKey("after.SAK_ID") }
+            validate { it.demandValue("table", "SIAMO.VEDTAK") }
+            validate {
+                it.requireKey(
+                    "op_ts",
+                    "after.VEDTAK_ID",
+                    "tokens.FODSELSNR",
+                    "after.SAK_ID",
+                )
+            }
             validate { it.requireAny("after.VEDTAKTYPEKODE", listOf("O", "G")) }
             validate { it.requireAny("after.UTFALLKODE", listOf("JA", "NEI")) }
             validate { it.interestedIn("after", "tokens") }

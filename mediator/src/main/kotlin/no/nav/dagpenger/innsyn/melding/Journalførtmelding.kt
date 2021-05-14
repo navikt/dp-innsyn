@@ -3,6 +3,7 @@ package no.nav.dagpenger.innsyn.melding
 import no.nav.dagpenger.innsyn.modell.hendelser.Journalføring
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.vedtakOppgave
 import no.nav.helse.rapids_rivers.JsonMessage
+import java.time.LocalDateTime
 
 internal class Journalførtmelding(private val packet: JsonMessage) : Hendelsemelding(packet) {
     override val fødselsnummer: String = packet["fødselsnummer"].asText()
@@ -12,6 +13,6 @@ internal class Journalførtmelding(private val packet: JsonMessage) : Hendelseme
         get() = Journalføring(
             journalpostId,
             fagsakId,
-            setOf(vedtakOppgave.ny(fagsakId, "Venter på vedtak")),
+            setOf(vedtakOppgave.ny(fagsakId, "Venter på vedtak", LocalDateTime.now())),
         )
 }

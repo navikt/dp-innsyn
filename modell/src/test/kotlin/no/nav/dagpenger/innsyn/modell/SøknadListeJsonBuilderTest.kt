@@ -11,13 +11,11 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 internal class SøknadListeJsonBuilderTest {
-
     @Test
     fun `vi kan bygge json med flere søknader`() {
         val person = Person("123")
         person.håndter(Søknad("1", "11", setOf(søknadOppgave.ferdig("ferdig", ""))))
         person.håndter(Søknad("2", "22", setOf(søknadOppgave.ny("ny", ""))))
-
         val json = SøknadListeJsonBuilder(person).resultat()
 
         assertEquals(2, json.size())
