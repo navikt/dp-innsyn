@@ -11,6 +11,8 @@ import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
+import java.time.Duration
+import java.time.LocalDateTime
 
 private val logg = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadMottak")
@@ -39,11 +41,16 @@ internal class SøknadMottak(
         val fnr = packet["fødselsnummer"].asText()
         val søknadId = packet["søknadsData.brukerBehandlingId"].asText()
         val journalpostId = packet["journalpostId"].asText()
+        val forsinkelse = packet["datoRegistrert"].asLocalDateTime()
 
         withLoggingContext(
             "søknadId" to søknadId,
             "journalpostId" to journalpostId
         ) {
+            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble().also {
+                logg.info { "Har mottatt en søknad med $it sekunder forsinkelse" }
+            }
+
             logg.info { "Mottok ny søknad." }
             sikkerlogg.info { "Mottok ny søknad for person $fnr: ${packet.toJson()}" }
 
@@ -51,7 +58,10 @@ internal class SøknadMottak(
                 personMediator.håndter(it.søknad, it)
             }
         }.also {
-            Metrikker.søknadForsinkelse(packet["datoRegistrert"].asLocalDateTime())
+            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble().also {
+                logg.info { "Har lagret en søknad med $it sekunder forsinkelse" }
+            }
+            Metrikker.søknadForsinkelse(forsinkelse)
         }
     }
 

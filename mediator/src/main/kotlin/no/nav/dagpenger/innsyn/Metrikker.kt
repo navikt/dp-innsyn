@@ -31,9 +31,7 @@ internal object Metrikker {
 
     fun søknadForsinkelse(forsinkelse: LocalDateTime) =
         mottakForsinkelse.labels("soknad").observe(
-            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble().also {
-                logg.info { "Har logget en søknad med $it sekunder forsinkelse" }
-            }
+            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble()
         )
 
     fun ettersendingForsinkelse(forsinkelse: LocalDateTime) =
