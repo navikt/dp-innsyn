@@ -55,7 +55,7 @@ internal class OppgaveMottak(
             val navn = packet["after"]["OPPGAVETYPE_BESKRIVELSE"].asText()
             val frist = packet["after"]["DUEDATE"].asText().let { LocalDateTime.parse(it, formatter) }
 
-            logg.info { "Mottok operasjon $operasjon på oppgave $navn. Ligger på benk $benk, med frist til $frist." }
+            logg.info { "Mottok operasjon $operasjon på oppgave $navn. Ligger på benk $benk, med frist til ${frist.toLocalDate()}." }
             // sikkerlogg.info { "Mottok oppgave: ${packet.toJson()}" }
         }
     }
