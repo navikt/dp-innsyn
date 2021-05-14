@@ -27,6 +27,7 @@ internal class SøknadMottak(
             validate {
                 it.requireKey(
                     "fødselsnummer",
+                    "@opprettet",
                     "journalpostId",
                     "datoRegistrert",
                     "søknadsData.brukerBehandlingId"
@@ -41,6 +42,7 @@ internal class SøknadMottak(
         val fnr = packet["fødselsnummer"].asText()
         val søknadId = packet["søknadsData.brukerBehandlingId"].asText()
         val journalpostId = packet["journalpostId"].asText()
+        val opprettet = packet["@opprettet"].asLocalDateTime()
         val forsinkelse = packet["datoRegistrert"].asLocalDateTime()
 
         withLoggingContext(
@@ -49,6 +51,9 @@ internal class SøknadMottak(
         ) {
             Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble().also {
                 logg.info { "Har mottatt en søknad med $it sekunder forsinkelse" }
+            }
+            Duration.between(opprettet, LocalDateTime.now()).seconds.toDouble().also {
+                logg.info { "Har mottatt en søknad med $it sekunder forsinkelse fra opprettelse i dp-mottak" }
             }
 
             logg.info { "Mottok ny søknad." }

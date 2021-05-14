@@ -70,6 +70,7 @@ private const val syntheticDelaySeconds: Long = 5
 @Language("JSON")
 private val søknadJson = """{
   "@event_name": "innsending_mottatt",
+  "@opprettet": "${LocalDateTime.now()}",
   "fødselsnummer": "123",
   "journalpostId": "123",
   "type": "NySøknad",
