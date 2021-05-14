@@ -24,7 +24,7 @@ class ProsessIdTest {
         val stønadsid = ProsessId()
 
         assertTrue(stønadsid.håndter(hendelse))
-        assertTrue(stønadsid.håndter(hendelse))
+        assertFalse(stønadsid.håndter(hendelse), "Skal ikke håndtere samme hendelse flere ganger")
 
         val annenEttersending = Ettersending("2", emptySet())
         assertFalse(stønadsid.håndter(annenEttersending))

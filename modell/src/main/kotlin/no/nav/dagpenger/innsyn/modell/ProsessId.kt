@@ -21,6 +21,7 @@ class ProsessId(
     constructor() : this(UUID.randomUUID(), mutableListOf())
 
     fun håndter(søknad: Søknad): Boolean {
+        if (eksterneIder.any { it.type == "søknad" }) return false
         eksterneIder.add(søknadId(søknad.søknadId))
         eksterneIder.add(journalpostId(søknad.journalpostId))
         return true

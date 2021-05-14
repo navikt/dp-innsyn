@@ -1,10 +1,10 @@
 package no.nav.dagpenger.innsyn.modell.hendelser
 
-class Vedtak private constructor(
+class Vedtak constructor(
     private val vedtakId: String,
     val fagsakId: String,
-    public val status: Status,
-    oppgaver: Set<Oppgave>
+    oppgaver: Set<Oppgave>,
+    val status: Status,
 ) : Hendelse(oppgaver) {
     constructor(
         vedtakId: String,
@@ -13,20 +13,8 @@ class Vedtak private constructor(
     ) : this(
         vedtakId,
         fagsakId,
+        emptySet(),
         status,
-        emptySet()
-    )
-
-    constructor(
-        vedtakId: String,
-        fagsakId: String,
-        oppgaver: Set<Oppgave>,
-        status: Status
-    ) : this(
-        vedtakId,
-        fagsakId,
-        status,
-        oppgaver
     )
 
     enum class Status {

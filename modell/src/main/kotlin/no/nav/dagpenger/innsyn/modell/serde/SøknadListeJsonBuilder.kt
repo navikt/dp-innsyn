@@ -9,6 +9,9 @@ import no.nav.dagpenger.innsyn.modell.Søknadsprosess
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveId
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand.Ferdig
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.søknadOppgave
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.vedtakOppgave
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -39,12 +42,19 @@ class SøknadListeJsonBuilder(person: Person) : PersonVisitor {
         opprettet: LocalDateTime,
         tilstand: OppgaveTilstand
     ) {
-        if (id.type == Oppgave.OppgaveType.søknadOppgave) {
+        if (id.type == søknadOppgave) {
             prosess.put("søknadstidspunkt", opprettet.toString())
+        }
+        if (id.type == vedtakOppgave && tilstand == Ferdig) {
+            prosess.put("vedtakstidspunkt", opprettet.toString())
         }
     }
 
     override fun postVisit(søknadsprosess: Søknadsprosess, tilstand: Søknadsprosess.Tilstand) {
-        root.add(prosess)
+        root.add(
+            prosess.also {
+                it.put("tilstand", tilstand.type.toString())
+            }
+        )
     }
 }

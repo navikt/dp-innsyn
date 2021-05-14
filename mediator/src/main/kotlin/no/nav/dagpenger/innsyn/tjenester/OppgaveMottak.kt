@@ -57,7 +57,7 @@ internal class OppgaveMottak(
             val frist = packet["after"]["DUEDATE"].asText().let { LocalDateTime.parse(it, formatter) }
             val dagerTil = Duration.between(LocalDateTime.now(), frist).toDays()
 
-            logg.info { "Mottok operasjon $operasjon på oppgave $navn. Ligger på benk $benk, med frist til ${frist.toLocalDate()} (om ${dagerTil} dager)." }
+            logg.info { "Mottok operasjon $operasjon på oppgave $navn. Ligger på benk $benk, med frist til ${frist.toLocalDate()} (om $dagerTil dager)." }
             // sikkerlogg.info { "Mottok oppgave: ${packet.toJson()}" }
         }
     }
