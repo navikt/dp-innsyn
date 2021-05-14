@@ -15,16 +15,20 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Saksbehandling
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.SøknadsprosessVisitor
+import java.time.Duration
+import java.time.LocalDateTime
 
 class Søknadsprosess private constructor(
     private val prosessId: ProsessId,
     private val tidslinje: MutableSet<Oppgave>,
-    private var tilstand: Tilstand
+    private var tilstand: Tilstand,
 ) {
+    private val observers = mutableListOf<SøknadsprosessObserver>()
+
     constructor() : this(
         prosessId = ProsessId(),
         tidslinje = mutableSetOf(),
-        tilstand = Start
+        tilstand = Start,
     )
 
     fun accept(visitor: SøknadsprosessVisitor) {
@@ -230,6 +234,41 @@ class Søknadsprosess private constructor(
 
     private fun tilstand(hendelse: Hendelse, nyTilstand: Tilstand) {
         if (tilstand == nyTilstand) return
+        val forrigeTilstand = tilstand.type
         tilstand = nyTilstand
+        emitTilstandEndret(
+            forrigeTilstand,
+            tilstand.type
+        )
+    }
+
+    private fun emitTilstandEndret(
+        forrigeTilstand: TilstandType,
+        gjeldendeTilstand: TilstandType,
+    ) {
+        observers.forEach {
+            it.tilstandEndret(
+                SøknadsprosessObserver.EndretTilstandEvent(
+                    gjeldendeTilstand,
+                    forrigeTilstand,
+                )
+            )
+        }
+    }
+
+    private fun emitFerdigBehandlet(
+        opprettet: LocalDateTime,
+        ferdig: LocalDateTime,
+    ) {
+        observers.forEach {
+            it.ferdigBehandlet(
+                SøknadsprosessObserver.FerdigBehandletEvent(
+                    prosessId.internId,
+                    opprettet,
+                    ferdig,
+                    Duration.between(opprettet, ferdig)
+                )
+            )
+        }
     }
 }

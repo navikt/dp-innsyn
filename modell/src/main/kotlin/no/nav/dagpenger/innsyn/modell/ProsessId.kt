@@ -15,7 +15,7 @@ data class EksternId(
 )
 
 class ProsessId(
-    private val internId: UUID,
+    internal val internId: UUID,
     private val eksterneIder: MutableList<EksternId>
 ) {
     constructor() : this(UUID.randomUUID(), mutableListOf())
