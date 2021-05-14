@@ -2,6 +2,7 @@ package no.nav.dagpenger.innsyn.tjenester
 
 import mu.KotlinLogging
 import mu.withLoggingContext
+import no.nav.dagpenger.innsyn.Metrikker
 import no.nav.dagpenger.innsyn.PersonMediator
 import no.nav.dagpenger.innsyn.melding.Ettersendingsmelding
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -9,6 +10,7 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.asLocalDateTime
 
 private val logg = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.EttersendingMottak")
@@ -49,6 +51,8 @@ internal class EttersendingMottak(
             Ettersendingsmelding(packet).also {
                 personMediator.håndter(it.ettersending, it)
             }
+        }.also {
+            Metrikker.ettersendingForsinkelse(packet["datoRegistrert"].asLocalDateTime())
         }
     }
 

@@ -2,6 +2,7 @@ package no.nav.dagpenger.innsyn.tjenester
 
 import mu.KotlinLogging
 import mu.withLoggingContext
+import no.nav.dagpenger.innsyn.Metrikker
 import no.nav.dagpenger.innsyn.PersonMediator
 import no.nav.dagpenger.innsyn.melding.Søknadsmelding
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -9,6 +10,7 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.asLocalDateTime
 
 private val logg = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadMottak")
@@ -48,6 +50,8 @@ internal class SøknadMottak(
             Søknadsmelding(packet).also {
                 personMediator.håndter(it.søknad, it)
             }
+        }.also {
+            Metrikker.søknadForsinkelse(packet["datoRegistrert"].asLocalDateTime())
         }
     }
 
