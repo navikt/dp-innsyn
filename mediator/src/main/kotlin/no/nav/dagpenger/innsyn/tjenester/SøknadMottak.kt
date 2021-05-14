@@ -42,8 +42,10 @@ internal class SøknadMottak(
         val fnr = packet["fødselsnummer"].asText()
         val søknadId = packet["søknadsData.brukerBehandlingId"].asText()
         val journalpostId = packet["journalpostId"].asText()
-        val opprettet = packet["@opprettet"].asLocalDateTime()
         val forsinkelse = packet["datoRegistrert"].asLocalDateTime()
+        val opprettet = packet["@opprettet"].asLocalDateTime().also {
+            Metrikker.mottakForsinkelse(it)
+        }
 
         withLoggingContext(
             "søknadId" to søknadId,

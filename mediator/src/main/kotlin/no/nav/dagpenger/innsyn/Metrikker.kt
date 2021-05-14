@@ -38,4 +38,9 @@ internal object Metrikker {
         mottakForsinkelse.labels("ettersending").observe(
             Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble()
         )
+
+    fun mottakForsinkelse(forsinkelse: LocalDateTime) =
+        mottakForsinkelse.labels("mottak").observe(
+            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble()
+        )
 }
