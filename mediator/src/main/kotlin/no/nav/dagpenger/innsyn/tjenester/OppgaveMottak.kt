@@ -8,6 +8,7 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -54,8 +55,9 @@ internal class OppgaveMottak(
             val operasjon = packet["after"]["OPERASJON"].asText()
             val navn = packet["after"]["OPPGAVETYPE_BESKRIVELSE"].asText()
             val frist = packet["after"]["DUEDATE"].asText().let { LocalDateTime.parse(it, formatter) }
+            val dagerTil = Duration.between(LocalDateTime.now(), frist).toDays()
 
-            logg.info { "Mottok operasjon $operasjon på oppgave $navn. Ligger på benk $benk, med frist til ${frist.toLocalDate()}." }
+            logg.info { "Mottok operasjon $operasjon på oppgave $navn. Ligger på benk $benk, med frist til ${frist.toLocalDate()} (om ${dagerTil} dager)." }
             // sikkerlogg.info { "Mottok oppgave: ${packet.toJson()}" }
         }
     }
