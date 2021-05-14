@@ -14,6 +14,7 @@ import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import no.nav.dagpenger.innsyn.modell.serde.SøknadListeJsonBuilder
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.JournalførtMottak
+import no.nav.dagpenger.innsyn.tjenester.PapirSøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakMottak
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -28,12 +29,14 @@ internal class E2ESøknadOgVedtakTest {
     private val personRepository = PostgresPersonRepository()
     private val personMediator = PersonMediator(personRepository)
     private val søknadAsJson by lazy { javaClass.getResource("/søknad_mottatt.json").readText() }
+    private val papirsøknadAsJson by lazy { javaClass.getResource("/papirsøknad_mottatt.json").readText() }
     private val journalførtAsJson by lazy { javaClass.getResource("/journalført.json").readText() }
     private val ettersendingAsJson by lazy { javaClass.getResource("/ettersending.json").readText() }
     private val vedtakAsJson by lazy { javaClass.getResource("/vedtak.json").readText() }
 
     init {
         SøknadMottak(rapid, personMediator)
+        PapirSøknadMottak(rapid, personMediator)
         JournalførtMottak(rapid, personMediator)
         EttersendingMottak(rapid, personMediator)
         VedtakMottak(rapid, personMediator)
@@ -77,6 +80,20 @@ internal class E2ESøknadOgVedtakTest {
             }
 
             println(SøknadListeJsonBuilder(person).resultat().toPrettyString())
+        }
+    }
+
+    @Test
+    fun `skal kunne motta papirsøknad`() {
+        withMigratedDb {
+            rapid.sendTestMessage(papirsøknadAsJson)
+            with(PersonInspektør(person)) {
+                assertEquals(2, eksterneIder.size)
+                assertEquals(1, stønadsforhold)
+                assertEquals(0, vedtakOppgaver)
+                assertEquals(0, uferdigeOppgaver)
+                assertEquals(1, ferdigeOppgaver)
+            }
         }
     }
 

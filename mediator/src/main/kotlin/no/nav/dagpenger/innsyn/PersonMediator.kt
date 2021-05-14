@@ -4,12 +4,14 @@ import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.melding.Ettersendingsmelding
 import no.nav.dagpenger.innsyn.melding.Hendelsemelding
 import no.nav.dagpenger.innsyn.melding.Journalførtmelding
+import no.nav.dagpenger.innsyn.melding.PapirSøknadsMelding
 import no.nav.dagpenger.innsyn.melding.Søknadsmelding
 import no.nav.dagpenger.innsyn.melding.Vedtaksmelding
 import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
 import no.nav.dagpenger.innsyn.modell.hendelser.Hendelse
 import no.nav.dagpenger.innsyn.modell.hendelser.Journalføring
+import no.nav.dagpenger.innsyn.modell.hendelser.PapirSøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 
@@ -17,6 +19,12 @@ internal class PersonMediator(private val personRepository: PersonRepository) {
     fun håndter(søknad: Søknad, melding: Søknadsmelding) {
         håndter(søknad, melding) { person ->
             person.håndter(søknad)
+        }
+    }
+
+    fun håndter(papirSøknad: PapirSøknad, melding: PapirSøknadsMelding) {
+        håndter(papirSøknad, melding) { person ->
+            person.håndter(papirSøknad)
         }
     }
 

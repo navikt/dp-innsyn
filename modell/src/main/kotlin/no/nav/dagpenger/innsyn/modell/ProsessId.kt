@@ -3,6 +3,7 @@ package no.nav.dagpenger.innsyn.modell
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
 import no.nav.dagpenger.innsyn.modell.hendelser.Journalføring
 import no.nav.dagpenger.innsyn.modell.hendelser.Mangelbrev
+import no.nav.dagpenger.innsyn.modell.hendelser.PapirSøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Saksbehandling
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
@@ -23,6 +24,12 @@ class ProsessId(
     fun håndter(søknad: Søknad): Boolean {
         eksterneIder.add(søknadId(søknad.søknadId))
         eksterneIder.add(journalpostId(søknad.journalpostId))
+        return true
+    }
+
+    fun håndter(papirSøknad: PapirSøknad): Boolean {
+        eksterneIder.add(papirSøknadId(papirSøknad.journalpostId))
+        eksterneIder.add(journalpostId(papirSøknad.journalpostId))
         return true
     }
 
@@ -51,6 +58,8 @@ class ProsessId(
     }
 
     private fun søknadId(søknadId: String) = EksternId("søknad", søknadId)
+
+    private fun papirSøknadId(papirSøknadId: String) = EksternId("papirSøknadId", papirSøknadId)
 
     private fun journalpostId(journalpostId: String) = EksternId("journalpostId", journalpostId)
 

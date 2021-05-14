@@ -11,6 +11,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Hendelse
 import no.nav.dagpenger.innsyn.modell.hendelser.Journalføring
 import no.nav.dagpenger.innsyn.modell.hendelser.Mangelbrev
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
+import no.nav.dagpenger.innsyn.modell.hendelser.PapirSøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Saksbehandling
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
@@ -37,6 +38,7 @@ class Søknadsprosess private constructor(
     fun håndter(hendelse: Hendelse): Boolean {
         return when (hendelse) {
             is Søknad -> håndter(hendelse)
+            is PapirSøknad -> håndter(hendelse)
             is Journalføring -> håndter(hendelse)
             is Ettersending -> håndter(hendelse)
             is Vedtak -> håndter(hendelse)
@@ -49,6 +51,11 @@ class Søknadsprosess private constructor(
     fun håndter(søknad: Søknad): Boolean {
         if (!prosessId.håndter(søknad)) return false
         return tilstand.håndter(this, søknad)
+    }
+
+    fun håndter(papirsøknad: PapirSøknad): Boolean {
+        if (!prosessId.håndter(papirsøknad)) return false
+        return tilstand.håndter(this, papirsøknad)
     }
 
     fun håndter(journalføring: Journalføring): Boolean {
@@ -81,6 +88,8 @@ class Søknadsprosess private constructor(
 
         fun håndter(søknadsprosess: Søknadsprosess, søknad: Søknad) = false
 
+        fun håndter(søknadsprosess: Søknadsprosess, papirsøknad: PapirSøknad) = false
+
         fun håndter(søknadsprosess: Søknadsprosess, journalføring: Journalføring) = false
 
         fun håndter(søknadsprosess: Søknadsprosess, ettersending: Ettersending) = false
@@ -98,6 +107,12 @@ class Søknadsprosess private constructor(
         override fun håndter(søknadsprosess: Søknadsprosess, søknad: Søknad): Boolean {
             søknadsprosess.tilstand(søknad, UnderBehandling)
             søknadsprosess.tidslinje.addAll(søknad.oppgaver)
+            return true
+        }
+
+        override fun håndter(søknadsprosess: Søknadsprosess, papirsøknad: PapirSøknad): Boolean {
+            søknadsprosess.tilstand(papirsøknad, UnderBehandling)
+            søknadsprosess.tidslinje.addAll(papirsøknad.oppgaver)
             return true
         }
     }
