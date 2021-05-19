@@ -42,22 +42,11 @@ internal class SøknadMottak(
         val fnr = packet["fødselsnummer"].asText()
         val søknadId = packet["søknadsData.brukerBehandlingId"].asText()
         val journalpostId = packet["journalpostId"].asText()
-        val forsinkelse = packet["datoRegistrert"].asLocalDateTime()
-        val opprettet = packet["@opprettet"].asLocalDateTime().also {
-            Metrikker.mottakForsinkelse(it)
-        }
 
         withLoggingContext(
             "søknadId" to søknadId,
             "journalpostId" to journalpostId
         ) {
-            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble().also {
-                logg.info { "Har mottatt en søknad med $it sekunder forsinkelse" }
-            }
-            Duration.between(opprettet, LocalDateTime.now()).seconds.toDouble().also {
-                logg.info { "Har mottatt en søknad med $it sekunder forsinkelse fra opprettelse i dp-mottak" }
-            }
-
             logg.info { "Mottok ny søknad." }
             sikkerlogg.info { "Mottok ny søknad for person $fnr: ${packet.toJson()}" }
 
@@ -65,10 +54,13 @@ internal class SøknadMottak(
                 personMediator.håndter(it.søknad, it)
             }
         }.also {
-            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble().also {
-                logg.info { "Har lagret en søknad med $it sekunder forsinkelse" }
+            logg.info {
+                val datoRegistrert = packet["datoRegistrert"].asLocalDateTime().also {
+                    Metrikker.søknadForsinkelse(it)
+                }
+                val forsinkelse = Duration.between(datoRegistrert, LocalDateTime.now()).seconds.toDouble()
+                "Har lagret en søknad med $forsinkelse sekunder forsinkelse"
             }
-            Metrikker.søknadForsinkelse(forsinkelse)
         }
     }
 
