@@ -58,8 +58,8 @@ internal class SøknadMottak(
                 val datoRegistrert = packet["datoRegistrert"].asLocalDateTime().also {
                     Metrikker.søknadForsinkelse(it)
                 }
-                val forsinkelse = Duration.between(datoRegistrert, LocalDateTime.now()).seconds.toDouble()
-                "Har lagret en søknad med $forsinkelse sekunder forsinkelse"
+                val forsinkelse = Duration.between(datoRegistrert, LocalDateTime.now()).toMillis()
+                "Har lagret en søknad med $forsinkelse millisekunder forsinkelse"
             }
         }
     }
