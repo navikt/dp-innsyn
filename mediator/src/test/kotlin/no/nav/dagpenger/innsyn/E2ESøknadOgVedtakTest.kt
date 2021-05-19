@@ -85,7 +85,7 @@ internal class E2ESøknadOgVedtakTest {
     }
 
     @Test
-    fun `skal kunne motta papirsøknad`() {
+    fun `skal kunne motta papirsøknad som får vedtak`() {
         withMigratedDb {
             rapid.sendTestMessage(papirsøknadAsJson)
             with(PersonInspektør(person)) {
@@ -94,6 +94,19 @@ internal class E2ESøknadOgVedtakTest {
                 assertEquals(0, vedtakOppgaver)
                 assertEquals(0, uferdigeOppgaver)
                 assertEquals(1, ferdigeOppgaver)
+            }
+            rapid.sendTestMessage(journalførtAsJson)
+            with(PersonInspektør(person)) {
+                assertEquals(3, eksterneIder.size)
+                assertEquals(1, vedtakOppgaver)
+                assertEquals(1, uferdigeOppgaver)
+            }
+            rapid.sendTestMessage(vedtakAsJson)
+            with(PersonInspektør(person)) {
+                assertEquals(1, stønadsforhold)
+                assertEquals(1, vedtakOppgaver)
+                assertEquals(1, søknadOppgaver)
+                assertEquals(2, ferdigeOppgaver)
             }
         }
     }
