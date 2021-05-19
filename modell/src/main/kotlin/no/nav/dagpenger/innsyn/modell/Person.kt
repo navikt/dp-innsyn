@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.modell
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Hendelse
+import no.nav.dagpenger.innsyn.modell.hendelser.PapirSøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 
@@ -13,6 +14,7 @@ class Person private constructor(
     fun håndter(hendelse: Hendelse) {
         if (søknadsprosesser.map { it.håndter(hendelse) }.none { it }) {
             if (hendelse is Søknad) søknadsprosesser.add(Søknadsprosess().also { it.håndter(hendelse) })
+            if (hendelse is PapirSøknad) søknadsprosesser.add(Søknadsprosess().also { it.håndter(hendelse) })
         }
     }
 
