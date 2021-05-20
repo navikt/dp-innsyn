@@ -12,7 +12,7 @@ internal object Metrikker {
     private val mottakForsinkelse = Histogram
         .build()
         .namespace(DAGPENGER_NAMESPACE)
-        .name("mottak_forsinkelse")
+        .name("mottak_forsinkelse_ms")
         .labelNames("type")
         .buckets(
             1.0,
@@ -31,16 +31,11 @@ internal object Metrikker {
 
     fun søknadForsinkelse(forsinkelse: LocalDateTime) =
         mottakForsinkelse.labels("soknad").observe(
-            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble()
+            Duration.between(forsinkelse, LocalDateTime.now()).toMillis().toDouble()
         )
 
     fun ettersendingForsinkelse(forsinkelse: LocalDateTime) =
         mottakForsinkelse.labels("ettersending").observe(
-            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble()
-        )
-
-    fun mottakForsinkelse(forsinkelse: LocalDateTime) =
-        mottakForsinkelse.labels("mottak").observe(
-            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble()
+            Duration.between(forsinkelse, LocalDateTime.now()).toMillis().toDouble()
         )
 }
