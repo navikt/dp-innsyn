@@ -10,7 +10,6 @@ import no.nav.dagpenger.innsyn.melding.Søknadsmelding
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -45,14 +44,7 @@ class SøknadMottakTest {
             "dagpenger_mottak_forsinkelse_count",
             "type" to "soknad"
         ).also {
-            assertEquals(1.0, it)
-        }
-        defaultRegistry.getSampleValue(
-            "dagpenger_mottak_forsinkelse_bucket",
-            "type" to "soknad",
-            "le" to "10.0"
-        ).also {
-            assertEquals(1.0, it)
+            assertTrue(1.0 <= it)
         }
     }
 }
