@@ -54,5 +54,6 @@ internal class VedtakMottak(
 
     override fun onError(problems: MessageProblems, context: MessageContext) {
         logg.error { problems }
+        sikkerlogg.error { problems.toExtendedReport() }
     }
 }
