@@ -14,7 +14,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.søknadOppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
-import no.nav.dagpenger.innsyn.modell.serde.SøknadListeJsonBuilder
+import no.nav.dagpenger.innsyn.modell.serde.SøknadsprosessJsonBuilder
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -88,7 +88,7 @@ internal class InnsynApiTest {
             it.person("test@nav.no").also { person ->
                 person.håndter(Søknad("1", "11", setOf(søknadOppgave.ferdig("ferdig", ""))))
                 it.lagre(person)
-                internId = UUID.fromString(SøknadListeJsonBuilder(person).resultat().first()["id"].asText())
+                internId = UUID.fromString(SøknadsprosessJsonBuilder(person).resultat().first()["id"].asText())
             }
         }
         withTestApplication({
