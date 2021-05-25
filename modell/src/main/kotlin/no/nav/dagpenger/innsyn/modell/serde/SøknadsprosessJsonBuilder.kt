@@ -27,9 +27,7 @@ class SøknadsprosessJsonBuilder(person: Person, private val internId: UUID) : P
     fun resultat() = root
 
     override fun preVisit(stønadsid: ProsessId, internId: UUID, eksternId: EksternId) {
-        if (internId != this.internId) {
-            ignore = true
-        }
+        ignore = internId != this.internId
     }
 
     override fun preVisit(
@@ -54,10 +52,9 @@ class SøknadsprosessJsonBuilder(person: Person, private val internId: UUID) : P
     }
 
     override fun postVisit(søknadsprosess: Søknadsprosess, tilstand: Søknadsprosess.Tilstand) {
+        if (ignore) return
         root.put("id", internId.toString())
         root.put("søknadstidspunkt", søknadstidspunkt.toString())
         root.put("oppgaver", oppgaver)
-
-        ignore = false
     }
 }

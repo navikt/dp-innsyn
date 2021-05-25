@@ -35,4 +35,16 @@ class SøknadprosessJsonBuilderTest {
 
         assertEquals(1, json["oppgaver"].size())
     }
+
+    @Test
+    fun `skal fungere for søknad nr 2 også`() {
+        val person = Person("123")
+        person.håndter(Søknad("1", "2", setOf(søknadOppgave.ny("ny", ""))))
+        person.håndter(Søknad("3", "4", setOf(søknadOppgave.ny("ny", ""))))
+
+        val internId = UUID.fromString(SøknadListeJsonBuilder(person).resultat().last()["id"].asText())
+        val json = SøknadsprosessJsonBuilder(person, internId).resultat()
+
+        assertEquals(1, json["oppgaver"].size())
+    }
 }
