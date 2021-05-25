@@ -7,6 +7,7 @@ import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.ProsessId
 import no.nav.dagpenger.innsyn.modell.Søknadsprosess
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
+import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.søknadOppgave
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -14,7 +15,7 @@ import java.util.UUID
 class SøknadsprosessJsonBuilder(person: Person, private val internId: UUID) : PersonVisitor {
 
     private lateinit var søknadstidspunkt: LocalDateTime
-    private var ignore: Boolean = true
+    private var ignore: Boolean = false
     private val mapper = ObjectMapper()
     private val root: ObjectNode = mapper.createObjectNode()
     private val oppgaver = mapper.createArrayNode()
@@ -26,8 +27,8 @@ class SøknadsprosessJsonBuilder(person: Person, private val internId: UUID) : P
     fun resultat() = root
 
     override fun preVisit(stønadsid: ProsessId, internId: UUID, eksternId: EksternId) {
-        if (internId == this.internId) {
-            ignore = false
+        if (internId != this.internId) {
+            ignore = true
         }
     }
 
@@ -47,7 +48,7 @@ class SøknadsprosessJsonBuilder(person: Person, private val internId: UUID) : P
             it.put("tilstand", tilstand.toString())
         }
 
-        if (id.type == Oppgave.OppgaveType.søknadOppgave) {
+        if (id.type == søknadOppgave) {
             søknadstidspunkt = opprettet
         }
     }
@@ -56,5 +57,7 @@ class SøknadsprosessJsonBuilder(person: Person, private val internId: UUID) : P
         root.put("id", internId.toString())
         root.put("søknadstidspunkt", søknadstidspunkt.toString())
         root.put("oppgaver", oppgaver)
+
+        ignore = false
     }
 }
