@@ -30,7 +30,8 @@ internal class SøknadMottak(
                     "@opprettet",
                     "journalpostId",
                     "datoRegistrert",
-                    "søknadsData.brukerBehandlingId"
+                    "søknadsData.brukerBehandlingId",
+                    "søknadsData.skjemaNummer"
                 )
             }
             validate { it.requireAny("type", listOf("NySøknad", "Gjenopptak")) }

@@ -1,6 +1,5 @@
 package no.nav.dagpenger.innsyn.melding
 
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.vedtakOppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.helse.rapids_rivers.JsonMessage
 import java.time.LocalDateTime
@@ -16,7 +15,7 @@ internal class Vedtaksmelding(private val packet: JsonMessage) : Hendelsemelding
     private val fattet = packet["op_ts"].asText().let {
         LocalDateTime.parse(it, formatter)
     }
-    internal val vedtak get() = Vedtak(vedtakId, sakId, setOf(vedtakOppgave.ferdig(sakId, "", fattet)), status)
+    internal val vedtak get() = Vedtak(vedtakId, sakId, status)
     override val fødselsnummer: String = packet["tokens"]["FODSELSNR"].asText()
     private val status
         get() =

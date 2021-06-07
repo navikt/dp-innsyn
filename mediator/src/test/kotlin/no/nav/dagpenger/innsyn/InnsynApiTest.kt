@@ -9,7 +9,7 @@ import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
 import no.nav.dagpenger.innsyn.helpers.InMemoryPersonRepository
 import no.nav.dagpenger.innsyn.helpers.JwtStub
-import no.nav.dagpenger.innsyn.modell.hendelser.Journalføring
+import no.nav.dagpenger.innsyn.modell.hendelser.Sakstilknytning
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.søknadOppgave
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
@@ -51,7 +51,7 @@ internal class InnsynApiTest {
                 person.håndter(Søknad("3", "12", setOf(søknadOppgave.ferdig("ferdig", ""))))
                 person.håndter(Søknad("4", "13", setOf(søknadOppgave.ferdig("ferdig", ""))))
                 person.håndter(Søknad("5", "14", setOf(søknadOppgave.ferdig("ferdig", ""))))
-                person.håndter(Journalføring("11", "arenaId"))
+                person.håndter(Sakstilknytning("11", "arenaId"))
                 person.håndter(
                     Vedtak(
                         "2",

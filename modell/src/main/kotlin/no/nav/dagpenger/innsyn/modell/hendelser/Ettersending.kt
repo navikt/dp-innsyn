@@ -1,6 +1,14 @@
 package no.nav.dagpenger.innsyn.modell.hendelser
 
+import no.nav.dagpenger.innsyn.modell.serde.EttersendingVisitor
+
 class Ettersending(
-    val søknadId: String,
-    oppgaver: Set<Oppgave>
-) : Innsending(søknadId, oppgaver)
+    val ettersendingId: String?,
+    val søknadId: String?,
+    val journalpostId: String,
+    val kanal: Kanal
+) {
+    fun accept(visitor: EttersendingVisitor) {
+        visitor.visitEttersending(søknadId, kanal)
+    }
+}

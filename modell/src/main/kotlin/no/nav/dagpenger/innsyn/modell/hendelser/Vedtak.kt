@@ -1,21 +1,15 @@
 package no.nav.dagpenger.innsyn.modell.hendelser
 
+import no.nav.dagpenger.innsyn.modell.serde.VedtakVisitor
+
 class Vedtak constructor(
     private val vedtakId: String,
     val fagsakId: String,
-    oppgaver: Set<Oppgave>,
     val status: Status,
-) : Hendelse(oppgaver) {
-    constructor(
-        vedtakId: String,
-        fagsakId: String,
-        status: Status
-    ) : this(
-        vedtakId,
-        fagsakId,
-        emptySet(),
-        status,
-    )
+) {
+    fun accept(visitor: VedtakVisitor) {
+        visitor.visitVedtak(vedtakId, fagsakId, status)
+    }
 
     enum class Status {
         INNVILGET,

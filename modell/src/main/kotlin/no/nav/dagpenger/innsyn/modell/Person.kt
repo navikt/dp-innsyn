@@ -1,26 +1,39 @@
 package no.nav.dagpenger.innsyn.modell
 
-import no.nav.dagpenger.innsyn.modell.hendelser.Hendelse
-import no.nav.dagpenger.innsyn.modell.hendelser.PapirSøknad
+import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
+import no.nav.dagpenger.innsyn.modell.hendelser.Sakstilknytning
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
+import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 
 class Person private constructor(
     val fnr: String,
-    private val søknadsprosesser: MutableSet<Søknadsprosess>
+    private val søknader: MutableList<Søknad>,
+    private val ettersendinger: MutableList<Ettersending>,
+    private val vedtak: MutableList<Vedtak>,
+    private val sakstilknytninger: MutableList<Sakstilknytning>
 ) {
-    constructor(fnr: String) : this(fnr, mutableSetOf())
+    constructor(fnr: String) : this(fnr, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf())
 
-    fun håndter(hendelse: Hendelse) {
-        if (søknadsprosesser.map { it.håndter(hendelse) }.none { it }) {
-            if (hendelse is Søknad) søknadsprosesser.add(Søknadsprosess().also { it.håndter(hendelse) })
-            if (hendelse is PapirSøknad) søknadsprosesser.add(Søknadsprosess().also { it.håndter(hendelse) })
-        }
+    fun håndter(søknad: Søknad) {
+        søknader.add(søknad)
+    }
+
+    fun håndter(ettersending: Ettersending) {
+        ettersendinger.add(ettersending)
+    }
+
+    fun håndter(vedtak: Vedtak) {
+        this.vedtak.add(vedtak)
+    }
+    fun håndter(sakstilknytning: Sakstilknytning) {
+        sakstilknytninger.add(sakstilknytning)
     }
 
     fun accept(visitor: PersonVisitor) {
-        visitor.preVisit(this, fnr)
-        søknadsprosesser.forEach { it.accept(visitor) }
-        visitor.postVisit(this, fnr)
+        søknader.forEach { it.accept(visitor) }
+        ettersendinger.forEach { it.accept(visitor) }
+        vedtak.forEach { it.accept(visitor) }
+        sakstilknytninger.forEach { it.accept(visitor) }
     }
 }

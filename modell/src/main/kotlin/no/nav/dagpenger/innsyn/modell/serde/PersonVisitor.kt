@@ -1,56 +1,43 @@
 package no.nav.dagpenger.innsyn.modell.serde
 
-import no.nav.dagpenger.innsyn.modell.EksternId
 import no.nav.dagpenger.innsyn.modell.Person
-import no.nav.dagpenger.innsyn.modell.ProsessId
-import no.nav.dagpenger.innsyn.modell.Søknadsprosess
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
-import java.time.LocalDateTime
-import java.util.UUID
+import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
+import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
+import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 
-interface PersonVisitor : SøknadsprosessVisitor {
+interface PersonVisitor: SøknadVisitor, EttersendingVisitor, VedtakVisitor, SakstilknytningVisitor {
     fun preVisit(person: Person, fnr: String) {}
     fun postVisit(person: Person, fnr: String) {}
 }
 
-interface SøknadsprosessVisitor : OppgaveVisitor, ProsessIdVisitor {
-    fun preVisit(
-        søknadsprosess: Søknadsprosess,
-        tilstand: Søknadsprosess.Tilstand
-    ) {}
-    fun postVisit(
-        søknadsprosess: Søknadsprosess,
-        tilstand: Søknadsprosess.Tilstand
-    ) {}
+interface SøknadVisitor {
+    fun visitSøknad(
+        søknadId: String?,
+        journalpostId: String,
+        skjemaKode: String?,
+        søknadsType: Søknad.SøknadsType,
+        kanal: Kanal
+    ){}
 }
 
-interface ProsessIdVisitor {
-    fun preVisit(
-        stønadsid: ProsessId,
-        internId: UUID,
-        eksternId: EksternId
-    ) {}
-    fun postVisit(
-        stønadsid: ProsessId,
-        internId: UUID,
-        eksternId: EksternId
-    ) {}
+interface EttersendingVisitor {
+    fun visitEttersending(
+        søknadId: String?,
+        kanal: Kanal
+    ){}
 }
 
-interface OppgaveVisitor {
-    fun preVisit(
-        oppgave: Oppgave,
-        id: Oppgave.OppgaveId,
-        beskrivelse: String,
-        opprettet: LocalDateTime,
-        tilstand: OppgaveTilstand
-    ) {}
-    fun postVisit(
-        oppgave: Oppgave,
-        id: Oppgave.OppgaveId,
-        beskrivelse: String,
-        opprettet: LocalDateTime,
-        tilstand: OppgaveTilstand
-    ) {}
+interface VedtakVisitor {
+    fun visitVedtak(
+        vedtakId: String,
+        fagsakId: String,
+        status: Vedtak.Status,
+    ){}
+}
+
+interface SakstilknytningVisitor {
+    fun visitSakstilknytning(
+        journalpostId: String,
+        fagsakId: String,
+    ){}
 }

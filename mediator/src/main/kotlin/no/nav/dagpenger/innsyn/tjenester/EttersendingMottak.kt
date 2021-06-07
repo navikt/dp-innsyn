@@ -28,9 +28,10 @@ internal class EttersendingMottak(
                     "fødselsnummer",
                     "journalpostId",
                     "datoRegistrert",
+                    "søknadsData.brukerBehandlingId",
+                    "søknadsData.behandlingskjedeId"
                 )
             }
-            validate { it.requireKey("søknadsData.behandlingskjedeId") }
             validate { it.requireAny("type", listOf("Ettersending")) }
             validate { it.interestedIn("søknadsData.vedlegg") }
         }.register(this)
