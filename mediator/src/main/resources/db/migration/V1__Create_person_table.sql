@@ -14,3 +14,4 @@ CREATE TABLE IF NOT EXISTS søknad(
     søknads_type     VARCHAR(20) NOT NULL,
     kanal           VARCHAR(20) NOT NULL
 );
+CREATE UNIQUE INDEX IF NOT EXISTS søknad_id_uindex ON søknad(søknad_id)

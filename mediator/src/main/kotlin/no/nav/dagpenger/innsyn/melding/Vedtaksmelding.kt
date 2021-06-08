@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.melding
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
+import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak.Status
 import no.nav.helse.rapids_rivers.JsonMessage
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -20,8 +21,8 @@ internal class Vedtaksmelding(private val packet: JsonMessage) : Hendelsemelding
     private val status
         get() =
             when (packet["after"]["UTFALLKODE"].asText()) {
-                "JA" -> INNVILGET
-                "NEI" -> AVSLÅTT
+                "JA" -> Status.INNVILGET
+                "NEI" -> Status.AVSLÅTT
                 else -> throw IllegalArgumentException("Ukjent utfallskode")
             }
 }

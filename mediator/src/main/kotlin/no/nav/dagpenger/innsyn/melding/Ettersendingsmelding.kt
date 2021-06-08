@@ -1,7 +1,6 @@
 package no.nav.dagpenger.innsyn.melding
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
-import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal.Digital
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal.Papir
 import no.nav.helse.rapids_rivers.JsonMessage

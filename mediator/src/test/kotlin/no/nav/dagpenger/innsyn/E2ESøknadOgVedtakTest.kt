@@ -40,12 +40,11 @@ internal class E2ESøknadOgVedtakTest {
             rapid.sendTestMessage(søknadsJson("999"))
             with(PersonInspektør(person)) {
                 assertEquals(1, søknader)
-
             }
+
             rapid.sendTestMessage(søknadsJson("123"))
             with(PersonInspektør(person)) {
                 assertEquals(2, søknader)
-
             }
         }
     }
@@ -53,7 +52,6 @@ internal class E2ESøknadOgVedtakTest {
     private val person get() = personRepository.person("10108099999")
 
     private class PersonInspektør(person: Person) : PersonVisitor {
-
         var søknader = 0
 
         init {

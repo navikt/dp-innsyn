@@ -26,7 +26,6 @@ internal class PersonTest {
             person.håndter(ettersending("12", "34"))
             person.håndter(ettersending("33", "44"))
             assertEquals(2, PersonInspektør(person).antallEttersendinger)
-
         }
     }
 
@@ -36,7 +35,6 @@ internal class PersonTest {
             person.håndter(Vedtak("1", "2", Vedtak.Status.INNVILGET))
             person.håndter(Vedtak("5", "6", Vedtak.Status.AVSLÅTT))
             assertEquals(2, PersonInspektør(person).antallVedtak)
-
         }
     }
 

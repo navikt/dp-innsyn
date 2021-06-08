@@ -11,14 +11,12 @@ import io.ktor.auth.jwt.JWTPrincipal
 import io.ktor.auth.jwt.jwt
 import io.ktor.features.CallLogging
 import io.ktor.request.document
-import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.routing
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.Configuration.appName
 import no.nav.dagpenger.innsyn.db.PersonRepository
 import org.slf4j.event.Level
-import java.util.UUID
 
 private val logger = KotlinLogging.logger { }
 private val sikkerlogg = KotlinLogging.logger("tjenestekall")
@@ -63,14 +61,14 @@ internal fun Application.innsynApi(
                 val fnr = jwtPrincipal!!.fnr
                 val person = personRepository.person(fnr)
 
-                //call.respondText { SøknadsprosessJsonBuilder(person).resultat().toString() }
+                // call.respondText { SøknadsprosessJsonBuilder(person).resultat().toString() }
             }
             get("/soknader/{id}") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
                 val person = personRepository.person(fnr)
 
-                //call.respondText { SøknadsprosessJsonBuilder(person, UUID.fromString(call.parameters["id"])).resultat().toString() }
+                // call.respondText { SøknadsprosessJsonBuilder(person, UUID.fromString(call.parameters["id"])).resultat().toString() }
             }
         }
     }

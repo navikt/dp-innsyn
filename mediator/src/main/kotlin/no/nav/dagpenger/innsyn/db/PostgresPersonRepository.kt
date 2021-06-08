@@ -37,10 +37,8 @@ class PostgresPersonRepository() : PersonRepository {
     }
 
     private fun hentSøknaderFor(session: Session, personId: Int) = session.run(
-        queryOf(
-            //language=PostgreSQL
-            """SELECT * from søknad WHERE person_id = :personId """,
-            mapOf("personId" to personId)
+        queryOf( //language=PostgreSQL
+            "SELECT * FROM søknad WHERE person_id = ?", personId
         ).map { row ->
             Søknad(
                 søknadId = row.string("søknad_id"),
@@ -52,10 +50,9 @@ class PostgresPersonRepository() : PersonRepository {
         }.asList
     )
 
-    private fun selectPerson(fnr: String) = //language=PostgreSQL
-        queryOf(
-            "SELECT person_id FROM person WHERE fnr = ?", fnr
-        ).map { it.int(1) }.asSingle
+    private fun selectPerson(fnr: String) = queryOf( //language=PostgreSQL
+        "SELECT person_id FROM person WHERE fnr = ?", fnr
+    ).map { it.int(1) }.asSingle
 
     private class PersonLagrer(person: Person) : PersonVisitor {
         val queries = mutableListOf<Query>()
