@@ -17,7 +17,6 @@ import io.ktor.routing.routing
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.Configuration.appName
 import no.nav.dagpenger.innsyn.db.PersonRepository
-import no.nav.dagpenger.innsyn.modell.serde.SøknadsprosessJsonBuilder
 import org.slf4j.event.Level
 import java.util.UUID
 
@@ -64,14 +63,14 @@ internal fun Application.innsynApi(
                 val fnr = jwtPrincipal!!.fnr
                 val person = personRepository.person(fnr)
 
-                call.respondText { SøknadsprosessJsonBuilder(person).resultat().toString() }
+                //call.respondText { SøknadsprosessJsonBuilder(person).resultat().toString() }
             }
             get("/soknader/{id}") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
                 val person = personRepository.person(fnr)
 
-                call.respondText { SøknadsprosessJsonBuilder(person, UUID.fromString(call.parameters["id"])).resultat().toString() }
+                //call.respondText { SøknadsprosessJsonBuilder(person, UUID.fromString(call.parameters["id"])).resultat().toString() }
             }
         }
     }

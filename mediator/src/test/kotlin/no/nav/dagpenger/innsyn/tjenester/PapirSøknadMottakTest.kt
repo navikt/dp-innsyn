@@ -5,7 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.innsyn.PersonMediator
 import no.nav.dagpenger.innsyn.melding.PapirSøknadsMelding
-import no.nav.dagpenger.innsyn.modell.hendelser.PapirSøknad
+import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,7 +24,7 @@ class PapirSøknadMottakTest {
     fun `vi kan motta søknad`() {
         PapirSøknadMottak(testRapid, personMediator)
         testRapid.sendTestMessage(papirsøknadJson)
-        verify { personMediator.håndter(any<PapirSøknad>(), any<PapirSøknadsMelding>()) }
+        verify { personMediator.håndter(any<Søknad>(), any<PapirSøknadsMelding>()) }
         confirmVerified(personMediator)
     }
 }

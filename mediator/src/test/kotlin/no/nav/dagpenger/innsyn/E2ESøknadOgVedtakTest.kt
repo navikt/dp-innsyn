@@ -2,16 +2,10 @@ package no.nav.dagpenger.innsyn
 
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
-import no.nav.dagpenger.innsyn.modell.EksternId
 import no.nav.dagpenger.innsyn.modell.Person
-import no.nav.dagpenger.innsyn.modell.ProsessId
-import no.nav.dagpenger.innsyn.modell.Søknadsprosess
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.søknadOppgave
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.vedleggOppgave
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveType.Companion.vedtakOppgave
+import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
+import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
-import no.nav.dagpenger.innsyn.modell.serde.SøknadsprosessJsonBuilder
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.JournalførtMottak
 import no.nav.dagpenger.innsyn.tjenester.PapirSøknadMottak
@@ -21,8 +15,6 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
-import java.util.UUID
 
 internal class E2ESøknadOgVedtakTest {
     private val rapid = TestRapid()
@@ -43,90 +35,17 @@ internal class E2ESøknadOgVedtakTest {
     }
 
     @Test
-    fun `skal kunne motta søknad og vedtak`() {
+    fun `skal kunne motta flere søknader`() {
         withMigratedDb {
-            rapid.sendTestMessage(søknadAsJson)
+            rapid.sendTestMessage(søknadsJson("999"))
             with(PersonInspektør(person)) {
-                assertEquals(2, eksterneIder.size)
-                assertEquals(1, stønadsforhold)
-                assertEquals(0, vedtakOppgaver)
-                assertEquals(2, uferdigeOppgaver)
-                assertEquals(1, ferdigeOppgaver)
-            }
+                assertEquals(1, søknader)
 
-            rapid.sendTestMessage(journalførtAsJson)
-            with(PersonInspektør(person)) {
-                assertEquals(3, eksterneIder.size)
-                assertEquals(1, vedtakOppgaver)
-                assertEquals(3, uferdigeOppgaver)
             }
-
-            rapid.sendTestMessage(ettersendingAsJson)
-            with(PersonInspektør(person)) {
-                assertEquals(1, vedtakOppgaver)
-                assertEquals(2, vedleggOppgaver)
-                assertEquals(2, uferdigeOppgaver)
-                assertEquals(2, ferdigeOppgaver)
-            }
-
-            rapid.sendTestMessage(vedtakAsJson)
-            with(PersonInspektør(person)) {
-                assertEquals(1, stønadsforhold)
-                assertEquals(1, vedtakOppgaver)
-                assertEquals(1, søknadOppgaver)
-                assertEquals(2, vedleggOppgaver)
-                assertEquals(1, uferdigeOppgaver)
-                assertEquals(3, ferdigeOppgaver)
-            }
-            val internId = UUID.fromString(SøknadsprosessJsonBuilder(person).resultat().first()["id"].asText())
-            println(SøknadsprosessJsonBuilder(person, internId).resultat().toPrettyString())
-        }
-    }
-
-    @Test
-    fun `skal kunne motta papirsøknad som får vedtak`() {
-        withMigratedDb {
-            rapid.sendTestMessage(papirsøknadAsJson)
-            with(PersonInspektør(person)) {
-                assertEquals(2, eksterneIder.size)
-                assertEquals(1, stønadsforhold)
-                assertEquals(0, vedtakOppgaver)
-                assertEquals(0, uferdigeOppgaver)
-                assertEquals(1, ferdigeOppgaver)
-            }
-            rapid.sendTestMessage(journalførtAsJson)
-            with(PersonInspektør(person)) {
-                assertEquals(3, eksterneIder.size)
-                assertEquals(1, vedtakOppgaver)
-                assertEquals(1, uferdigeOppgaver)
-            }
-            rapid.sendTestMessage(vedtakAsJson)
-            with(PersonInspektør(person)) {
-                assertEquals(1, stønadsforhold)
-                assertEquals(1, vedtakOppgaver)
-                assertEquals(1, søknadOppgaver)
-                assertEquals(2, ferdigeOppgaver)
-            }
-        }
-    }
-
-    @Test
-    fun `2 søknader skal gi 2 stønadsforhold`() {
-        withMigratedDb {
             rapid.sendTestMessage(søknadsJson("123"))
-            rapid.sendTestMessage(søknadsJson("456"))
             with(PersonInspektør(person)) {
-                assertEquals(2, stønadsforhold)
-            }
-        }
-    }
+                assertEquals(2, søknader)
 
-    @Test
-    fun `vedtak uten søknad først`() {
-        withMigratedDb {
-            rapid.sendTestMessage(vedtakAsJson)
-            with(PersonInspektør(person)) {
-                assertEquals(0, stønadsforhold)
             }
         }
     }
@@ -134,46 +53,21 @@ internal class E2ESøknadOgVedtakTest {
     private val person get() = personRepository.person("10108099999")
 
     private class PersonInspektør(person: Person) : PersonVisitor {
-        val eksterneIder = mutableSetOf<EksternId>()
-        var uferdigeOppgaver = 0
-        var ferdigeOppgaver = 0
-        var søknadOppgaver = 0
-        var vedleggOppgaver = 0
-        var vedtakOppgaver = 0
-        var stønadsforhold = 0
+
+        var søknader = 0
 
         init {
             person.accept(this)
         }
 
-        override fun preVisit(
-            søknadsprosess: Søknadsprosess,
-            tilstand: Søknadsprosess.Tilstand
+        override fun visitSøknad(
+            søknadId: String?,
+            journalpostId: String,
+            skjemaKode: String?,
+            søknadsType: Søknad.SøknadsType,
+            kanal: Kanal
         ) {
-            this.stønadsforhold++
-        }
-
-        override fun preVisit(stønadsid: ProsessId, internId: UUID, eksternId: EksternId) {
-            eksterneIder.add(eksternId)
-        }
-
-        override fun preVisit(
-            oppgave: Oppgave,
-            id: Oppgave.OppgaveId,
-            beskrivelse: String,
-            opprettet: LocalDateTime,
-            tilstand: Oppgave.OppgaveTilstand
-        ) {
-            when (tilstand) {
-                Oppgave.OppgaveTilstand.Uferdig -> uferdigeOppgaver++
-                Oppgave.OppgaveTilstand.Ferdig -> ferdigeOppgaver++
-            }
-
-            when (id.type) {
-                søknadOppgave -> søknadOppgaver++
-                vedleggOppgave -> vedleggOppgaver++
-                vedtakOppgave -> vedtakOppgaver++
-            }
+            søknader++
         }
     }
 }
@@ -189,6 +83,7 @@ private fun søknadsJson(søknadsId: String) = """{
   "aktørId": "1234455",
     "søknadsData": {
     "brukerBehandlingId": $søknadsId,
+    "skjemaNummer": "NAV123",
     "aktoerId": "10108099999"
   },
   "@event_name": "innsending_mottatt",

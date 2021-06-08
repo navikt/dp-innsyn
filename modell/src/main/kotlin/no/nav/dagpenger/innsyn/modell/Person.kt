@@ -31,9 +31,11 @@ class Person private constructor(
     }
 
     fun accept(visitor: PersonVisitor) {
+        visitor.preVisit(this, fnr)
         søknader.forEach { it.accept(visitor) }
         ettersendinger.forEach { it.accept(visitor) }
         vedtak.forEach { it.accept(visitor) }
         sakstilknytninger.forEach { it.accept(visitor) }
+        visitor.postVisit(this, fnr)
     }
 }

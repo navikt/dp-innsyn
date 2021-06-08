@@ -6,21 +6,13 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.dataSource
-import no.nav.dagpenger.innsyn.modell.EksternId
 import no.nav.dagpenger.innsyn.modell.Person
-import no.nav.dagpenger.innsyn.modell.ProsessId
-import no.nav.dagpenger.innsyn.modell.Søknadsprosess
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveId
-import no.nav.dagpenger.innsyn.modell.hendelser.Oppgave.OppgaveTilstand
-import no.nav.dagpenger.innsyn.modell.serde.OppgaveData
+import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
+import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.serde.PersonData
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
-import no.nav.dagpenger.innsyn.modell.serde.SøknadsprosessData
-import java.time.LocalDateTime
-import java.util.UUID
 
-class PostgresPersonRepository : PersonRepository {
+class PostgresPersonRepository() : PersonRepository {
     override fun person(fnr: String): Person = getPerson(fnr) ?: lagPerson(fnr)
 
     override fun lagre(person: Person): Boolean {
@@ -37,61 +29,25 @@ class PostgresPersonRepository : PersonRepository {
 
     private fun lagPerson(fnr: String): Person = Person(fnr).also { lagre(it) }
 
-    private fun getPerson(fnr: String): Person? =
-        using(sessionOf(dataSource)) { session ->
-            session.run(selectPerson(fnr))?.let {
-                val stønadsforhold = hentSøknadsprosess(session, it)
-
-                PersonData(fnr, stønadsforhold).person
-            }
+    private fun getPerson(fnr: String) = using(sessionOf(dataSource)) { session ->
+        session.run(selectPerson(fnr))?.let {
+            val søknader = hentSøknaderFor(session, it)
+            PersonData(fnr, søknader).person
         }
-
-    private fun hentSøknadsprosess(session: Session, personId: Int) = session.run(
-        queryOf(
-            //language=PostgreSQL
-            "SELECT søknadsprosess_id, tilstand FROM søknadsprosesser WHERE person_id=?",
-            personId
-        ).map { row ->
-            val stønadsforholdId = UUID.fromString(row.string("søknadsprosess_id"))
-            SøknadsprosessData(
-                hentProsessId(session, stønadsforholdId),
-                hentOppgaver(session, stønadsforholdId),
-                row.string("tilstand")
-            )
-        }.asList
-    )
-
-    private fun hentProsessId(session: Session, stønadsforholdId: UUID) = session.run(
-        queryOf(
-            //language=PostgreSQL
-            "SELECT ekstern_id, ekstern_type FROM prosess_id WHERE søknadsprosess_id = ?",
-            stønadsforholdId
-        ).map { row ->
-            EksternId(
-                row.string("ekstern_type"),
-                row.string("ekstern_id"),
-            )
-        }.asList
-    ).run {
-        ProsessId(stønadsforholdId, this.toMutableList())
     }
 
-    private fun hentOppgaver(session: Session, stønadsforholdId: UUID): List<OppgaveData> = session.run(
+    private fun hentSøknaderFor(session: Session, personId: Int) = session.run(
         queryOf(
             //language=PostgreSQL
-            """SELECT oppgave_id, id, beskrivelse, opprettet, type, tilstand
-                FROM oppgave
-                WHERE søknadsprosess_id = ? ORDER BY opprettet
-            """.trimIndent(),
-            stønadsforholdId
+            """SELECT * from søknad WHERE person_id = :personId """,
+            mapOf("personId" to personId)
         ).map { row ->
-            OppgaveData(
-                row.int("oppgave_id"),
-                row.string("id"),
-                row.string("beskrivelse"),
-                row.localDateTime("opprettet"),
-                row.string("type"),
-                row.string("tilstand")
+            Søknad(
+                søknadId = row.string("søknad_id"),
+                journalpostId = row.string("journalpost_id"),
+                skjemaKode = row.string("skjema_kode"),
+                søknadsType = Søknad.SøknadsType.valueOf(row.string("søknads_type")),
+                kanal = Kanal.valueOf(row.string("kanal"))
             )
         }.asList
     )
@@ -104,8 +60,6 @@ class PostgresPersonRepository : PersonRepository {
     private class PersonLagrer(person: Person) : PersonVisitor {
         val queries = mutableListOf<Query>()
         private lateinit var fnr: String
-        private lateinit var aktivtStønadsforhold: UUID
-        private lateinit var tilstand: String
 
         init {
             person.accept(this)
@@ -121,62 +75,27 @@ class PostgresPersonRepository : PersonRepository {
             )
         }
 
-        override fun preVisit(søknadsprosess: Søknadsprosess, tilstand: Søknadsprosess.Tilstand) {
-            this.tilstand = tilstand.type.toString()
-        }
-
-        override fun preVisit(stønadsid: ProsessId, internId: UUID, eksternId: EksternId) {
-            aktivtStønadsforhold = internId
-            queries.add(
-                queryOf(
-                    //language=PostgreSQL
-                    """INSERT INTO søknadsprosesser(søknadsprosess_id, person_id, tilstand)
-                        VALUES (:stonadsforhold, (SELECT person_id FROM person WHERE fnr = :fnr), :tilstand)
-                        ON CONFLICT (søknadsprosess_id) DO UPDATE SET tilstand = :tilstand
-                    """.trimIndent(),
-                    mapOf(
-                        "stonadsforhold" to aktivtStønadsforhold,
-                        "fnr" to fnr,
-                        "tilstand" to tilstand
-                    )
-                )
-            )
-            queries.add(
-                queryOf(
-                    //language=PostgreSQL
-                    """INSERT INTO prosess_id(søknadsprosess_id, ekstern_type, ekstern_id)
-                        VALUES (:stonadsforholdId, :eksternType, :eksternId)
-                        ON CONFLICT (søknadsprosess_id, ekstern_type, ekstern_id) DO NOTHING
-                    """.trimIndent(),
-                    mapOf(
-                        "stonadsforholdId" to internId,
-                        "eksternType" to eksternId.type,
-                        "eksternId" to eksternId.id,
-                    )
-                )
-            )
-        }
-
-        override fun preVisit(
-            oppgave: Oppgave,
-            id: OppgaveId,
-            beskrivelse: String,
-            opprettet: LocalDateTime,
-            tilstand: OppgaveTilstand
+        override fun visitSøknad(
+            søknadId: String?,
+            journalpostId: String,
+            skjemaKode: String?,
+            søknadsType: Søknad.SøknadsType,
+            kanal: Kanal
         ) {
             queries.add(
-                queryOf( //language=PostgreSQL
-                    """INSERT INTO oppgave (id, søknadsprosess_id, beskrivelse, opprettet, type, tilstand)
-                        VALUES (:id, :stonadsforhold, :beskrivelse, :opprettet, :type, :tilstand)
-                        ON CONFLICT (id, type, søknadsprosess_id) DO UPDATE SET tilstand = :tilstand
-                    """.trimIndent(),
+                queryOf(
+                    //language=PostgreSQL
+                    """INSERT INTO søknad(person_id, søknad_id, journalpost_id, skjema_kode, søknads_type, kanal)
+                        VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :soknadId, :journalpostId, :skjemaKode, :soknadsType, :kanal)
+                        ON CONFLICT DO NOTHING
+                    """.trimMargin(),
                     mapOf(
-                        "id" to id.id,
-                        "stonadsforhold" to aktivtStønadsforhold,
-                        "beskrivelse" to beskrivelse,
-                        "opprettet" to opprettet,
-                        "type" to id.type.toString(),
-                        "tilstand" to tilstand.toString()
+                        "fnr" to fnr,
+                        "soknadId" to søknadId,
+                        "journalpostId" to journalpostId,
+                        "skjemaKode" to skjemaKode,
+                        "soknadsType" to søknadsType.toString(),
+                        "kanal" to kanal.toString(),
                     )
                 )
             )

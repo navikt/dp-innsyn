@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.melding
 
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
+import no.nav.dagpenger.innsyn.modell.hendelser.Kanal.Papir
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.helse.rapids_rivers.JsonMessage
 
@@ -15,7 +16,7 @@ internal class PapirSøknadsMelding(private val packet: JsonMessage) : Hendelsem
             journalpostId,
             null,
             søknadsType,
-            Kanal.Papir
+            Papir
 
         )
     override val fødselsnummer: String

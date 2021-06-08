@@ -20,8 +20,8 @@ internal class Vedtaksmelding(private val packet: JsonMessage) : Hendelsemelding
     private val status
         get() =
             when (packet["after"]["UTFALLKODE"].asText()) {
-                "JA" -> Vedtak.Status.INNVILGET
-                "NEI" -> Vedtak.Status.AVSLÅTT
+                "JA" -> INNVILGET
+                "NEI" -> AVSLÅTT
                 else -> throw IllegalArgumentException("Ukjent utfallskode")
             }
 }
