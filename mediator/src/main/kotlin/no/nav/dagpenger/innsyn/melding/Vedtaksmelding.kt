@@ -8,15 +8,32 @@ import java.time.format.DateTimeFormatter
 
 internal class Vedtaksmelding(private val packet: JsonMessage) : Hendelsemelding(packet) {
     companion object {
-        private var formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")
+        private var formatter1: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")
+        private var formatter2: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     }
 
     private val vedtakId = packet["after"]["VEDTAK_ID"].asText()
     private val sakId = packet["after"]["SAK_ID"].asText()
     private val fattet = packet["op_ts"].asText().let {
-        LocalDateTime.parse(it, formatter)
+        LocalDateTime.parse(it, formatter1)
     }
-    internal val vedtak get() = Vedtak(vedtakId, sakId, status, fattet)
+    private val fraDato = packet["after"]["FRA_DATO"].asText().let {
+        LocalDateTime.parse(it, formatter2)
+    }
+    private val tilDato get() = when (packet["after"]["TIL_DATO"].asText()) {
+        "null" -> null
+        else -> LocalDateTime.parse(packet["after"]["TIL_DATO"].asText(), formatter2)
+    }
+
+    internal val vedtak
+        get() = Vedtak(
+            vedtakId = vedtakId,
+            fagsakId = sakId,
+            status = status,
+            datoFattet = fattet,
+            fraDato = fraDato,
+            tilDato = tilDato
+        )
     override val fødselsnummer: String = packet["tokens"]["FODSELSNR"].asText()
     private val status
         get() =

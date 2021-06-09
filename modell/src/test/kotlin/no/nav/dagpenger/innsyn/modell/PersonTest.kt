@@ -33,8 +33,26 @@ internal class PersonTest {
     @Test
     fun `Flere vedtak gir flere vedtak `() {
         Person("ident").also { person ->
-            person.håndter(Vedtak("1", "2", Vedtak.Status.INNVILGET, LocalDateTime.now()))
-            person.håndter(Vedtak("5", "6", Vedtak.Status.AVSLÅTT, LocalDateTime.now()))
+            person.håndter(
+                Vedtak(
+                    "1",
+                    "2",
+                    Vedtak.Status.INNVILGET,
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now()
+                )
+            )
+            person.håndter(
+                Vedtak(
+                    "5",
+                    "6",
+                    Vedtak.Status.AVSLÅTT,
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now()
+                )
+            )
             assertEquals(2, PersonInspektør(person).antallVedtak)
         }
     }
@@ -47,7 +65,9 @@ internal class PersonTest {
         Kanal.Digital,
         LocalDateTime.now()
     )
-    private fun ettersending(søknadId: String?, ettersendingId: String?) = Ettersending(søknadId, ettersendingId, "99", Kanal.Digital)
+
+    private fun ettersending(søknadId: String?, ettersendingId: String?) =
+        Ettersending(søknadId, ettersendingId, "99", Kanal.Digital)
 
     private class PersonInspektør(person: Person) : PersonVisitor {
         var antallVedtak = 0
@@ -73,7 +93,14 @@ internal class PersonTest {
             antallEttersendinger++
         }
 
-        override fun visitVedtak(vedtakId: String, fagsakId: String, status: Vedtak.Status, datoFattet: LocalDateTime) {
+        override fun visitVedtak(
+            vedtakId: String,
+            fagsakId: String,
+            status: Vedtak.Status,
+            datoFattet: LocalDateTime,
+            fraDato: LocalDateTime,
+            tilDato: LocalDateTime?
+        ) {
             antallVedtak++
         }
     }

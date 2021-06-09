@@ -26,11 +26,13 @@ internal class VedtakMottak(
                     "after.VEDTAK_ID",
                     "tokens.FODSELSNR",
                     "after.SAK_ID",
+                    "after.FRA_DATO"
                 )
             }
             validate { it.requireAny("after.VEDTAKTYPEKODE", listOf("O", "G")) }
             validate { it.requireAny("after.UTFALLKODE", listOf("JA", "NEI")) }
             validate { it.interestedIn("after", "tokens") }
+            validate { it.interestedIn("after.TIL_DATO") }
         }.register(this)
     }
 
