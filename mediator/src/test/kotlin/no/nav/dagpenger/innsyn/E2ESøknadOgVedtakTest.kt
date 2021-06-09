@@ -82,7 +82,7 @@ internal class E2ESøknadOgVedtakTest {
             søknader++
         }
 
-        override fun visitVedtak(vedtakId: String, fagsakId: String, status: Vedtak.Status) {
+        override fun visitVedtak(vedtakId: String, fagsakId: String, status: Vedtak.Status, datoFattet: LocalDateTime) {
             vedtak++
         }
     }

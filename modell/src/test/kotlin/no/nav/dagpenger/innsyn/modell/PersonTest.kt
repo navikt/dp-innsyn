@@ -33,8 +33,8 @@ internal class PersonTest {
     @Test
     fun `Flere vedtak gir flere vedtak `() {
         Person("ident").also { person ->
-            person.håndter(Vedtak("1", "2", Vedtak.Status.INNVILGET))
-            person.håndter(Vedtak("5", "6", Vedtak.Status.AVSLÅTT))
+            person.håndter(Vedtak("1", "2", Vedtak.Status.INNVILGET, LocalDateTime.now()))
+            person.håndter(Vedtak("5", "6", Vedtak.Status.AVSLÅTT, LocalDateTime.now()))
             assertEquals(2, PersonInspektør(person).antallVedtak)
         }
     }
@@ -73,7 +73,7 @@ internal class PersonTest {
             antallEttersendinger++
         }
 
-        override fun visitVedtak(vedtakId: String, fagsakId: String, status: Vedtak.Status) {
+        override fun visitVedtak(vedtakId: String, fagsakId: String, status: Vedtak.Status, datoFattet: LocalDateTime) {
             antallVedtak++
         }
     }

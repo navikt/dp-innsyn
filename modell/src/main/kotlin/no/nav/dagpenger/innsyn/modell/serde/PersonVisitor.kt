@@ -34,6 +34,7 @@ interface VedtakVisitor {
         vedtakId: String,
         fagsakId: String,
         status: Vedtak.Status,
+        fattetDato: LocalDateTime
     ) {}
 }
 

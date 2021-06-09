@@ -16,7 +16,7 @@ internal class Vedtaksmelding(private val packet: JsonMessage) : Hendelsemelding
     private val fattet = packet["op_ts"].asText().let {
         LocalDateTime.parse(it, formatter)
     }
-    internal val vedtak get() = Vedtak(vedtakId, sakId, status)
+    internal val vedtak get() = Vedtak(vedtakId, sakId, status, fattet)
     override val fødselsnummer: String = packet["tokens"]["FODSELSNR"].asText()
     private val status
         get() =

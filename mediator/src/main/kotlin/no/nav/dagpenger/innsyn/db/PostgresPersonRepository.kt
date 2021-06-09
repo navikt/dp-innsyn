@@ -61,7 +61,8 @@ class PostgresPersonRepository() : PersonRepository {
             Vedtak(
                 vedtakId = row.string("vedtak_id"),
                 fagsakId = row.string("fagsak_id"),
-                status = Vedtak.Status.valueOf(row.string("status"))
+                status = Vedtak.Status.valueOf(row.string("status")),
+                datoFattet = LocalDateTime.now()
             )
         }.asList
     )
@@ -115,7 +116,7 @@ class PostgresPersonRepository() : PersonRepository {
             )
         }
 
-        override fun visitVedtak(vedtakId: String, fagsakId: String, status: Vedtak.Status) {
+        override fun visitVedtak(vedtakId: String, fagsakId: String, status: Vedtak.Status, datoFattet: LocalDateTime) {
             queries.add(
                 queryOf(
                     //language=PostgreSQL

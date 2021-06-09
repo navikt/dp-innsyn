@@ -102,6 +102,7 @@ internal class InnsynApiTest {
                         "2",
                         "arenaId",
                         Vedtak.Status.INNVILGET,
+                        LocalDateTime.now()
                     )
                 )
                 it.lagre(person)
