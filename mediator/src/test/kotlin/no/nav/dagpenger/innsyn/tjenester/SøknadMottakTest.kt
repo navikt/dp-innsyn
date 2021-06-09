@@ -69,7 +69,8 @@ private val søknadJson = """{
   "datoRegistrert": "${LocalDateTime.now().minusSeconds(syntheticDelaySeconds)}",
   "søknadsData": {
     "brukerBehandlingId": "123",
-    "vedlegg": []
+    "vedlegg": [],
+    "skjemaNummer": "NAV12"
   }
 }
 """.trimIndent()

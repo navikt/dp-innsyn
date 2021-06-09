@@ -5,6 +5,7 @@ import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
 import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
+import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.JournalførtMottak
@@ -49,10 +50,21 @@ internal class E2ESøknadOgVedtakTest {
         }
     }
 
+    @Test
+    fun `skal kunne motta flere vedtak`() {
+        withMigratedDb {
+            rapid.sendTestMessage(vedtakAsJson)
+            with(PersonInspektør(person)) {
+                assertEquals(1, vedtak)
+            }
+        }
+    }
+
     private val person get() = personRepository.person("10108099999")
 
     private class PersonInspektør(person: Person) : PersonVisitor {
         var søknader = 0
+        var vedtak = 0
 
         init {
             person.accept(this)
@@ -67,20 +79,24 @@ internal class E2ESøknadOgVedtakTest {
         ) {
             søknader++
         }
+
+        override fun visitVedtak(vedtakId: String, fagsakId: String, status: Vedtak.Status) {
+            vedtak++
+        }
     }
 }
 
 @Language("JSON")
-private fun søknadsJson(søknadsId: String) = """{
+private fun søknadsJson(journalpostId: String) = """{
   "@id": "98638d1d-9b75-4802-abb2-8b7f1a08948f",
   "@opprettet": "2021-05-06T09:39:03.638555",
-  "journalpostId": "12455",
+  "journalpostId": $journalpostId,
   "datoRegistrert": "2021-05-06T09:39:03.62863",
   "type": "NySøknad",
   "fødselsnummer": "10108099999",
   "aktørId": "1234455",
     "søknadsData": {
-    "brukerBehandlingId": $søknadsId,
+    "brukerBehandlingId": "12345",
     "skjemaNummer": "NAV123",
     "aktoerId": "10108099999"
   },
