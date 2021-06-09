@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS søknad(
     journalpost_id   VARCHAR(255),
     skjema_kode     VARCHAR(20),
     søknads_type     VARCHAR(20) NOT NULL,
-    kanal           VARCHAR(20) NOT NULL
+    kanal           VARCHAR(20) NOT NULL,
+    dato_innsendt TIMESTAMP NOT NULL
 );
 CREATE UNIQUE INDEX IF NOT EXISTS journalpost_id_uindex ON søknad(journalpost_id);
 
@@ -21,6 +22,9 @@ CREATE TABLE IF NOT EXISTS vedtak(
      person_id       BIGSERIAL REFERENCES person,
      vedtak_id       VARCHAR(12) NOT NULL,
      fagsak_id      VARCHAR(12) NOT NULL,
-     status     VARCHAR(20) NOT NULL
+     status         VARCHAR(20) NOT NULL,
+     fattet         TIMESTAMP NOT NULL,
+     fra_dato       TIMESTAMP NOT NULL,
+     til_dato       TIMESTAMP
 );
 CREATE UNIQUE INDEX IF NOT EXISTS vedtak_id_uindex ON vedtak(vedtak_id)

@@ -49,7 +49,7 @@ class PostgresPersonRepository() : PersonRepository {
                 skjemaKode = row.string("skjema_kode"),
                 søknadsType = Søknad.SøknadsType.valueOf(row.string("søknads_type")),
                 kanal = Kanal.valueOf(row.string("kanal")),
-                datoInnsendt = LocalDateTime.now()
+                datoInnsendt = row.localDateTime("dato_innsendt")
             )
         }.asList
     )
@@ -62,9 +62,9 @@ class PostgresPersonRepository() : PersonRepository {
                 vedtakId = row.string("vedtak_id"),
                 fagsakId = row.string("fagsak_id"),
                 status = Vedtak.Status.valueOf(row.string("status")),
-                datoFattet = LocalDateTime.now(),
-                fraDato = LocalDateTime.now(),
-                tilDato = null
+                datoFattet = row.localDateTime("fattet"),
+                fraDato = row.localDateTime("fra_dato"),
+                tilDato = row.localDateTimeOrNull("til_dato")
             )
         }.asList
     )
@@ -102,8 +102,8 @@ class PostgresPersonRepository() : PersonRepository {
             queries.add(
                 queryOf(
                     //language=PostgreSQL
-                    """INSERT INTO søknad(person_id, søknad_id, journalpost_id, skjema_kode, søknads_type, kanal)
-                        VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :soknadId, :journalpostId, :skjemaKode, :soknadsType, :kanal)
+                    """INSERT INTO søknad(person_id, søknad_id, journalpost_id, skjema_kode, søknads_type, kanal, dato_innsendt)
+                        VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :soknadId, :journalpostId, :skjemaKode, :soknadsType, :kanal, :datoInnsendt)
                         ON CONFLICT DO NOTHING
                     """.trimMargin(),
                     mapOf(
@@ -113,6 +113,7 @@ class PostgresPersonRepository() : PersonRepository {
                         "skjemaKode" to skjemaKode,
                         "soknadsType" to søknadsType.toString(),
                         "kanal" to kanal.toString(),
+                        "datoInnsendt" to datoInnsendt
                     )
                 )
             )
@@ -129,8 +130,8 @@ class PostgresPersonRepository() : PersonRepository {
             queries.add(
                 queryOf(
                     //language=PostgreSQL
-                    """INSERT INTO vedtak(person_id, vedtak_id, fagsak_id, status)
-                        VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :vedtakId, :fagsakId, :status)
+                    """INSERT INTO vedtak(person_id, vedtak_id, fagsak_id, status, fattet, fra_dato, til_dato)
+                        VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :vedtakId, :fagsakId, :status, :fattet, :fraDato, :tilDato)
                         ON CONFLICT DO NOTHING
                     """.trimMargin(),
                     mapOf(
@@ -138,6 +139,9 @@ class PostgresPersonRepository() : PersonRepository {
                         "vedtakId" to vedtakId,
                         "fagsakId" to fagsakId,
                         "status" to status.toString(),
+                        "fattet" to datoFattet,
+                        "fraDato" to fraDato,
+                        "tilDato" to tilDato
                     )
                 )
             )
