@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 
 internal class InnsynApiTest {
     private val testIssuer = "test-issuer"
@@ -45,11 +46,56 @@ internal class InnsynApiTest {
     fun `test at bruker har søknad`() {
         val personRepository = InMemoryPersonRepository().also {
             it.person("test@nav.no").also { person ->
-                person.håndter(Søknad("1", "1", "NAV01", Søknad.SøknadsType.NySøknad, Kanal.Digital))
-                person.håndter(Søknad("2", "11", "NAV01", Søknad.SøknadsType.NySøknad, Kanal.Digital))
-                person.håndter(Søknad("3", "12", "NAV01", Søknad.SøknadsType.NySøknad, Kanal.Digital))
-                person.håndter(Søknad("4", "13", "NAV01", Søknad.SøknadsType.NySøknad, Kanal.Digital))
-                person.håndter(Søknad("5", "14", "NAV01", Søknad.SøknadsType.NySøknad, Kanal.Digital))
+                person.håndter(
+                    Søknad(
+                        "1",
+                        "1",
+                        "NAV01",
+                        Søknad.SøknadsType.NySøknad,
+                        Kanal.Digital,
+                        LocalDateTime.now()
+                    )
+                )
+                person.håndter(
+                    Søknad(
+                        "2",
+                        "11",
+                        "NAV01",
+                        Søknad.SøknadsType.NySøknad,
+                        Kanal.Digital,
+                        LocalDateTime.now()
+                    )
+                )
+                person.håndter(
+                    Søknad(
+                        "3",
+                        "12",
+                        "NAV01",
+                        Søknad.SøknadsType.NySøknad,
+                        Kanal.Digital,
+                        LocalDateTime.now()
+                    )
+                )
+                person.håndter(
+                    Søknad(
+                        "4",
+                        "13",
+                        "NAV01",
+                        Søknad.SøknadsType.NySøknad,
+                        Kanal.Digital,
+                        LocalDateTime.now()
+                    )
+                )
+                person.håndter(
+                    Søknad(
+                        "5",
+                        "14",
+                        "NAV01",
+                        Søknad.SøknadsType.NySøknad,
+                        Kanal.Digital,
+                        LocalDateTime.now()
+                    )
+                )
                 person.håndter(Sakstilknytning("11", "arenaId"))
                 person.håndter(
                     Vedtak(

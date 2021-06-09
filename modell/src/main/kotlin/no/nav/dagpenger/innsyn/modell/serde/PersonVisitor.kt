@@ -4,6 +4,7 @@ import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
+import java.time.LocalDateTime
 
 interface PersonVisitor : SøknadVisitor, EttersendingVisitor, VedtakVisitor, SakstilknytningVisitor {
     fun preVisit(person: Person, fnr: String) {}
@@ -16,7 +17,8 @@ interface SøknadVisitor {
         journalpostId: String,
         skjemaKode: String?,
         søknadsType: Søknad.SøknadsType,
-        kanal: Kanal
+        kanal: Kanal,
+        datoInnsendt: LocalDateTime
     ) {}
 }
 

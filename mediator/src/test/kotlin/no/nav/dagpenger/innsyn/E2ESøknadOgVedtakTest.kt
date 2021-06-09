@@ -16,6 +16,7 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 
 internal class E2ESøknadOgVedtakTest {
     private val rapid = TestRapid()
@@ -75,7 +76,8 @@ internal class E2ESøknadOgVedtakTest {
             journalpostId: String,
             skjemaKode: String?,
             søknadsType: Søknad.SøknadsType,
-            kanal: Kanal
+            kanal: Kanal,
+            datoInnsendt: LocalDateTime
         ) {
             søknader++
         }

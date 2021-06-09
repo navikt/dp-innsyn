@@ -7,6 +7,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 
 internal class PersonTest {
 
@@ -38,7 +39,14 @@ internal class PersonTest {
         }
     }
 
-    private fun søknad(id: String) = Søknad(id, "journalpostId", "NAV123", Søknad.SøknadsType.NySøknad, Kanal.Digital)
+    private fun søknad(id: String) = Søknad(
+        id,
+        "journalpostId",
+        "NAV123",
+        Søknad.SøknadsType.NySøknad,
+        Kanal.Digital,
+        LocalDateTime.now()
+    )
     private fun ettersending(søknadId: String?, ettersendingId: String?) = Ettersending(søknadId, ettersendingId, "99", Kanal.Digital)
 
     private class PersonInspektør(person: Person) : PersonVisitor {
@@ -55,7 +63,8 @@ internal class PersonTest {
             journalpostId: String,
             skjemaKode: String?,
             søknadsType: Søknad.SøknadsType,
-            kanal: Kanal
+            kanal: Kanal,
+            datoInnsendt: LocalDateTime
         ) {
             antallSøknader++
         }

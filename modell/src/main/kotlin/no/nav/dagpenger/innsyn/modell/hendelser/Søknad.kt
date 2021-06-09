@@ -1,16 +1,18 @@
 package no.nav.dagpenger.innsyn.modell.hendelser
 
 import no.nav.dagpenger.innsyn.modell.serde.SøknadVisitor
+import java.time.LocalDateTime
 
 class Søknad(
-    internal val søknadId: String?,
-    internal val journalpostId: String,
-    internal val skjemaKode: String?,
-    internal val søknadsType: SøknadsType,
-    internal val kanal: Kanal
+    private val søknadId: String?,
+    private val journalpostId: String,
+    private val skjemaKode: String?,
+    private val søknadsType: SøknadsType,
+    private val kanal: Kanal,
+    private val datoInnsendt: LocalDateTime
 ) {
     fun accept(visitor: SøknadVisitor) {
-        visitor.visitSøknad(søknadId, journalpostId, skjemaKode, søknadsType, kanal)
+        visitor.visitSøknad(søknadId, journalpostId, skjemaKode, søknadsType, kanal, datoInnsendt)
     }
 
     enum class SøknadsType {

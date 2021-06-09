@@ -12,6 +12,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.PersonData
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
+import java.time.LocalDateTime
 
 class PostgresPersonRepository() : PersonRepository {
     override fun person(fnr: String): Person = getPerson(fnr) ?: lagPerson(fnr)
@@ -47,7 +48,8 @@ class PostgresPersonRepository() : PersonRepository {
                 journalpostId = row.string("journalpost_id"),
                 skjemaKode = row.string("skjema_kode"),
                 søknadsType = Søknad.SøknadsType.valueOf(row.string("søknads_type")),
-                kanal = Kanal.valueOf(row.string("kanal"))
+                kanal = Kanal.valueOf(row.string("kanal")),
+                datoInnsendt = LocalDateTime.now()
             )
         }.asList
     )
@@ -91,7 +93,8 @@ class PostgresPersonRepository() : PersonRepository {
             journalpostId: String,
             skjemaKode: String?,
             søknadsType: Søknad.SøknadsType,
-            kanal: Kanal
+            kanal: Kanal,
+            datoInnsendt: LocalDateTime
         ) {
             queries.add(
                 queryOf(

@@ -21,7 +21,7 @@ class PapirSøknadMottakTest {
     }
 
     @Test
-    fun `vi kan motta søknad`() {
+    fun `vi kan motta papirsøknad`() {
         PapirSøknadMottak(testRapid, personMediator)
         testRapid.sendTestMessage(papirsøknadJson)
         verify { personMediator.håndter(any<Søknad>(), any<PapirSøknadsMelding>()) }

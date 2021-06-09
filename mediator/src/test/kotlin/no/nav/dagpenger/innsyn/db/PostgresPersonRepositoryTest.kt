@@ -7,6 +7,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 
 internal class PostgresPersonRepositoryTest {
     private val repository = PostgresPersonRepository()
@@ -16,7 +17,16 @@ internal class PostgresPersonRepositoryTest {
         withMigratedDb {
             val person = repository.person("123")
 
-            person.håndter(Søknad("id", "journalpostId", "NAV01", Søknad.SøknadsType.NySøknad, Kanal.Digital))
+            person.håndter(
+                Søknad(
+                    "id",
+                    "journalpostId",
+                    "NAV01",
+                    Søknad.SøknadsType.NySøknad,
+                    Kanal.Digital,
+                    LocalDateTime.now()
+                )
+            )
             repository.lagre(person)
 
             repository.person(person.fnr).also {
@@ -39,7 +49,8 @@ internal class PostgresPersonRepositoryTest {
             journalpostId: String,
             skjemaKode: String?,
             søknadsType: Søknad.SøknadsType,
-            kanal: Kanal
+            kanal: Kanal,
+            datoInnsendt: LocalDateTime
         ) {
             søknader++
         }

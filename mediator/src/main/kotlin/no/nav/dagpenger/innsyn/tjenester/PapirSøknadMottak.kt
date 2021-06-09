@@ -17,6 +17,7 @@ internal class PapirSøknadMottak(
             validate { it.demandValue("@event_name", "innsending_mottatt") }
             validate { it.demandKey("fødselsnummer") }
             validate { it.demandKey("journalpostId") }
+            validate { it.requireKey("datoRegistrert") }
             validate { it.requireAny("type", listOf("NySøknad", "Gjenopptak")) }
             validate { it.forbid("søknadsData.brukerBehandlingId") }
         }.register(this)

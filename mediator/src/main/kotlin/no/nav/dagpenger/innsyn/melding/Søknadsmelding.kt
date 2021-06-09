@@ -10,11 +10,11 @@ internal class Søknadsmelding(packet: JsonMessage) : Innsendingsmelding(packet)
     private val søknadsType = Søknad.SøknadsType.valueOf(packet["type"].asText())
     internal val søknad
         get() = Søknad(
-            søknadId,
-            journalpostId,
-            skjemaNummer,
-            søknadsType,
-            Digital
-
+            søknadId = søknadId,
+            journalpostId = journalpostId,
+            skjemaKode = skjemaNummer,
+            søknadsType = søknadsType,
+            kanal = Digital,
+            datoInnsendt = datoRegistrert
         )
 }
