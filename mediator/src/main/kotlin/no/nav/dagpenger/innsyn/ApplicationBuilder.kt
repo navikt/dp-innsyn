@@ -17,7 +17,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
     ).withKtorModule {
-        innsynApi(personRepository, AuthFactory.jwkProvider, AuthFactory.issuer, AuthFactory.clientId)
+        innsynApi(AuthFactory.jwkProvider, AuthFactory.issuer, AuthFactory.clientId, personRepository)
     }.build().apply {
         SøknadMottak(this, personMediator)
         JournalførtMottak(this, personMediator)

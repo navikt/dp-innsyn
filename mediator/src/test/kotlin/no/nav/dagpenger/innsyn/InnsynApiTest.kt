@@ -3,20 +3,23 @@ package no.nav.dagpenger.innsyn
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
-import no.nav.dagpenger.innsyn.helpers.InMemoryPersonRepository
+import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.JwtStub
+import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Sakstilknytning
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
+import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType.NySøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 internal class InnsynApiTest {
@@ -24,34 +27,32 @@ internal class InnsynApiTest {
     private val jwtStub = JwtStub(testIssuer)
     private val clientId = "id"
 
-    @Disabled
     @Test
-    fun `test at bruker ikke har søknad`() {
+    fun `test at bruker ikke har søknad`() = withMigratedDb {
         withTestApplication({
             innsynApi(
-                InMemoryPersonRepository(),
                 jwtStub.stubbedJwkProvider(),
                 testIssuer,
-                clientId
+                clientId,
+                PostgresPersonRepository()
             )
         }) {
             autentisert("/soknader")
         }.apply {
-            assertEquals(200, response.status()?.value)
+            assertEquals(HttpStatusCode.NotFound, response.status())
         }
     }
 
-    @Disabled
     @Test
-    fun `test at bruker har søknad`() {
-        val personRepository = InMemoryPersonRepository().also {
+    fun `test at bruker har søknad`() = withMigratedDb {
+        val personRepository = PostgresPersonRepository().also {
             it.person("test@nav.no").also { person ->
                 person.håndter(
                     Søknad(
                         "1",
                         "1",
                         "NAV01",
-                        Søknad.SøknadsType.NySøknad,
+                        NySøknad,
                         Kanal.Digital,
                         LocalDateTime.now()
                     )
@@ -61,7 +62,7 @@ internal class InnsynApiTest {
                         "2",
                         "11",
                         "NAV01",
-                        Søknad.SøknadsType.NySøknad,
+                        NySøknad,
                         Kanal.Digital,
                         LocalDateTime.now()
                     )
@@ -71,7 +72,7 @@ internal class InnsynApiTest {
                         "3",
                         "12",
                         "NAV01",
-                        Søknad.SøknadsType.NySøknad,
+                        NySøknad,
                         Kanal.Digital,
                         LocalDateTime.now()
                     )
@@ -81,7 +82,7 @@ internal class InnsynApiTest {
                         "4",
                         "13",
                         "NAV01",
-                        Søknad.SøknadsType.NySøknad,
+                        NySøknad,
                         Kanal.Digital,
                         LocalDateTime.now()
                     )
@@ -91,7 +92,7 @@ internal class InnsynApiTest {
                         "5",
                         "14",
                         "NAV01",
-                        Søknad.SøknadsType.NySøknad,
+                        NySøknad,
                         Kanal.Digital,
                         LocalDateTime.now()
                     )
@@ -112,19 +113,18 @@ internal class InnsynApiTest {
         }
         withTestApplication({
             innsynApi(
-                personRepository,
                 jwtStub.stubbedJwkProvider(),
                 testIssuer,
-                clientId
+                clientId,
+                personRepository,
             )
         }) {
-            autentisert("/soknader")
+            val dagensDato = LocalDate.now()
+            autentisert("/soknader?fom=$dagensDato&tom=$dagensDato&type=Gjenopptak&type=NySøknad")
         }.apply {
-            assertEquals(200, response.status()?.value)
-            assertTrue(response.content!!.contains("id"))
-            assertTrue(response.content!!.contains("søknadstidspunkt"))
-            assertTrue(response.content!!.contains("vedtakstidspunkt"))
-            assertTrue(response.content!!.contains("LØPENDE"))
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertTrue(response.content!!.contains(NySøknad.toString()))
+            println(response.content)
         }
     }
 
@@ -152,13 +152,16 @@ internal class InnsynApiTest {
             assertTrue(response.content!!.contains(internId.toString()))
         }
     }*/
-
     private fun TestApplicationEngine.autentisert(
         endepunkt: String,
         token: String = jwtStub.createTokenFor("test@nav.no", "id"),
         httpMethod: HttpMethod = HttpMethod.Get,
         body: String? = null
     ) = handleRequest(httpMethod, endepunkt) {
+        addHeader(
+            HttpHeaders.Accept,
+            ContentType.Application.Json.toString()
+        )
         addHeader(
             HttpHeaders.ContentType,
             ContentType.Application.Json.toString()

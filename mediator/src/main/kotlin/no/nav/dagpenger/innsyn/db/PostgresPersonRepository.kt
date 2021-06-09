@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.db
 
 import kotliquery.Query
+import kotliquery.Row
 import kotliquery.Session
 import kotliquery.queryOf
 import kotliquery.sessionOf
@@ -9,12 +10,14 @@ import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
+import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.PersonData
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
+import java.time.LocalDate
 import java.time.LocalDateTime
 
-class PostgresPersonRepository() : PersonRepository {
+class PostgresPersonRepository : PersonRepository {
     override fun person(fnr: String): Person = getPerson(fnr) ?: lagPerson(fnr)
 
     override fun lagre(person: Person): Boolean {
@@ -33,26 +36,11 @@ class PostgresPersonRepository() : PersonRepository {
 
     private fun getPerson(fnr: String) = using(sessionOf(dataSource)) { session ->
         session.run(selectPerson(fnr))?.let {
-            val søknader = hentSøknaderFor(session, it)
+            val søknader = hentSøknaderFor(fnr)
             val vedtak = hentVedtakFor(session, it)
             PersonData(fnr, søknader, vedtak).person
         }
     }
-
-    private fun hentSøknaderFor(session: Session, personId: Int) = session.run(
-        queryOf( //language=PostgreSQL
-            "SELECT * FROM søknad WHERE person_id = ?", personId
-        ).map { row ->
-            Søknad(
-                søknadId = row.string("søknad_id"),
-                journalpostId = row.string("journalpost_id"),
-                skjemaKode = row.string("skjema_kode"),
-                søknadsType = Søknad.SøknadsType.valueOf(row.string("søknads_type")),
-                kanal = Kanal.valueOf(row.string("kanal")),
-                datoInnsendt = row.localDateTime("dato_innsendt")
-            )
-        }.asList
-    )
 
     private fun hentVedtakFor(session: Session, personId: Int) = session.run(
         queryOf( //language=PostgreSQL
@@ -95,7 +83,7 @@ class PostgresPersonRepository() : PersonRepository {
             søknadId: String?,
             journalpostId: String,
             skjemaKode: String?,
-            søknadsType: Søknad.SøknadsType,
+            søknadsType: SøknadsType,
             kanal: Kanal,
             datoInnsendt: LocalDateTime
         ) {
@@ -147,4 +135,64 @@ class PostgresPersonRepository() : PersonRepository {
             )
         }
     }
+
+    override fun hentSøknaderFor(fnr: String) =
+        using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf( //language=PostgreSQL
+                    "SELECT * FROM søknad WHERE person_id = (SELECT person_id FROM person WHERE fnr = ?)", fnr
+                ).map { row -> row.toSøknad() }.asList
+            )
+        }
+
+    override fun hentSøknaderFor(
+        fnr: String,
+        fom: LocalDate?,
+        tom: LocalDate?,
+        type: List<SøknadsType>,
+        kanal: List<Kanal>,
+        offset: Int,
+        limit: Int
+    ): List<Søknad> {
+        val paramMap = mutableMapOf<String, Any>(
+            "fnr" to fnr,
+        )
+        val where = mutableListOf<String>().apply {
+            fom?.let {
+                add("dato_innsendt::date >= :fom")
+                paramMap["fom"] = it
+            }
+            tom?.let {
+                add("dato_innsendt::date <= :tom")
+                paramMap["tom"] = it
+            }
+            if (type.isNotEmpty()) {
+                add("søknads_type IN (:type)")
+                paramMap["type"] = type.joinToString(separator = "','", prefix = "'", postfix = "'")
+            }
+        }.joinToString(prefix = " AND ", separator = " AND ")
+
+        return using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf( //language=PostgreSQL
+                    """SELECT *
+                    FROM søknad
+                    WHERE person_id = (SELECT person_id FROM person WHERE fnr = :fnr) $where
+                    ORDER BY dato_innsendt DESC
+                    LIMIT $limit OFFSET $offset
+                    """.trimIndent(),
+                    paramMap
+                ).map { row -> row.toSøknad() }.asList
+            )
+        }
+    }
+
+    private fun Row.toSøknad() = Søknad(
+        søknadId = string("søknad_id"),
+        journalpostId = string("journalpost_id"),
+        skjemaKode = string("skjema_kode"),
+        søknadsType = SøknadsType.valueOf(string("søknads_type")),
+        kanal = Kanal.valueOf(string("kanal")),
+        datoInnsendt = localDateTime("dato_innsendt")
+    )
 }
