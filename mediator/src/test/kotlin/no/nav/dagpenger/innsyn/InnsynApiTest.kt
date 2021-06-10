@@ -17,6 +17,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType.NySøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -125,7 +126,50 @@ internal class InnsynApiTest {
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
             assertTrue(response.content!!.contains(NySøknad.toString()))
-            println(response.content)
+        }
+    }
+
+    @Test
+    fun `test at bruker har søknad som ikke kommer med`() = withMigratedDb {
+        val personRepository = PostgresPersonRepository().also {
+            it.person("test@nav.no").also { person ->
+                person.håndter(
+                    Søknad(
+                        "1",
+                        "1",
+                        "NAV01",
+                        NySøknad,
+                        Kanal.Digital,
+                        LocalDateTime.now().minusDays(90)
+                    )
+                )
+                person.håndter(Sakstilknytning("11", "arenaId"))
+                person.håndter(
+                    Vedtak(
+                        "2",
+                        "arenaId",
+                        Vedtak.Status.INNVILGET,
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
+                        null
+                    )
+                )
+                it.lagre(person)
+            }
+        }
+        withTestApplication({
+            innsynApi(
+                jwtStub.stubbedJwkProvider(),
+                testIssuer,
+                clientId,
+                personRepository,
+            )
+        }) {
+            val dagensDato = LocalDate.now()
+            autentisert("/soknader?søktFom=${dagensDato.minusDays(30)}&søktTom=$dagensDato")
+        }.apply {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertFalse(response.content!!.contains(NySøknad.toString()))
         }
     }
 
@@ -170,34 +214,53 @@ internal class InnsynApiTest {
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
             assertTrue(response.content!!.contains(Vedtak.Status.INNVILGET.toString()))
-            println(response.content)
         }
     }
 
-    /*@Test
-    fun `test at vi kan finne en spesifikk søknad`() {
-        var internId: UUID
-        val personRepository = InMemoryPersonRepository().also {
+    @Test
+    fun `test at bruker har vedtak som ikke er innefor tiden`() = withMigratedDb {
+        val personRepository = PostgresPersonRepository().also {
             it.person("test@nav.no").also { person ->
-                person.håndter(Søknad("1", "11", "NAV01", Søknad.SøknadsType.NySøknad, Kanal.Digital))
+                person.håndter(
+                    Søknad(
+                        "1",
+                        "1",
+                        "NAV01",
+                        NySøknad,
+                        Kanal.Digital,
+                        LocalDateTime.now()
+                    )
+                )
+                person.håndter(Sakstilknytning("11", "arenaId"))
+                person.håndter(
+                    Vedtak(
+                        "2",
+                        "arenaId",
+                        Vedtak.Status.INNVILGET,
+                        LocalDateTime.now().minusDays(90),
+                        LocalDateTime.now(),
+                        null
+                    )
+                )
                 it.lagre(person)
-                //internId = UUID.fromString(SøknadsprosessJsonBuilder(person).resultat().first()["id"].asText())
             }
         }
         withTestApplication({
             innsynApi(
-                personRepository,
                 jwtStub.stubbedJwkProvider(),
                 testIssuer,
-                clientId
+                clientId,
+                personRepository,
             )
         }) {
-            autentisert("/soknader/$internId")
+            val dagensDato = LocalDate.now()
+            autentisert("/vedtak?fattetFom=${dagensDato.minusDays(30)}&fattetTom=$dagensDato")
         }.apply {
-            assertEquals(200, response.status()?.value)
-            assertTrue(response.content!!.contains(internId.toString()))
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertFalse(response.content!!.contains(Vedtak.Status.INNVILGET.toString()))
         }
-    }*/
+    }
+
     private fun TestApplicationEngine.autentisert(
         endepunkt: String,
         token: String = jwtStub.createTokenFor("test@nav.no", "id"),
