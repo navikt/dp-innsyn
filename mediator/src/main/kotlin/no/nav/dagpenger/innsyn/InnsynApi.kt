@@ -89,13 +89,10 @@ internal fun Application.innsynApi(
                 val fnr = jwtPrincipal!!.fnr
                 val fom = call.request.queryParameters["søktFom"]?.asOptionalLocalDate()
                 val tom = call.request.queryParameters["søktTom"]?.asOptionalLocalDate()
-                val type = call.request.queryParameters.getAll("type")?.map { SøknadsType.valueOf(it) } ?: emptyList()
                 val søknader = personRepository.hentSøknaderFor(
                     fnr,
                     fom = fom,
                     tom = tom,
-                    // TODO: få til dette
-                    // type = type
                 )
 
                 call.respond(søknader.map { SøknadJsonBuilder(it).resultat() })
@@ -103,15 +100,16 @@ internal fun Application.innsynApi(
             get("/vedtak") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
-                val fomFattet = call.request.queryParameters["fattetFom"]?.asOptionalLocalDate()
-                val tomFattet = call.request.queryParameters["fattetTom"]?.asOptionalLocalDate()
+                val fattetFom = call.request.queryParameters["fattetFom"]?.asOptionalLocalDate()
+                val fattetTom = call.request.queryParameters["fattetTom"]?.asOptionalLocalDate()
                 val type = call.request.queryParameters.getAll("type")?.map { SøknadsType.valueOf(it) } ?: emptyList()
-                val søknader = personRepository.hentVedtakFor(
-                    fnr
+                val vedtak = personRepository.hentVedtakFor(
+                    fnr,
+                    fattetFom = fattetFom,
+                    fattetTom = fattetTom,
                 )
-                val map = søknader.map { VedtakJsonBuilder(it).resultat() }
 
-                call.respond(map)
+                call.respond(vedtak.map { VedtakJsonBuilder(it).resultat() })
             }
         }
     }

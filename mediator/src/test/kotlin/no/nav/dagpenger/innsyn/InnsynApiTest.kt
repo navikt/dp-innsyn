@@ -121,7 +121,7 @@ internal class InnsynApiTest {
             )
         }) {
             val dagensDato = LocalDate.now()
-            autentisert("/soknader?søktFom=$dagensDato&søktTom=$dagensDato&type=Gjenopptak&type=NySøknad")
+            autentisert("/soknader?søktFom=$dagensDato&søktTom=$dagensDato")
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
             assertTrue(response.content!!.contains(NySøknad.toString()))

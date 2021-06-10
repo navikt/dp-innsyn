@@ -3,6 +3,7 @@ package no.nav.dagpenger.innsyn.db
 import kotliquery.Query
 import kotliquery.Row
 import kotliquery.Session
+import kotliquery.param
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
@@ -145,49 +146,6 @@ class PostgresPersonRepository : PersonRepository {
             )
         }
 
-    override fun hentVedtakFor(
-        fnr: String,
-        fomFraDato: LocalDate?,
-        tomFraDato: LocalDate?,
-        fomTilDato: LocalDate?,
-        tomTilDato: LocalDate?,
-        status: List<Vedtak.Status>,
-        offset: Int,
-        limit: Int
-    ): List<Vedtak> {
-        val paramMap = mutableMapOf<String, Any>(
-            "fnr" to fnr,
-        )
-        val where = mutableListOf<String>().apply {
-            fomFraDato?.let {
-                add("dato_innsendt::date >= :fom")
-                paramMap["fom"] = it
-            }
-            tomFraDato?.let {
-                add("dato_innsendt::date <= :tom")
-                paramMap["tom"] = it
-            }
-            if (status.isNotEmpty()) {
-                add("status IN (:status)")
-                paramMap["status"] = status.joinToString(separator = "','", prefix = "'", postfix = "'")
-            }
-        }.joinToString(prefix = " AND ", separator = " AND ")
-
-        return using(sessionOf(dataSource)) { session ->
-            session.run(
-                queryOf( //language=PostgreSQL
-                    """SELECT *
-                    FROM vedtak
-                    WHERE person_id = (SELECT person_id FROM person WHERE fnr = :fnr) $where
-                    ORDER BY dato_innsendt DESC
-                    LIMIT $limit OFFSET $offset
-                    """.trimIndent(),
-                    paramMap
-                ).map { row -> row.toVedtak() }.asList
-            )
-        }
-    }
-
     override fun hentVedtakFor(fnr: String) =
         using(sessionOf(dataSource)) { session ->
             session.run(
@@ -197,6 +155,35 @@ class PostgresPersonRepository : PersonRepository {
             )
         }
 
+    override fun hentVedtakFor(
+        fnr: String,
+        fattetFom: LocalDate?,
+        fattetTom: LocalDate?,
+        status: List<Vedtak.Status>,
+        offset: Int,
+        limit: Int
+    ): List<Vedtak> = using(sessionOf(dataSource)) { session ->
+        session.run(
+            queryOf( //language=PostgreSQL
+                """SELECT *
+                FROM vedtak
+                WHERE person_id = (SELECT person_id FROM person WHERE fnr = :fnr) 
+                    AND (:fom::DATE IS NULL OR fattet::DATE >= :fom)
+                    AND (:tom::DATE IS NULL OR fattet::DATE <= :tom)
+                ORDER BY fattet DESC
+                LIMIT :limit OFFSET :offset
+                """.trimIndent(),
+                mapOf(
+                    "fnr" to fnr,
+                    "fom" to fattetFom,
+                    "tom" to fattetTom,
+                    "limit" to limit,
+                    "offset" to offset
+                )
+            ).map { row -> row.toVedtak() }.asList
+        )
+    }
+
     override fun hentSøknaderFor(
         fnr: String,
         fom: LocalDate?,
@@ -205,38 +192,26 @@ class PostgresPersonRepository : PersonRepository {
         kanal: List<Kanal>,
         offset: Int,
         limit: Int
-    ): List<Søknad> {
-        val paramMap = mutableMapOf<String, Any>(
-            "fnr" to fnr,
+    ) = using(sessionOf(dataSource)) { session ->
+        session.run(
+            queryOf( //language=PostgreSQL
+                """SELECT *
+                FROM søknad
+                WHERE person_id = (SELECT person_id FROM person WHERE fnr = :fnr) 
+                    AND (:fom::DATE IS NULL OR dato_innsendt::DATE >= :fom)
+                    AND (:tom::DATE IS NULL OR dato_innsendt::DATE <= :tom)
+                ORDER BY dato_innsendt DESC
+                LIMIT :limit OFFSET :offset
+                """.trimIndent(),
+                mapOf(
+                    "fnr" to fnr.param(),
+                    "fom" to fom,
+                    "tom" to tom,
+                    "limit" to limit,
+                    "offset" to offset
+                )
+            ).map { row -> row.toSøknad() }.asList
         )
-        val where = mutableListOf<String>().apply {
-            fom?.let {
-                add("dato_innsendt::date >= :fom")
-                paramMap["fom"] = it
-            }
-            tom?.let {
-                add("dato_innsendt::date <= :tom")
-                paramMap["tom"] = it
-            }
-            if (type.isNotEmpty()) {
-                add("søknads_type IN (:type)")
-                paramMap["type"] = type.joinToString(separator = "','", prefix = "'", postfix = "'")
-            }
-        }.takeIf { it.isNotEmpty() }?.joinToString(prefix = " AND ", separator = " AND ") ?: ""
-
-        return using(sessionOf(dataSource)) { session ->
-            session.run(
-                queryOf( //language=PostgreSQL
-                    """SELECT *
-                    FROM søknad
-                    WHERE person_id = (SELECT person_id FROM person WHERE fnr = :fnr) $where
-                    ORDER BY dato_innsendt DESC
-                    LIMIT $limit OFFSET $offset
-                    """.trimIndent(),
-                    paramMap
-                ).map { row -> row.toSøknad() }.asList
-            )
-        }
     }
 
     private fun Row.toSøknad() = Søknad(
