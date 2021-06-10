@@ -27,6 +27,7 @@ import no.nav.dagpenger.innsyn.Configuration.appName
 import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType
 import no.nav.dagpenger.innsyn.modell.serde.SøknadJsonBuilder
+import no.nav.dagpenger.innsyn.modell.serde.VedtakJsonBuilder
 import org.slf4j.event.Level
 import java.time.LocalDate
 
@@ -86,8 +87,8 @@ internal fun Application.innsynApi(
             get("/soknader") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
-                val fom = call.request.queryParameters["fom"]?.asOptionalLocalDate()
-                val tom = call.request.queryParameters["tom"]?.asOptionalLocalDate()
+                val fom = call.request.queryParameters["søktFom"]?.asOptionalLocalDate()
+                val tom = call.request.queryParameters["søktTom"]?.asOptionalLocalDate()
                 val type = call.request.queryParameters.getAll("type")?.map { SøknadsType.valueOf(it) } ?: emptyList()
                 val søknader = personRepository.hentSøknaderFor(
                     fnr,
@@ -96,15 +97,21 @@ internal fun Application.innsynApi(
                     // TODO: få til dette
                     // type = type
                 )
-                val map = søknader.map { SøknadJsonBuilder(it).resultat() }
 
-                call.respond(map)
+                call.respond(søknader.map { SøknadJsonBuilder(it).resultat() })
             }
-            get("/soknader/{id}") {
+            get("/vedtak") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
-                val person = personRepository.person(fnr)
-                // call.respondText { SøknadsprosessJsonBuilder(person, UUID.fromString(call.parameters["id"])).resultat().toString() }
+                val fomFattet = call.request.queryParameters["fattetFom"]?.asOptionalLocalDate()
+                val tomFattet = call.request.queryParameters["fattetTom"]?.asOptionalLocalDate()
+                val type = call.request.queryParameters.getAll("type")?.map { SøknadsType.valueOf(it) } ?: emptyList()
+                val søknader = personRepository.hentVedtakFor(
+                    fnr
+                )
+                val map = søknader.map { VedtakJsonBuilder(it).resultat() }
+
+                call.respond(map)
             }
         }
     }

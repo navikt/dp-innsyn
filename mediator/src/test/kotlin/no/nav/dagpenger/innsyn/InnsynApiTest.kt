@@ -39,7 +39,8 @@ internal class InnsynApiTest {
         }) {
             autentisert("/soknader")
         }.apply {
-            assertEquals(HttpStatusCode.NotFound, response.status())
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertEquals("[ ]", response.content!!)
         }
     }
 
@@ -120,10 +121,55 @@ internal class InnsynApiTest {
             )
         }) {
             val dagensDato = LocalDate.now()
-            autentisert("/soknader?fom=$dagensDato&tom=$dagensDato&type=Gjenopptak&type=NySøknad")
+            autentisert("/soknader?søktFom=$dagensDato&søktTom=$dagensDato&type=Gjenopptak&type=NySøknad")
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
             assertTrue(response.content!!.contains(NySøknad.toString()))
+            println(response.content)
+        }
+    }
+
+    @Test
+    fun `test at bruker har vedtak`() = withMigratedDb {
+        val personRepository = PostgresPersonRepository().also {
+            it.person("test@nav.no").also { person ->
+                person.håndter(
+                    Søknad(
+                        "1",
+                        "1",
+                        "NAV01",
+                        NySøknad,
+                        Kanal.Digital,
+                        LocalDateTime.now()
+                    )
+                )
+                person.håndter(Sakstilknytning("11", "arenaId"))
+                person.håndter(
+                    Vedtak(
+                        "2",
+                        "arenaId",
+                        Vedtak.Status.INNVILGET,
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
+                        null
+                    )
+                )
+                it.lagre(person)
+            }
+        }
+        withTestApplication({
+            innsynApi(
+                jwtStub.stubbedJwkProvider(),
+                testIssuer,
+                clientId,
+                personRepository,
+            )
+        }) {
+            val dagensDato = LocalDate.now()
+            autentisert("/vedtak?fattetFom=$dagensDato&fattetTom=$dagensDato")
+        }.apply {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertTrue(response.content!!.contains(Vedtak.Status.INNVILGET.toString()))
             println(response.content)
         }
     }

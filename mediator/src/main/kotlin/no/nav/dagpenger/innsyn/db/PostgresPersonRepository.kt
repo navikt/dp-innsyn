@@ -145,6 +145,58 @@ class PostgresPersonRepository : PersonRepository {
             )
         }
 
+    override fun hentVedtakFor(
+        fnr: String,
+        fomFraDato: LocalDate?,
+        tomFraDato: LocalDate?,
+        fomTilDato: LocalDate?,
+        tomTilDato: LocalDate?,
+        status: List<Vedtak.Status>,
+        offset: Int,
+        limit: Int
+    ): List<Vedtak> {
+        val paramMap = mutableMapOf<String, Any>(
+            "fnr" to fnr,
+        )
+        val where = mutableListOf<String>().apply {
+            fomFraDato?.let {
+                add("dato_innsendt::date >= :fom")
+                paramMap["fom"] = it
+            }
+            tomFraDato?.let {
+                add("dato_innsendt::date <= :tom")
+                paramMap["tom"] = it
+            }
+            if (status.isNotEmpty()) {
+                add("status IN (:status)")
+                paramMap["status"] = status.joinToString(separator = "','", prefix = "'", postfix = "'")
+            }
+        }.joinToString(prefix = " AND ", separator = " AND ")
+
+        return using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf( //language=PostgreSQL
+                    """SELECT *
+                    FROM vedtak
+                    WHERE person_id = (SELECT person_id FROM person WHERE fnr = :fnr) $where
+                    ORDER BY dato_innsendt DESC
+                    LIMIT $limit OFFSET $offset
+                    """.trimIndent(),
+                    paramMap
+                ).map { row -> row.toVedtak() }.asList
+            )
+        }
+    }
+
+    override fun hentVedtakFor(fnr: String) =
+        using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf( //language=PostgreSQL
+                    "SELECT * FROM vedtak WHERE person_id = (SELECT person_id FROM person WHERE fnr = ?)", fnr
+                ).map { row -> row.toVedtak() }.asList
+            )
+        }
+
     override fun hentSøknaderFor(
         fnr: String,
         fom: LocalDate?,
@@ -170,7 +222,7 @@ class PostgresPersonRepository : PersonRepository {
                 add("søknads_type IN (:type)")
                 paramMap["type"] = type.joinToString(separator = "','", prefix = "'", postfix = "'")
             }
-        }.joinToString(prefix = " AND ", separator = " AND ")
+        }.takeIf { it.isNotEmpty() }?.joinToString(prefix = " AND ", separator = " AND ") ?: ""
 
         return using(sessionOf(dataSource)) { session ->
             session.run(
@@ -194,5 +246,14 @@ class PostgresPersonRepository : PersonRepository {
         søknadsType = SøknadsType.valueOf(string("søknads_type")),
         kanal = Kanal.valueOf(string("kanal")),
         datoInnsendt = localDateTime("dato_innsendt")
+    )
+
+    private fun Row.toVedtak() = Vedtak(
+        vedtakId = string("vedtak_id"),
+        fagsakId = string("fagsak_id"),
+        status = Vedtak.Status.valueOf(string("status")),
+        datoFattet = localDateTime("fattet"),
+        fraDato = localDateTime("fra_dato"),
+        tilDato = localDateTimeOrNull("til_dato"),
     )
 }
