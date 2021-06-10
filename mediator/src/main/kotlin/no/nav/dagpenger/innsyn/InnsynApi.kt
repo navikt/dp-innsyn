@@ -84,7 +84,7 @@ internal fun Application.innsynApi(
 
     routing {
         authenticate {
-            get("/soknader") {
+            get("/soknad") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
                 val fom = call.request.queryParameters["søktFom"]?.asOptionalLocalDate()

@@ -38,7 +38,7 @@ internal class InnsynApiTest {
                 PostgresPersonRepository()
             )
         }) {
-            autentisert("/soknader")
+            autentisert("/soknad")
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals("[ ]", response.content!!)
@@ -122,7 +122,7 @@ internal class InnsynApiTest {
             )
         }) {
             val dagensDato = LocalDate.now()
-            autentisert("/soknader?søktFom=$dagensDato&søktTom=$dagensDato")
+            autentisert("/soknad?søktFom=$dagensDato&søktTom=$dagensDato")
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
             assertTrue(response.content!!.contains(NySøknad.toString()))
@@ -166,7 +166,7 @@ internal class InnsynApiTest {
             )
         }) {
             val dagensDato = LocalDate.now()
-            autentisert("/soknader?søktFom=${dagensDato.minusDays(30)}&søktTom=$dagensDato")
+            autentisert("/soknad?søktFom=${dagensDato.minusDays(30)}&søktTom=$dagensDato")
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
             assertFalse(response.content!!.contains(NySøknad.toString()))
