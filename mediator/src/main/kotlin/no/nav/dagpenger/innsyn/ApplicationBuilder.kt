@@ -33,7 +33,6 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     fun start() = rapidsConnection.start()
 
     override fun onStartup(rapidsConnection: RapidsConnection) {
-        clean()
         runMigration()
     }
 }
