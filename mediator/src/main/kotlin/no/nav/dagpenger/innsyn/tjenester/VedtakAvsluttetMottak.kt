@@ -9,7 +9,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
 private val logg = KotlinLogging.logger {}
-private val sikkerlogg = KotlinLogging.logger("tjenestekall.VedtakMottak")
+private val sikkerlogg = KotlinLogging.logger("tjenestekall.VedtakAvsluttetMottak")
 
 internal class VedtakAvsluttetMottak(
     rapidsConnection: RapidsConnection,
