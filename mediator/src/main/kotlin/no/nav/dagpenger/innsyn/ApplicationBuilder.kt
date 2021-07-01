@@ -6,6 +6,7 @@ import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.JournalførtMottak
 import no.nav.dagpenger.innsyn.tjenester.OppgaveMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
+import no.nav.dagpenger.innsyn.tjenester.VedtakAvsluttetMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakMottak
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -23,6 +24,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
         EttersendingMottak(this, personMediator)
         VedtakMottak(this, personMediator)
         OppgaveMottak(this, personMediator)
+        VedtakAvsluttetMottak(this)
     }
 
     init {
