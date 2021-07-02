@@ -16,6 +16,7 @@ internal class PersonTest {
         Person("ident").also { person ->
             person.håndter(søknad("id1"))
             person.håndter(søknad("id2"))
+            person.håndter(søknad("id2")) // Duplikater skal ikke med
 
             assertEquals(2, PersonInspektør(person).antallSøknader)
         }
@@ -59,7 +60,7 @@ internal class PersonTest {
 
     private fun søknad(id: String) = Søknad(
         id,
-        "journalpostId",
+        "journalpostId-$id",
         "NAV123",
         Søknad.SøknadsType.NySøknad,
         Kanal.Digital,

@@ -3,6 +3,7 @@ package no.nav.dagpenger.innsyn.modell
 import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
 import no.nav.dagpenger.innsyn.modell.hendelser.Sakstilknytning
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
+import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.Companion.har
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 
@@ -16,6 +17,7 @@ class Person private constructor(
     constructor(fnr: String) : this(fnr, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf())
 
     fun håndter(søknad: Søknad) {
+        if (søknader.har(søknad)) return
         søknader.add(søknad)
     }
 
