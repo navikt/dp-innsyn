@@ -40,12 +40,12 @@ internal class E2ESøknadOgVedtakTest {
     @Test
     fun `skal kunne motta flere søknader`() {
         withMigratedDb {
-            rapid.sendTestMessage(søknadsJson("999"))
+            rapid.sendTestMessage(søknadsJson("999", "søknad1"))
             with(PersonInspektør(person)) {
                 assertEquals(1, søknader)
             }
 
-            rapid.sendTestMessage(søknadsJson("123"))
+            rapid.sendTestMessage(søknadsJson("123", "søknad2"))
             with(PersonInspektør(person)) {
                 assertEquals(2, søknader)
             }
@@ -124,7 +124,7 @@ internal class E2ESøknadOgVedtakTest {
 }
 
 @Language("JSON")
-private fun søknadsJson(journalpostId: String) = """{
+private fun søknadsJson(journalpostId: String, søknadsId: String) = """{
   "@id": "98638d1d-9b75-4802-abb2-8b7f1a08948f",
   "@opprettet": "2021-05-06T09:39:03.638555",
   "journalpostId": $journalpostId,
@@ -133,7 +133,7 @@ private fun søknadsJson(journalpostId: String) = """{
   "fødselsnummer": "10108099999",
   "aktørId": "1234455",
     "søknadsData": {
-    "brukerBehandlingId": "12345",
+    "brukerBehandlingId": "$søknadsId",
     "skjemaNummer": "NAV123",
     "aktoerId": "10108099999"
   },
