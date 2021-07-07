@@ -11,6 +11,7 @@ import io.ktor.server.testing.withTestApplication
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.JwtStub
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
+import no.nav.dagpenger.innsyn.modell.hendelser.Innsending
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Sakstilknytning
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
@@ -92,6 +93,7 @@ internal class InnsynApiTest {
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
             assertTrue(response.content!!.contains(NySøknad.toString()))
+            assertTrue(response.content!!.contains(Innsending.Vedlegg.Status.LastetOpp.toString()))
         }
     }
 
@@ -235,6 +237,6 @@ internal class InnsynApiTest {
         søknadsType = NySøknad,
         kanal = Kanal.Digital,
         datoInnsendt = datoInnsendt,
-        vedlegg = emptyList()
+        vedlegg = listOf(Innsending.Vedlegg("123", "navn", Innsending.Vedlegg.Status.LastetOpp))
     )
 }
