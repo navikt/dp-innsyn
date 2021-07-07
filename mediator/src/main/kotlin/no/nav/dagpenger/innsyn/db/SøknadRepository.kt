@@ -1,5 +1,6 @@
 package no.nav.dagpenger.innsyn.db
 
+import no.nav.dagpenger.innsyn.modell.hendelser.Innsending
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType
@@ -17,4 +18,5 @@ interface SøknadRepository {
     ): List<Søknad>
 
     fun hentSøknaderFor(fnr: String): List<Søknad>
+    fun hentVedleggFor(søknadsId: String): List<Innsending.Vedlegg>
 }

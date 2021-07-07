@@ -64,11 +64,18 @@ internal class PersonTest {
         "NAV123",
         Søknad.SøknadsType.NySøknad,
         Kanal.Digital,
-        LocalDateTime.now()
+        LocalDateTime.now(),
+        emptyList()
     )
 
     private fun ettersending(søknadId: String?, ettersendingId: String?) =
-        Ettersending(søknadId, ettersendingId, "99", Kanal.Digital)
+        Ettersending(
+            søknadId,
+            ettersendingId,
+            "99",
+            Kanal.Digital,
+            emptyList()
+        )
 
     private class PersonInspektør(person: Person) : PersonVisitor {
         var antallVedtak = 0

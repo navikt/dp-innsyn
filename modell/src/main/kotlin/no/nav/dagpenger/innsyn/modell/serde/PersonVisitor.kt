@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.modell.serde
 
 import no.nav.dagpenger.innsyn.modell.Person
+import no.nav.dagpenger.innsyn.modell.hendelser.Innsending
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
@@ -19,6 +20,12 @@ interface SøknadVisitor {
         søknadsType: Søknad.SøknadsType,
         kanal: Kanal,
         datoInnsendt: LocalDateTime
+    ) {}
+
+    fun visitVedlegg(
+        skjemaNummer: String,
+        navn: String,
+        status: Innsending.Vedlegg.Status
     ) {}
 }
 

@@ -15,6 +15,7 @@ internal class Søknadsmelding(packet: JsonMessage) : Innsendingsmelding(packet)
             skjemaKode = skjemaNummer,
             søknadsType = søknadsType,
             kanal = Digital,
-            datoInnsendt = datoRegistrert
+            datoInnsendt = datoRegistrert,
+            vedlegg = vedlegg
         )
 }

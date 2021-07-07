@@ -19,6 +19,7 @@ internal class PapirSøknadsMelding(private val packet: JsonMessage) : Hendelsem
             skjemaKode = null,
             søknadsType = søknadsType,
             kanal = Papir,
-            datoInnsendt = datoRegistrert
+            datoInnsendt = datoRegistrert,
+            vedlegg = emptyList()
         )
 }

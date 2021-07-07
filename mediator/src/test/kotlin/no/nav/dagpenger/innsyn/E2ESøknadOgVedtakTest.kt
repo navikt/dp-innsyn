@@ -3,6 +3,7 @@ package no.nav.dagpenger.innsyn
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
 import no.nav.dagpenger.innsyn.modell.Person
+import no.nav.dagpenger.innsyn.modell.hendelser.Innsending
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
@@ -52,6 +53,23 @@ internal class E2ESøknadOgVedtakTest {
     }
 
     @Test
+    fun `skal kunne liste opp vedlegg og ettersende vedlegg`() {
+        withMigratedDb {
+            rapid.sendTestMessage(søknadAsJson)
+            with(PersonInspektør(person)) {
+                assertEquals(2, uferdigeVedlegg)
+                assertEquals(0, ferdigeVedlegg)
+            }
+
+            rapid.sendTestMessage(ettersendingAsJson)
+            with(PersonInspektør(person)) {
+                assertEquals(1, uferdigeVedlegg)
+                assertEquals(1, ferdigeVedlegg)
+            }
+        }
+    }
+
+    @Test
     fun `skal kunne motta flere vedtak`() {
         withMigratedDb {
             rapid.sendTestMessage(vedtakAsJson)
@@ -65,6 +83,8 @@ internal class E2ESøknadOgVedtakTest {
 
     private class PersonInspektør(person: Person) : PersonVisitor {
         var søknader = 0
+        var ferdigeVedlegg = 0
+        var uferdigeVedlegg = 0
         var vedtak = 0
 
         init {
@@ -80,6 +100,14 @@ internal class E2ESøknadOgVedtakTest {
             datoInnsendt: LocalDateTime
         ) {
             søknader++
+        }
+
+        override fun visitVedlegg(skjemaNummer: String, navn: String, status: Innsending.Vedlegg.Status) {
+            if (status == Innsending.Vedlegg.Status.LastetOpp) {
+                ferdigeVedlegg++
+            } else {
+                uferdigeVedlegg++
+            }
         }
 
         override fun visitVedtak(

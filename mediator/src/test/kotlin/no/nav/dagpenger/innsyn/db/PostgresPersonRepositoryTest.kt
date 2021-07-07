@@ -2,6 +2,8 @@ package no.nav.dagpenger.innsyn.db
 
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
 import no.nav.dagpenger.innsyn.modell.Person
+import no.nav.dagpenger.innsyn.modell.hendelser.Innsending.Vedlegg
+import no.nav.dagpenger.innsyn.modell.hendelser.Innsending.Vedlegg.Status.LastetOpp
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
@@ -24,7 +26,10 @@ internal class PostgresPersonRepositoryTest {
                     "NAV01",
                     Søknad.SøknadsType.NySøknad,
                     Kanal.Digital,
-                    LocalDateTime.now()
+                    LocalDateTime.now(),
+                    listOf(
+                        Vedlegg("123", "123", LastetOpp)
+                    )
                 )
             )
             repository.lagre(person)
@@ -32,6 +37,7 @@ internal class PostgresPersonRepositoryTest {
             repository.person(person.fnr).also {
                 with(PersonInspektør(it)) {
                     assertEquals(1, søknader)
+                    assertEquals(1, vedlegg)
                 }
             }
         }
@@ -39,6 +45,7 @@ internal class PostgresPersonRepositoryTest {
 
     private class PersonInspektør(person: Person) : PersonVisitor {
         var søknader = 0
+        var vedlegg = 0
 
         init {
             person.accept(this)
@@ -53,6 +60,10 @@ internal class PostgresPersonRepositoryTest {
             datoInnsendt: LocalDateTime
         ) {
             søknader++
+        }
+
+        override fun visitVedlegg(skjemaNummer: String, navn: String, status: Vedlegg.Status) {
+            vedlegg++
         }
     }
 }
