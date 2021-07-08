@@ -66,7 +66,7 @@ internal class PersonTest {
         Kanal.Digital,
         LocalDateTime.now(),
         emptyList(),
-        tittel
+        "tittel"
     )
 
     private fun ettersending(søknadId: String?, ettersendingId: String?) =
