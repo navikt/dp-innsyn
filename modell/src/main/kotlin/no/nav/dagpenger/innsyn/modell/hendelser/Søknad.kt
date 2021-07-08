@@ -14,7 +14,7 @@ class Søknad(
     private val tittel: String?,
 ) : Innsending(vedlegg) {
     init {
-        check(søknadId == null && vedlegg.isEmpty()) { "Søknader uten søknadId kan ikke ha vedlegg" }
+        check(papirKanIkkeHaVedlegg) { "Søknader uten søknadId (papir) kan ikke ha vedlegg" }
     }
 
     companion object {
@@ -35,4 +35,6 @@ class Søknad(
         NySøknad,
         Gjenopptak
     }
+
+    private val papirKanIkkeHaVedlegg get() = !(søknadId == null && vedlegg.isNotEmpty())
 }
