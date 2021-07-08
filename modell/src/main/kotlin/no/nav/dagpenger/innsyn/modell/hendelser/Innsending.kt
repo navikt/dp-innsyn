@@ -15,12 +15,10 @@ abstract class Innsending(
         }
 
         enum class Status {
-            VedleggKreves,
             LastetOpp,
             VedleggSendesAvAndre,
             VedleggSendesIkke,
             SendesSenere,
-            SendesIkke,
             VedleggAlleredeSendt
         }
     }
