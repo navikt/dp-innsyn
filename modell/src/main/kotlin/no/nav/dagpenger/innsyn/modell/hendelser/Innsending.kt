@@ -19,6 +19,7 @@ abstract class Innsending(
             VedleggSendesAvAndre,
             VedleggSendesIkke,
             SendesSenere,
+            SendesIkke,
             VedleggAlleredeSendt
         }
     }
