@@ -13,6 +13,10 @@ class Søknad(
     vedlegg: List<Vedlegg>,
     private val tittel: String?,
 ) : Innsending(vedlegg) {
+    init {
+        check(søknadId == null && vedlegg.isEmpty()) { "Søknader uten søknadId kan ikke ha vedlegg" }
+    }
+
     companion object {
         fun List<Søknad>.har(søknad: Søknad) = this.any { it.journalpostId == søknad.journalpostId }
     }

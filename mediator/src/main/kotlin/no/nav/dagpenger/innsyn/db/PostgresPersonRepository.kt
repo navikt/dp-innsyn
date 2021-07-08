@@ -177,7 +177,9 @@ class PostgresPersonRepository : PersonRepository {
                     """.trimMargin(),
                     fnr
                 ).map { row ->
-                    val vedlegg = hentVedleggFor(row.string("søknad_id"))
+                    val vedlegg = row.stringOrNull("søknad_id")?.let {
+                        hentVedleggFor(row.string("søknad_id"))
+                    }.orEmpty()
                     row.toSøknad(vedlegg)
                 }.asList
             )
@@ -192,8 +194,7 @@ class PostgresPersonRepository : PersonRepository {
                         WHERE søknad_id = ? 
                     """.trimMargin(),
                     søknadsId
-                ).map {
-                    row ->
+                ).map { row ->
                     row.toVedlegg()
                 }.asList
             )
@@ -268,7 +269,7 @@ class PostgresPersonRepository : PersonRepository {
     }
 
     private fun Row.toSøknad(vedlegg: List<Vedlegg>) = Søknad(
-        søknadId = string("søknad_id"),
+        søknadId = stringOrNull("søknad_id"),
         journalpostId = string("journalpost_id"),
         skjemaKode = string("skjema_kode"),
         søknadsType = SøknadsType.valueOf(string("søknads_type")),

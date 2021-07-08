@@ -44,6 +44,34 @@ internal class PostgresPersonRepositoryTest {
         }
     }
 
+    @Test
+    fun `skal lagre og finne person med papirsøknad`() {
+        withMigratedDb {
+            val person = repository.person("123")
+
+            person.håndter(
+                Søknad(
+                    null,
+                    "journalpostId",
+                    "NAV01",
+                    Søknad.SøknadsType.NySøknad,
+                    Kanal.Digital,
+                    LocalDateTime.now(),
+                    emptyList(),
+                    "tittel"
+                )
+            )
+            repository.lagre(person)
+
+            repository.person(person.fnr).also {
+                with(PersonInspektør(it)) {
+                    assertEquals(1, søknader)
+                    assertEquals(0, vedlegg)
+                }
+            }
+        }
+    }
+
     private class PersonInspektør(person: Person) : PersonVisitor {
         var søknader = 0
         var vedlegg = 0
