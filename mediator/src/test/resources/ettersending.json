@@ -8,6 +8,7 @@
   "aktørId": "1234455",
   "fagsakId": "29501780",
   "skjemaKode": "NAV 04-01.03",
+  "tittel": "Tittel",
   "søknadsData": {
     "soknadId": 11611,
     "soknadsType": "dagpenger.ordinaer",

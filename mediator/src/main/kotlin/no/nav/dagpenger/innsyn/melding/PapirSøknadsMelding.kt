@@ -15,6 +15,7 @@ internal class PapirSøknadsMelding(packet: JsonMessage) : Innsendingsmelding(pa
             søknadsType = søknadsType,
             kanal = Papir,
             datoInnsendt = datoRegistrert,
-            vedlegg = emptyList()
+            vedlegg = emptyList(),
+            tittel = tittel
         )
 }

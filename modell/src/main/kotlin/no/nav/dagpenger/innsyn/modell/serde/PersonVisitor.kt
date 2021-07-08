@@ -19,7 +19,8 @@ interface SøknadVisitor {
         skjemaKode: String?,
         søknadsType: Søknad.SøknadsType,
         kanal: Kanal,
-        datoInnsendt: LocalDateTime
+        datoInnsendt: LocalDateTime,
+        tittel: String?
     ) {}
 
     fun visitVedlegg(

@@ -11,13 +11,14 @@ class Søknad(
     private val kanal: Kanal,
     private val datoInnsendt: LocalDateTime,
     vedlegg: List<Vedlegg>,
+    private val tittel: String?,
 ) : Innsending(vedlegg) {
     companion object {
         fun List<Søknad>.har(søknad: Søknad) = this.any { it.journalpostId == søknad.journalpostId }
     }
 
     fun accept(visitor: SøknadVisitor) {
-        visitor.visitSøknad(søknadId, journalpostId, skjemaKode, søknadsType, kanal, datoInnsendt)
+        visitor.visitSøknad(søknadId, journalpostId, skjemaKode, søknadsType, kanal, datoInnsendt, tittel)
         vedlegg.forEach { it.accept(visitor) }
     }
 

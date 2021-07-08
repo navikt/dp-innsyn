@@ -89,14 +89,15 @@ class PostgresPersonRepository : PersonRepository {
             skjemaKode: String?,
             søknadsType: SøknadsType,
             kanal: Kanal,
-            datoInnsendt: LocalDateTime
+            datoInnsendt: LocalDateTime,
+            tittel: String?
         ) {
             aktivSøknadId = søknadId
             queries.add(
                 queryOf(
                     //language=PostgreSQL
-                    """INSERT INTO søknad(person_id, søknad_id, journalpost_id, skjema_kode, søknads_type, kanal, dato_innsendt)
-                        VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :soknadId, :journalpostId, :skjemaKode, :soknadsType, :kanal, :datoInnsendt)
+                    """INSERT INTO søknad(person_id, søknad_id, journalpost_id, skjema_kode, søknads_type, kanal, dato_innsendt, tittel)
+                        VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :soknadId, :journalpostId, :skjemaKode, :soknadsType, :kanal, :datoInnsendt, :tittel)
                         ON CONFLICT DO NOTHING
                     """.trimMargin(),
                     mapOf(
@@ -106,7 +107,8 @@ class PostgresPersonRepository : PersonRepository {
                         "skjemaKode" to skjemaKode,
                         "soknadsType" to søknadsType.toString(),
                         "kanal" to kanal.toString(),
-                        "datoInnsendt" to datoInnsendt
+                        "datoInnsendt" to datoInnsendt,
+                        "tittel" to tittel
                     )
                 )
             )
@@ -272,7 +274,8 @@ class PostgresPersonRepository : PersonRepository {
         søknadsType = SøknadsType.valueOf(string("søknads_type")),
         kanal = Kanal.valueOf(string("kanal")),
         datoInnsendt = localDateTime("dato_innsendt"),
-        vedlegg = vedlegg
+        vedlegg = vedlegg,
+        tittel = stringOrNull("tittel")
     )
 
     private fun Row.toVedlegg() = Vedlegg(

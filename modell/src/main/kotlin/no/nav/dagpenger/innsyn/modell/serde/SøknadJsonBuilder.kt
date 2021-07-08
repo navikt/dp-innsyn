@@ -23,13 +23,15 @@ class SøknadJsonBuilder(val søknad: Søknad) : SøknadVisitor {
         skjemaKode: String?,
         søknadsType: Søknad.SøknadsType,
         kanal: Kanal,
-        datoInnsendt: LocalDateTime
+        datoInnsendt: LocalDateTime,
+        tittel: String?
     ) {
-        søknadId?.let { root.put("søknadId", søknadId) }
+        søknadId?.let { root.put("søknadId", it) }
         skjemaKode?.let {
-            root.put("skjemaKode", skjemaKode)
-            root.put("tittel", finnTittel(skjemaKode))
+            root.put("skjemaKode", it)
+            finnTittel(it)?.let { tittel -> root.put("tittel", tittel) }
         }
+        tittel?.let { root.put("tittel", it) }
         root.put("journalpostId", journalpostId)
         root.put("søknadsType", søknadsType.toString())
         root.put("kanal", kanal.toString())

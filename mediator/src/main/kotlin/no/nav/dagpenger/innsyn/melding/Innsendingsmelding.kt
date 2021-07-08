@@ -11,6 +11,7 @@ internal abstract class Innsendingsmelding(packet: JsonMessage) : Hendelsemeldin
     internal val journalpostId: String = packet["journalpostId"].asText()
     internal val skjemaKode = packet["skjemaKode"].asText()
     internal val datoRegistrert: LocalDateTime = packet["datoRegistrert"].asLocalDateTime()
+    internal val tittel = packet["tittel"].asText()
 
     internal val vedlegg = packet["søknadsData.vedlegg"].map {
         Vedlegg(

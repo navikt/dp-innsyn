@@ -74,6 +74,7 @@ private val søknadJson = """{
   "fødselsnummer": "123",
   "journalpostId": "123",
   "skjemaKode": "NAV 03-102.23",
+  "tittel": "Tittel",
   "type": "NySøknad",
   "datoRegistrert": "${LocalDateTime.now().minusSeconds(syntheticDelaySeconds)}",
   "søknadsData": {
@@ -84,12 +85,14 @@ private val søknadJson = """{
 }
 """.trimIndent()
 
+@Language("JSON")
 private val papirsøknadJson = """{
   "@id": "123",
   "@opprettet": "2021-01-01T01:01:01.000001",
   "journalpostId": "12455",
   "datoRegistrert": "2021-01-01T01:01:01.000001",
   "skjemaKode": "NAV 03-102.23",
+  "tittel": "Tittel",
   "type": "NySøknad",
   "fødselsnummer": "11111111111",
   "aktørId": "1234455",

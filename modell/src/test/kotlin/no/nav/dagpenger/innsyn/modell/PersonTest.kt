@@ -65,7 +65,8 @@ internal class PersonTest {
         Søknad.SøknadsType.NySøknad,
         Kanal.Digital,
         LocalDateTime.now(),
-        emptyList()
+        emptyList(),
+        tittel
     )
 
     private fun ettersending(søknadId: String?, ettersendingId: String?) =
@@ -92,7 +93,8 @@ internal class PersonTest {
             skjemaKode: String?,
             søknadsType: Søknad.SøknadsType,
             kanal: Kanal,
-            datoInnsendt: LocalDateTime
+            datoInnsendt: LocalDateTime,
+            tittel: String?
         ) {
             antallSøknader++
         }

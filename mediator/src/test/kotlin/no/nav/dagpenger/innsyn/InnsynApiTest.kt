@@ -51,7 +51,7 @@ internal class InnsynApiTest {
         val personRepository = PostgresPersonRepository().also {
             it.person("test@nav.no").also { person ->
                 person.håndter(
-                    søknad("1", "1", LocalDateTime.now().minusDays(90))
+                    søknad("1", "1", LocalDateTime.now().minusDays(90), "Søknad om")
                 )
                 person.håndter(
                     søknad("2", "11", LocalDateTime.now().minusDays(90))
@@ -230,7 +230,8 @@ internal class InnsynApiTest {
     private fun søknad(
         søknadId: String = "1",
         journalpostId: String = "1",
-        datoInnsendt: LocalDateTime = LocalDateTime.now()
+        datoInnsendt: LocalDateTime = LocalDateTime.now(),
+        tittel: String? = null
     ) = Søknad(
         søknadId = søknadId,
         journalpostId = journalpostId,
@@ -238,6 +239,7 @@ internal class InnsynApiTest {
         søknadsType = NySøknad,
         kanal = Kanal.Digital,
         datoInnsendt = datoInnsendt,
-        vedlegg = listOf(Innsending.Vedlegg("123", "navn", Innsending.Vedlegg.Status.LastetOpp))
+        vedlegg = listOf(Innsending.Vedlegg("123", "navn", Innsending.Vedlegg.Status.LastetOpp)),
+        tittel = tittel
     )
 }

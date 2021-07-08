@@ -29,7 +29,8 @@ internal class EttersendingMottak(
                     "datoRegistrert",
                     "skjemaKode",
                     "søknadsData.brukerBehandlingId",
-                    "søknadsData.behandlingskjedeId"
+                    "søknadsData.behandlingskjedeId",
+                    "tittel"
                 )
             }
             validate { it.requireAny("type", listOf("Ettersending")) }

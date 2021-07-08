@@ -95,7 +95,8 @@ internal class E2ESøknadOgVedtakTest {
             skjemaKode: String?,
             søknadsType: Søknad.SøknadsType,
             kanal: Kanal,
-            datoInnsendt: LocalDateTime
+            datoInnsendt: LocalDateTime,
+            tittel: String?
         ) {
             søknader++
         }
@@ -128,6 +129,7 @@ private fun søknadsJson(journalpostId: String, søknadsId: String) = """{
   "journalpostId": $journalpostId,
   "datoRegistrert": "2021-05-06T09:39:03.62863",
   "skjemaKode": "NAV 03-102.23",
+  "tittel": "Tittel",
   "type": "NySøknad",
   "fødselsnummer": "10108099999",
   "aktørId": "1234455",

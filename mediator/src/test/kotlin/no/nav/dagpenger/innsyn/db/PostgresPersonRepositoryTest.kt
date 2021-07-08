@@ -29,7 +29,8 @@ internal class PostgresPersonRepositoryTest {
                     LocalDateTime.now(),
                     listOf(
                         Vedlegg("123", "123", LastetOpp)
-                    )
+                    ),
+                    "tittel"
                 )
             )
             repository.lagre(person)
@@ -57,7 +58,8 @@ internal class PostgresPersonRepositoryTest {
             skjemaKode: String?,
             søknadsType: Søknad.SøknadsType,
             kanal: Kanal,
-            datoInnsendt: LocalDateTime
+            datoInnsendt: LocalDateTime,
+            tittel: String?
         ) {
             søknader++
         }
