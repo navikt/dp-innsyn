@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.innsyn.Metrikker
 import no.nav.dagpenger.innsyn.PersonMediator
+import no.nav.dagpenger.innsyn.melding.PapirSøknadsMelding
 import no.nav.dagpenger.innsyn.melding.Søknadsmelding
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -27,15 +28,19 @@ internal class SøknadMottak(
             validate {
                 it.requireKey(
                     "fødselsnummer",
-                    "@opprettet",
                     "journalpostId",
                     "datoRegistrert",
-                    "søknadsData.brukerBehandlingId",
-                    "søknadsData.skjemaNummer"
+                    "skjemaKode",
+                    "tittel",
                 )
             }
             validate { it.requireAny("type", listOf("NySøknad", "Gjenopptak")) }
-            validate { it.interestedIn("søknadsData.vedlegg") }
+            validate {
+                it.interestedIn(
+                    "søknadsData.vedlegg",
+                    "søknadsData.brukerBehandlingId"
+                )
+            }
         }.register(this)
     }
 
@@ -51,8 +56,13 @@ internal class SøknadMottak(
             logg.info { "Mottok ny søknad." }
             sikkerlogg.info { "Mottok ny søknad for person $fnr: ${packet.toJson()}" }
 
-            Søknadsmelding(packet).also {
-                personMediator.håndter(it.søknad, it)
+            when (packet["søknadsData.brukerBehandlingId"].isTextual) {
+                false -> PapirSøknadsMelding(packet).also {
+                    personMediator.håndter(it.søknad, it)
+                }
+                true -> Søknadsmelding(packet).also {
+                    personMediator.håndter(it.søknad, it)
+                }
             }
         }.also {
             logg.info {

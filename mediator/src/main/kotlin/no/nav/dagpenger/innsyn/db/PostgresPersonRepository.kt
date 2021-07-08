@@ -9,6 +9,8 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.innsyn.modell.Person
+import no.nav.dagpenger.innsyn.modell.hendelser.Innsending.Vedlegg
+import no.nav.dagpenger.innsyn.modell.hendelser.Innsending.Vedlegg.Status
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType
@@ -63,6 +65,7 @@ class PostgresPersonRepository : PersonRepository {
     ).map { it.int(1) }.asSingle
 
     private class PersonLagrer(person: Person) : PersonVisitor {
+        private var aktivSøknadId: String? = null
         val queries = mutableListOf<Query>()
         private lateinit var fnr: String
 
@@ -86,13 +89,15 @@ class PostgresPersonRepository : PersonRepository {
             skjemaKode: String?,
             søknadsType: SøknadsType,
             kanal: Kanal,
-            datoInnsendt: LocalDateTime
+            datoInnsendt: LocalDateTime,
+            tittel: String?
         ) {
+            aktivSøknadId = søknadId
             queries.add(
                 queryOf(
                     //language=PostgreSQL
-                    """INSERT INTO søknad(person_id, søknad_id, journalpost_id, skjema_kode, søknads_type, kanal, dato_innsendt)
-                        VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :soknadId, :journalpostId, :skjemaKode, :soknadsType, :kanal, :datoInnsendt)
+                    """INSERT INTO søknad(person_id, søknad_id, journalpost_id, skjema_kode, søknads_type, kanal, dato_innsendt, tittel)
+                        VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :soknadId, :journalpostId, :skjemaKode, :soknadsType, :kanal, :datoInnsendt, :tittel)
                         ON CONFLICT DO NOTHING
                     """.trimMargin(),
                     mapOf(
@@ -102,7 +107,32 @@ class PostgresPersonRepository : PersonRepository {
                         "skjemaKode" to skjemaKode,
                         "soknadsType" to søknadsType.toString(),
                         "kanal" to kanal.toString(),
-                        "datoInnsendt" to datoInnsendt
+                        "datoInnsendt" to datoInnsendt,
+                        "tittel" to tittel
+                    )
+                )
+            )
+            queries.add(
+                queryOf(
+                    //language=PostgreSQL
+                    """DELETE FROM vedlegg WHERE søknad_id = ?""", aktivSøknadId
+                )
+            )
+        }
+
+        override fun visitVedlegg(skjemaNummer: String, navn: String, status: Status) {
+            queries.add(
+                queryOf(
+                    //language=PostgreSQL
+                    """INSERT INTO vedlegg(søknad_id, skjema_nummer, navn, status)
+                        VALUES (:soknadId, :skjemaNummer, :navn, :status)
+                        ON CONFLICT DO NOTHING
+                    """.trimMargin(),
+                    mapOf(
+                        "soknadId" to aktivSøknadId,
+                        "skjemaNummer" to skjemaNummer,
+                        "navn" to navn,
+                        "status" to status.toString(),
                     )
                 )
             )
@@ -141,8 +171,31 @@ class PostgresPersonRepository : PersonRepository {
         using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf( //language=PostgreSQL
-                    "SELECT * FROM søknad WHERE person_id = (SELECT person_id FROM person WHERE fnr = ?)", fnr
-                ).map { row -> row.toSøknad() }.asList
+                    """SELECT *
+                        FROM søknad
+                        WHERE person_id = (SELECT person_id FROM person WHERE fnr = ?)
+                    """.trimMargin(),
+                    fnr
+                ).map { row ->
+                    val vedlegg = hentVedleggFor(row.string("søknad_id"))
+                    row.toSøknad(vedlegg)
+                }.asList
+            )
+        }
+
+    override fun hentVedleggFor(søknadsId: String) =
+        using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf( //language=PostgreSQL
+                    """SELECT *
+                        FROM vedlegg 
+                        WHERE søknad_id = ? 
+                    """.trimMargin(),
+                    søknadsId
+                ).map {
+                    row ->
+                    row.toVedlegg()
+                }.asList
             )
         }
 
@@ -210,17 +263,25 @@ class PostgresPersonRepository : PersonRepository {
                     "limit" to limit,
                     "offset" to offset
                 )
-            ).map { row -> row.toSøknad() }.asList
+            ).map { row -> row.toSøknad(hentVedleggFor(row.string("søknad_id"))) }.asList
         )
     }
 
-    private fun Row.toSøknad() = Søknad(
+    private fun Row.toSøknad(vedlegg: List<Vedlegg>) = Søknad(
         søknadId = string("søknad_id"),
         journalpostId = string("journalpost_id"),
         skjemaKode = string("skjema_kode"),
         søknadsType = SøknadsType.valueOf(string("søknads_type")),
         kanal = Kanal.valueOf(string("kanal")),
-        datoInnsendt = localDateTime("dato_innsendt")
+        datoInnsendt = localDateTime("dato_innsendt"),
+        vedlegg = vedlegg,
+        tittel = stringOrNull("tittel")
+    )
+
+    private fun Row.toVedlegg() = Vedlegg(
+        skjemaNummer = string("skjema_nummer"),
+        navn = string("navn"),
+        status = Status.valueOf(string("status"))
     )
 
     private fun Row.toVedtak() = Vedtak(

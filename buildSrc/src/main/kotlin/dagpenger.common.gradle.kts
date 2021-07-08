@@ -7,6 +7,12 @@ plugins {
     id("dagpenger.spotless")
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(14))
+    }
+}
+
 repositories {
     mavenCentral()
 }

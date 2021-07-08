@@ -3,13 +3,13 @@ package no.nav.dagpenger.innsyn
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
 import no.nav.dagpenger.innsyn.modell.Person
+import no.nav.dagpenger.innsyn.modell.hendelser.Innsending
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.JournalførtMottak
-import no.nav.dagpenger.innsyn.tjenester.PapirSøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakMottak
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -30,7 +30,6 @@ internal class E2ESøknadOgVedtakTest {
 
     init {
         SøknadMottak(rapid, personMediator)
-        PapirSøknadMottak(rapid, personMediator)
         JournalførtMottak(rapid, personMediator)
         EttersendingMottak(rapid, personMediator)
         VedtakMottak(rapid, personMediator)
@@ -39,14 +38,31 @@ internal class E2ESøknadOgVedtakTest {
     @Test
     fun `skal kunne motta flere søknader`() {
         withMigratedDb {
-            rapid.sendTestMessage(søknadsJson("999"))
+            rapid.sendTestMessage(søknadsJson("999", "søknad1"))
             with(PersonInspektør(person)) {
                 assertEquals(1, søknader)
             }
 
-            rapid.sendTestMessage(søknadsJson("123"))
+            rapid.sendTestMessage(søknadsJson("123", "søknad2"))
             with(PersonInspektør(person)) {
                 assertEquals(2, søknader)
+            }
+        }
+    }
+
+    @Test
+    fun `skal kunne liste opp vedlegg og ettersende vedlegg`() {
+        withMigratedDb {
+            rapid.sendTestMessage(søknadAsJson)
+            with(PersonInspektør(person)) {
+                assertEquals(2, uferdigeVedlegg)
+                assertEquals(0, ferdigeVedlegg)
+            }
+
+            rapid.sendTestMessage(ettersendingAsJson)
+            with(PersonInspektør(person)) {
+                assertEquals(1, uferdigeVedlegg)
+                assertEquals(1, ferdigeVedlegg)
             }
         }
     }
@@ -65,6 +81,8 @@ internal class E2ESøknadOgVedtakTest {
 
     private class PersonInspektør(person: Person) : PersonVisitor {
         var søknader = 0
+        var ferdigeVedlegg = 0
+        var uferdigeVedlegg = 0
         var vedtak = 0
 
         init {
@@ -77,9 +95,18 @@ internal class E2ESøknadOgVedtakTest {
             skjemaKode: String?,
             søknadsType: Søknad.SøknadsType,
             kanal: Kanal,
-            datoInnsendt: LocalDateTime
+            datoInnsendt: LocalDateTime,
+            tittel: String?
         ) {
             søknader++
+        }
+
+        override fun visitVedlegg(skjemaNummer: String, navn: String, status: Innsending.Vedlegg.Status) {
+            if (status == Innsending.Vedlegg.Status.LastetOpp) {
+                ferdigeVedlegg++
+            } else {
+                uferdigeVedlegg++
+            }
         }
 
         override fun visitVedtak(
@@ -96,16 +123,18 @@ internal class E2ESøknadOgVedtakTest {
 }
 
 @Language("JSON")
-private fun søknadsJson(journalpostId: String) = """{
+private fun søknadsJson(journalpostId: String, søknadsId: String) = """{
   "@id": "98638d1d-9b75-4802-abb2-8b7f1a08948f",
   "@opprettet": "2021-05-06T09:39:03.638555",
   "journalpostId": $journalpostId,
   "datoRegistrert": "2021-05-06T09:39:03.62863",
+  "skjemaKode": "NAV 03-102.23",
+  "tittel": "Tittel",
   "type": "NySøknad",
   "fødselsnummer": "10108099999",
   "aktørId": "1234455",
     "søknadsData": {
-    "brukerBehandlingId": "12345",
+    "brukerBehandlingId": "$søknadsId",
     "skjemaNummer": "NAV123",
     "aktoerId": "10108099999"
   },

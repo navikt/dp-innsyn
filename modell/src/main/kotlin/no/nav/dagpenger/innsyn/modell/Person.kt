@@ -22,12 +22,14 @@ class Person private constructor(
     }
 
     fun håndter(ettersending: Ettersending) {
+        søknader.forEach { it.håndter(ettersending) }
         ettersendinger.add(ettersending)
     }
 
     fun håndter(vedtak: Vedtak) {
         this.vedtak.add(vedtak)
     }
+
     fun håndter(sakstilknytning: Sakstilknytning) {
         sakstilknytninger.add(sakstilknytning)
     }
