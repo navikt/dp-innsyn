@@ -22,12 +22,12 @@ internal class EttersendingMottak(
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "innsending_mottatt") }
-            validate { it.demandValue("@event_name", "innsending_mottatt") }
             validate {
                 it.requireKey(
                     "fødselsnummer",
                     "journalpostId",
                     "datoRegistrert",
+                    "skjemaKode",
                     "søknadsData.brukerBehandlingId",
                     "søknadsData.behandlingskjedeId"
                 )

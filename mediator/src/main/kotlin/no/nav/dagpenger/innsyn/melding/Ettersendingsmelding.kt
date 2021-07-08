@@ -9,6 +9,7 @@ internal class Ettersendingsmelding(packet: JsonMessage) : Innsendingsmelding(pa
     private val behandlingskjedeId = packet["søknadsData.behandlingskjedeId"].asText()
     private val ettersendingId = packet["søknadsData.brukerBehandlingId"].asText()
     private val kanal = ettersendingId?.let { Digital } ?: Papir
+
     internal val ettersending get() = Ettersending(
         ettersendingId,
         behandlingskjedeId,

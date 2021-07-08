@@ -10,7 +10,6 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.JournalførtMottak
-import no.nav.dagpenger.innsyn.tjenester.PapirSøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakMottak
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -31,7 +30,6 @@ internal class E2ESøknadOgVedtakTest {
 
     init {
         SøknadMottak(rapid, personMediator)
-        PapirSøknadMottak(rapid, personMediator)
         JournalførtMottak(rapid, personMediator)
         EttersendingMottak(rapid, personMediator)
         VedtakMottak(rapid, personMediator)
@@ -129,6 +127,7 @@ private fun søknadsJson(journalpostId: String, søknadsId: String) = """{
   "@opprettet": "2021-05-06T09:39:03.638555",
   "journalpostId": $journalpostId,
   "datoRegistrert": "2021-05-06T09:39:03.62863",
+  "skjemaKode": "NAV 03-102.23",
   "type": "NySøknad",
   "fødselsnummer": "10108099999",
   "aktørId": "1234455",

@@ -94,6 +94,7 @@ internal class InnsynApiTest {
             assertEquals(HttpStatusCode.OK, response.status())
             assertTrue(response.content!!.contains(NySøknad.toString()))
             assertTrue(response.content!!.contains(Innsending.Vedlegg.Status.LastetOpp.toString()))
+            assertTrue(response.content!!.contains("Søknad om"))
         }
     }
 
@@ -233,7 +234,7 @@ internal class InnsynApiTest {
     ) = Søknad(
         søknadId = søknadId,
         journalpostId = journalpostId,
-        skjemaKode = "NAV01",
+        skjemaKode = "NAV 04-01.03",
         søknadsType = NySøknad,
         kanal = Kanal.Digital,
         datoInnsendt = datoInnsendt,

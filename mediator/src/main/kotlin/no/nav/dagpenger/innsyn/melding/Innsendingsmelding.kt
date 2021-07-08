@@ -9,7 +9,9 @@ import java.time.LocalDateTime
 internal abstract class Innsendingsmelding(packet: JsonMessage) : Hendelsemelding(packet) {
     override val fødselsnummer = packet["fødselsnummer"].asText()
     internal val journalpostId: String = packet["journalpostId"].asText()
+    internal val skjemaKode = packet["skjemaKode"].asText()
     internal val datoRegistrert: LocalDateTime = packet["datoRegistrert"].asLocalDateTime()
+
     internal val vedlegg = packet["søknadsData.vedlegg"].map {
         Vedlegg(
             it["skjemaNummer"].asText(),

@@ -26,7 +26,10 @@ class SøknadJsonBuilder(val søknad: Søknad) : SøknadVisitor {
         datoInnsendt: LocalDateTime
     ) {
         søknadId?.let { root.put("søknadId", søknadId) }
-        skjemaKode?.let { root.put("skjemaKode", skjemaKode) }
+        skjemaKode?.let {
+            root.put("skjemaKode", skjemaKode)
+            root.put("tittel", finnTittel(skjemaKode))
+        }
         root.put("journalpostId", journalpostId)
         root.put("søknadsType", søknadsType.toString())
         root.put("kanal", kanal.toString())
@@ -41,4 +44,11 @@ class SøknadJsonBuilder(val søknad: Søknad) : SøknadVisitor {
             it.put("status", status.toString())
         }
     }
+
+    private fun finnTittel(skjemaNummer: String) = mapOf(
+        "NAV 04-16.04" to "Søknad om gjenopptak av dagpenger ved permittering",
+        "NAV 04-16.03" to "Søknad om gjenopptak av dagpenger",
+        "NAV 04-01.03" to "Søknad om dagpenger (ikke permittert)",
+        "NAV 04-01.04" to "Søknad om dagpenger ved permittering",
+    )[skjemaNummer]
 }
