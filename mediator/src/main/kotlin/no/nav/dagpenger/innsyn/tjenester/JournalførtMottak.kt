@@ -45,6 +45,6 @@ internal class JournalførtMottak(
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {
-        logg.error { problems }
+        logg.debug { problems }
     }
 }
