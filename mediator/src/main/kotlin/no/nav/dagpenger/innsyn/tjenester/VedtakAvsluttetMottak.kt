@@ -46,7 +46,7 @@ internal class VedtakAvsluttetMottak(
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {
-        logg.error { problems }
-        sikkerlogg.error { problems.toExtendedReport() }
+        logg.debug { problems }
+        sikkerlogg.debug { problems.toExtendedReport() }
     }
 }
