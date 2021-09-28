@@ -36,6 +36,7 @@ spec:
     inbound:
       rules:
         - application: dp-dagpenger
+        - application: dp-soknad-veileder
   tokenx:
     enabled: true
   gcp:
