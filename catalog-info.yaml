@@ -25,19 +25,41 @@ spec:
   owner: teamdagpenger
   system: dp-soknadsdialog
   definition: |
-    openapi: "3.0.0"
+    openapi: 3.0.0
     info:
-      version: 1.0.0
-      title: Artist API
-      license:
-        name: MIT
+      title: dp-innsyn
+      description: Gir innsyn i Dagpenger
+      version: 0.0.1
     servers:
-      - url: http://dp-innsyn
+      - url: http://dp-innsyn/api
+        description: Produksjon, in-cluster
     paths:
       /soknad:
         get:
-          summary: Lister ut søknader
-            apiVersion: backstage.io/v1alpha1
+          summary: Returnerer en liste med søknader
+          description: Optional extended description in CommonMark or HTML.
+          responses:
+            '200':    # status code
+              description: A JSON array of user names
+              content:
+                application/json:
+                  schema:
+                    type: array
+                    items:
+                      type: string
+      /vedtak:
+        get:
+          summary: Returnerer en liste med vedtak
+          description: Optional extended description in CommonMark or HTML.
+          responses:
+            '200':    # status code
+              description: A JSON array of user names
+              content:
+                application/json:
+                  schema:
+                    type: array
+                    items:
+                      type: string
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Resource
