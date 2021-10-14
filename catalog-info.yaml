@@ -1,0 +1,47 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: dp-innsyn
+  description: Tilbyr innsyn til bruker for hva som skjer med dagpenger
+spec:
+  type: service
+  lifecycle: production
+  owner: teamdagpenger
+  system: dp-soknadsdialog
+  providesApis:
+    - dp-innsyn-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: dp-innsyn-api
+  description: Gir informasjon om søknader
+spec:
+  type: openapi
+  lifecycle: production
+  owner: teamdagpenger
+  system: dp-soknadsdialog
+  definition: |
+    openapi: "3.0.0"
+    info:
+      version: 1.0.0
+      title: Artist API
+      license:
+        name: MIT
+    servers:
+      - url: http://dp-innsyn
+    paths:
+      /soknad:
+        get:
+          summary: Lister ut søknader
+            apiVersion: backstage.io/v1alpha1
+---
+kind: Resource
+metadata:
+  name: dp-innsyn-db
+  description: Lagrer data om brukers behandlinger i NAV
+spec:
+  type: database
+  owner: teamdagpenger
+  system: dp-soknadsdialog
