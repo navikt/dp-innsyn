@@ -177,13 +177,17 @@ class PostgresPersonRepository : PersonRepository {
                     """.trimMargin(),
                     fnr
                 ).map { row ->
-                    val vedlegg = row.stringOrNull("søknad_id")?.let {
-                        hentVedleggFor(row.string("søknad_id"))
-                    }.orEmpty()
-                    row.toSøknad(vedlegg)
+                    mapSøknadsRad(row)
                 }.asList
             )
         }
+
+    private fun mapSøknadsRad(row: Row): Søknad {
+        val vedlegg = row.stringOrNull("søknad_id")?.let {
+            hentVedleggFor(row.string("søknad_id"))
+        }.orEmpty()
+        return row.toSøknad(vedlegg)
+    }
 
     override fun hentVedleggFor(søknadsId: String) =
         using(sessionOf(dataSource)) { session ->
@@ -264,7 +268,7 @@ class PostgresPersonRepository : PersonRepository {
                     "limit" to limit,
                     "offset" to offset
                 )
-            ).map { row -> row.toSøknad(hentVedleggFor(row.string("søknad_id"))) }.asList
+            ).map { row -> mapSøknadsRad(row) }.asList
         )
     }
 
