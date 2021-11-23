@@ -13,10 +13,12 @@ import io.ktor.auth.authenticate
 import io.ktor.auth.authentication
 import io.ktor.auth.jwt.JWTPrincipal
 import io.ktor.auth.jwt.jwt
+import io.ktor.features.CallId
 import io.ktor.features.CallLogging
 import io.ktor.features.Compression
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
+import io.ktor.features.callIdMdc
 import io.ktor.jackson.jackson
 import io.ktor.request.document
 import io.ktor.response.respond
@@ -30,6 +32,7 @@ import no.nav.dagpenger.innsyn.modell.serde.SøknadJsonBuilder
 import no.nav.dagpenger.innsyn.modell.serde.VedtakJsonBuilder
 import org.slf4j.event.Level
 import java.time.LocalDate
+import java.util.UUID
 
 private val logger = KotlinLogging.logger { }
 private val sikkerlogg = KotlinLogging.logger("tjenestekall")
@@ -40,7 +43,12 @@ internal fun Application.innsynApi(
     clientId: String,
     personRepository: PersonRepository
 ) {
+    install(CallId) {
+        header("Nav-Call-Id")
+        generate { UUID.randomUUID().toString() }
+    }
     install(CallLogging) {
+        callIdMdc("x-callId")
         level = Level.DEBUG
         filter { call ->
             !setOf(
