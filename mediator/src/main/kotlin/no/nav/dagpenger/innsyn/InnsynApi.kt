@@ -50,8 +50,8 @@ internal fun Application.innsynApi(
         verify { callId: String -> callId.isNotEmpty() }
     }
     install(CallLogging) {
-        callIdMdc("x-callId")
-        mdc("x-consumerId") { it.request.headers["Nav-Consumer-Id"] }
+        callIdMdc("x_callId")
+        mdc("x_consumerId") { it.request.headers["Nav-Consumer-Id"] }
 
         level = Level.DEBUG
         filter { call ->
