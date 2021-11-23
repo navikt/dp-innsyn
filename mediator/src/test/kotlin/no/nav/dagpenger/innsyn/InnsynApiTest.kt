@@ -224,6 +224,8 @@ internal class InnsynApiTest {
             ContentType.Application.Json.toString()
         )
         addHeader(HttpHeaders.Authorization, "Bearer $token")
+        addHeader("Nav-Call-Id", "random call id")
+        addHeader("Nav-Consumer-Id", "dp-test")
         body?.also { setBody(it) }
     }
 

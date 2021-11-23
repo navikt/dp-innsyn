@@ -18,6 +18,7 @@ import io.ktor.features.CallLogging
 import io.ktor.features.Compression
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
+import io.ktor.features.callId
 import io.ktor.features.callIdMdc
 import io.ktor.jackson.jackson
 import io.ktor.request.document
@@ -46,9 +47,12 @@ internal fun Application.innsynApi(
     install(CallId) {
         header("Nav-Call-Id")
         generate { UUID.randomUUID().toString() }
+        verify { callId: String -> callId.isNotEmpty() }
     }
     install(CallLogging) {
         callIdMdc("x-callId")
+        mdc("x-consumerId") { it.request.headers["Nav-Consumer-Id"] }
+
         level = Level.DEBUG
         filter { call ->
             !setOf(
