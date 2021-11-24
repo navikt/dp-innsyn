@@ -39,6 +39,8 @@ spec:
         - application: dp-soknad-veileder
         - application: veientilarbeid
           namespace: paw
+        - application: paw-auth-proxy
+          namespace: paw
   tokenx:
     enabled: true
   gcp:
