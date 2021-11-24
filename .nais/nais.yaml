@@ -37,6 +37,8 @@ spec:
       rules:
         - application: dp-dagpenger
         - application: dp-soknad-veileder
+        - application: veientilarbeid
+          namespace: paw
   tokenx:
     enabled: true
   gcp:
