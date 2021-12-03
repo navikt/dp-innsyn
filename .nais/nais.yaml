@@ -41,6 +41,8 @@ spec:
           namespace: paw
         - application: paw-auth-proxy
           namespace: paw
+        - application: bakveientilarbeid
+          namespace: paw
   tokenx:
     enabled: true
   gcp:
