@@ -101,10 +101,12 @@ internal fun Application.innsynApi(
                 val fnr = jwtPrincipal!!.fnr
                 val fom = call.request.queryParameters["søktFom"]?.asOptionalLocalDate()
                 val tom = call.request.queryParameters["søktTom"]?.asOptionalLocalDate()
+                val fom2 = call.request.queryParameters["soktFom"]?.asOptionalLocalDate()
+                val tom2 = call.request.queryParameters["soktTom"]?.asOptionalLocalDate()
                 val søknader = personRepository.hentSøknaderFor(
                     fnr,
-                    fom = fom,
-                    tom = tom,
+                    fom = if (fom !== null) fom else fom2,
+                    tom = if (tom !== null) tom else tom2,
                 )
 
                 call.respond(søknader.map { SøknadJsonBuilder(it).resultat() })

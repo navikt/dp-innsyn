@@ -89,7 +89,7 @@ internal class InnsynApiTest {
         }) {
             val fom = LocalDate.now().minusDays(100)
             val dagensDato = LocalDate.now()
-            autentisert("/soknad?søktFom=$fom&søktTom=$dagensDato")
+            autentisert("/soknad?soktFom=$fom&søktTom=$dagensDato")
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
             assertTrue(response.content!!.contains(NySøknad.toString()))
