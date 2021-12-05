@@ -18,7 +18,6 @@ import io.ktor.features.CallLogging
 import io.ktor.features.Compression
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
-import io.ktor.features.callId
 import io.ktor.features.callIdMdc
 import io.ktor.jackson.jackson
 import io.ktor.request.document
@@ -85,6 +84,7 @@ internal fun Application.innsynApi(
             }
             realm = appName
             validate { credentials ->
+                logger.info { "Validerer token med claims: ${credentials.payload.claims.keys}" }
                 requireNotNull(credentials.payload.claims["pid"]) {
                     "Token må inneholde fødselsnummer for personen"
                 }

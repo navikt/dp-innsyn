@@ -9,7 +9,13 @@ plugins {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(14))
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+kotlin {
+    jvmToolchain {
+        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -19,7 +25,6 @@ repositories {
 
 dependencies {
     implementation(platform(kotlin("bom")))
-    implementation(kotlin("stdlib-jdk8"))
 
     testImplementation(Junit5.api)
     testRuntimeOnly(Junit5.engine)
@@ -37,6 +42,6 @@ tasks {
     }
 
     withType<KotlinCompile>().all {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_14.toString()
+        kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
     }
 }
