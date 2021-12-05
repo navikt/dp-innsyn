@@ -27,7 +27,6 @@ import io.ktor.routing.routing
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.Configuration.appName
 import no.nav.dagpenger.innsyn.db.PersonRepository
-import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType
 import no.nav.dagpenger.innsyn.modell.serde.SøknadJsonBuilder
 import no.nav.dagpenger.innsyn.modell.serde.VedtakJsonBuilder
 import org.slf4j.event.Level
@@ -99,14 +98,12 @@ internal fun Application.innsynApi(
             get("/soknad") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
-                val fom = call.request.queryParameters["søktFom"]?.asOptionalLocalDate()
-                val tom = call.request.queryParameters["søktTom"]?.asOptionalLocalDate()
-                val fom2 = call.request.queryParameters["soktFom"]?.asOptionalLocalDate()
-                val tom2 = call.request.queryParameters["soktTom"]?.asOptionalLocalDate()
+                val fom = call.request.queryParameters["soktFom"]?.asOptionalLocalDate()
+                val tom = call.request.queryParameters["soktTom"]?.asOptionalLocalDate()
                 val søknader = personRepository.hentSøknaderFor(
                     fnr,
-                    fom = if (fom !== null) fom else fom2,
-                    tom = if (tom !== null) tom else tom2,
+                    fom = fom,
+                    tom = tom,
                 )
 
                 call.respond(søknader.map { SøknadJsonBuilder(it).resultat() })
@@ -116,7 +113,6 @@ internal fun Application.innsynApi(
                 val fnr = jwtPrincipal!!.fnr
                 val fattetFom = call.request.queryParameters["fattetFom"]?.asOptionalLocalDate()
                 val fattetTom = call.request.queryParameters["fattetTom"]?.asOptionalLocalDate()
-                val type = call.request.queryParameters.getAll("type")?.map { SøknadsType.valueOf(it) } ?: emptyList()
                 val vedtak = personRepository.hentVedtakFor(
                     fnr,
                     fattetFom = fattetFom,
@@ -132,4 +128,4 @@ internal fun Application.innsynApi(
 private fun String.asOptionalLocalDate() =
     takeIf(String::isNotEmpty)?.let { LocalDate.parse(it) }
 
-private val JWTPrincipal.fnr get() = this.payload!!.claims["pid"]!!.asString()
+private val JWTPrincipal.fnr get() = this.payload.claims["pid"]!!.asString()
