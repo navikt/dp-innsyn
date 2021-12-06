@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn
 
 import com.auth0.jwk.JwkProvider
+import com.auth0.jwt.interfaces.Claim
 import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -83,9 +84,8 @@ internal fun Application.innsynApi(
             }
             realm = appName
             validate { credentials ->
-                logger.info { "Validerer token med claims: ${credentials.payload.claims.keys}" }
-                requireNotNull(credentials.payload.claims["pid"]) {
-                    "Token må inneholde fødselsnummer for personen"
+                requireNotNull(credentials.payload.claims.pidOrSub()) {
+                    "Token må inneholde fødselsnummer for personen i enten pid eller sub claim"
                 }
 
                 JWTPrincipal(credentials.payload)
@@ -128,4 +128,10 @@ internal fun Application.innsynApi(
 private fun String.asOptionalLocalDate() =
     takeIf(String::isNotEmpty)?.let { LocalDate.parse(it) }
 
-private val JWTPrincipal.fnr get() = this.payload.claims["pid"]!!.asString()
+private val JWTPrincipal.fnr: String
+    get() = this.payload.claims.pidOrSub().asString()
+
+private fun <V : Claim> Map<String, V>.pidOrSub(): V {
+    val keys = listOf("pid", "sub")
+    return this.firstNotNullOf { it.takeIf { keys.contains(it.key) } }.value
+}
