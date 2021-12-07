@@ -133,5 +133,7 @@ private val JWTPrincipal.fnr: String
 
 private fun <V : Claim> Map<String, V>.pidOrSub(): V {
     val keys = listOf("pid", "sub")
-    return this.firstNotNullOf { it.takeIf { keys.contains(it.key) } }.value
+    return this.firstNotNullOf { it.takeIf { keys.contains(it.key) } }.also {
+        logger.info { "Bruker ${it.key} for å finne fnr." }
+    }.value
 }
