@@ -20,15 +20,24 @@ class VedtakMottakTest {
     }
 
     @Test
-    fun `vi kan motta vedtak`() {
+    fun `vi kan motta vedtak (v1)`() {
         VedtakMottak(testRapid, personMediator)
-        testRapid.sendTestMessage(vedtakJson)
+        testRapid.sendTestMessage(vedtakJsonV1)
+        verify { personMediator.håndter(any<Vedtak>(), any<Vedtaksmelding>()) }
+        confirmVerified(personMediator)
+    }
+
+    @Test
+    fun `vi kan motta vedtak (v2)`() {
+        VedtakMottak(testRapid, personMediator)
+        testRapid.sendTestMessage(vedtakJsonV2)
         verify { personMediator.håndter(any<Vedtak>(), any<Vedtaksmelding>()) }
         confirmVerified(personMediator)
     }
 }
 
-private val vedtakJson = """{
+//language=JSON
+private val vedtakJsonV1 = """{
   "table": "SIAMO.VEDTAK",
   "op_type": "I",
   "op_ts": "2020-04-07 14:31:08.840468",
@@ -48,5 +57,27 @@ private val vedtakJson = """{
     "FRA_DATO": "2018-03-05 00:00:00",
     "TIL_DATO": null
   }
+}
+""".trimIndent()
+
+//language=JSON
+private val vedtakJsonV2 = """{
+    "table": "SIAMO.VEDTAK",
+    "op_type": "I",
+    "op_ts": "2021-11-12 08:31:33.092337",
+    "current_ts": "2021-11-12 08:57:55.082000",
+    "pos": "00000000000000010892",
+    "FODSELSNR": "***********",
+    "after": {
+        "VEDTAK_ID": 29501880,
+        "SAK_ID": 123,
+        "VEDTAKSTATUSKODE": "IVERK",
+        "VEDTAKTYPEKODE": "O",
+        "UTFALLKODE": "JA",
+        "RETTIGHETKODE": "DAGO",
+        "PERSON_ID": 4124685,
+        "FRA_DATO": "2018-03-05 00:00:00",
+        "TIL_DATO": null
+    }
 }
 """.trimIndent()

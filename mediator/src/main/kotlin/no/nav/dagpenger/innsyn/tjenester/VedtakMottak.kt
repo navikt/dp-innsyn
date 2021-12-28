@@ -9,6 +9,7 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.isMissingOrNull
 
 private val logg = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.VedtakMottak")
@@ -24,7 +25,6 @@ internal class VedtakMottak(
                 it.requireKey(
                     "op_ts",
                     "after.VEDTAK_ID",
-                    "tokens.FODSELSNR",
                     "after.SAK_ID",
                     "after.FRA_DATO"
                 )
@@ -33,11 +33,13 @@ internal class VedtakMottak(
             validate { it.requireAny("after.UTFALLKODE", listOf("JA", "NEI")) }
             validate { it.interestedIn("after", "tokens") }
             validate { it.interestedIn("after.TIL_DATO") }
+            validate { it.interestedIn("tokens.FODSELSNR") }
+            validate { it.interestedIn("FODSELSNR") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val fnr = packet["tokens"]["FODSELSNR"].asText()
+        val fnr = packet.fødselsnummer()
         val vedtakId = packet["after"]["VEDTAK_ID"].asText()
         val sakId = packet["after"]["SAK_ID"].asText()
 
@@ -59,3 +61,6 @@ internal class VedtakMottak(
         sikkerlogg.debug { problems.toExtendedReport() }
     }
 }
+
+internal fun JsonMessage.fødselsnummer(): String =
+    if (this["tokens"].isMissingOrNull()) this["FODSELSNR"].asText() else this["tokens"]["FODSELSNR"].asText()
