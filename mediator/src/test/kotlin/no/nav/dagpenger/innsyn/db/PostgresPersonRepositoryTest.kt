@@ -93,7 +93,7 @@ internal class PostgresPersonRepositoryTest {
                 LocalDateTime.now(),
                 LocalDateTime.now(),
 
-                )
+            )
 
             person.håndter(
                 vedtak
