@@ -7,6 +7,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Innsending.Vedlegg
 import no.nav.dagpenger.innsyn.modell.hendelser.Innsending.Vedlegg.Status.LastetOpp
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
+import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import no.nav.dagpenger.innsyn.modell.serde.SøknadVisitor
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -81,6 +82,37 @@ internal class PostgresPersonRepositoryTest {
     }
 
     @Test
+    fun `Lagring av vedtak er idempotent`() {
+        withMigratedDb {
+            val person = repository.person("123")
+            val vedtak = Vedtak(
+                "123",
+                "fagsakid",
+                Vedtak.Status.INNVILGET,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+
+            )
+
+            person.håndter(
+                vedtak
+            )
+            person.håndter(
+                vedtak
+            )
+            repository.lagre(person)
+
+            repository.person(person.fnr).also {
+                with(PersonInspektør(it)) {
+                    assertEquals(1, this.vedtak)
+                    assertEquals(0, vedlegg)
+                }
+            }
+        }
+    }
+
+    @Test
     fun `skal finne papirsøknad for person`() {
         withMigratedDb {
             val person = repository.person("123")
@@ -122,6 +154,7 @@ internal class PostgresPersonRepositoryTest {
     private class PersonInspektør(person: Person) : PersonVisitor {
         var søknader = 0
         var vedlegg = 0
+        var vedtak = 0
 
         init {
             person.accept(this)
@@ -141,6 +174,17 @@ internal class PostgresPersonRepositoryTest {
 
         override fun visitVedlegg(skjemaNummer: String, navn: String, status: Vedlegg.Status) {
             vedlegg++
+        }
+
+        override fun visitVedtak(
+            vedtakId: String,
+            fagsakId: String,
+            status: Vedtak.Status,
+            datoFattet: LocalDateTime,
+            fraDato: LocalDateTime,
+            tilDato: LocalDateTime?
+        ) {
+            vedtak++
         }
     }
 

@@ -3,6 +3,7 @@ package no.nav.dagpenger.innsyn.melding
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak.Status
+import no.nav.dagpenger.innsyn.tjenester.fødselsnummer
 import no.nav.helse.rapids_rivers.JsonMessage
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -33,7 +34,7 @@ internal class Vedtaksmelding(private val packet: JsonMessage) : Hendelsemelding
             fraDato = fraDato,
             tilDato = tilDato
         )
-    override val fødselsnummer: String = packet["tokens"]["FODSELSNR"].asText()
+    override val fødselsnummer: String = packet.fødselsnummer()
     private val status
         get() =
             when (packet["after"]["UTFALLKODE"].asText()) {

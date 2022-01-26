@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.modell.serde
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ArrayNode
 import no.nav.dagpenger.innsyn.modell.hendelser.Innsending
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
@@ -36,7 +37,7 @@ class SøknadJsonBuilder(val søknad: Søknad) : SøknadVisitor {
         root.put("søknadsType", søknadsType.toString())
         root.put("kanal", kanal.toString())
         root.put("datoInnsendt", datoInnsendt.toString())
-        root.put("vedlegg", vedlegg)
+        root.set<ArrayNode>("vedlegg", vedlegg)
     }
 
     override fun visitVedlegg(skjemaNummer: String, navn: String, status: Innsending.Vedlegg.Status) {
