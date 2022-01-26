@@ -19,20 +19,20 @@ internal class VedtakAvsluttetMottak(
             validate { it.demandValue("table", "SIAMO.VEDTAK") }
             validate {
                 it.requireKey(
-                    "tokens",
                     "after",
-                    "tokens.FODSELSNR",
                     "after.VEDTAK_ID",
                     "after.SAK_ID",
                 )
             }
             validate { it.requireValue("before.VEDTAKSTATUSKODE", "IVERK") }
             validate { it.requireValue("after.VEDTAKSTATUSKODE", "AVSLU") }
+            validate { it.interestedIn("tokens") }
+            validate { it.interestedIn("FODSELSNR") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val fnr = packet["tokens"]["FODSELSNR"].asText()
+        val fnr = packet.fødselsnummer()
         val vedtakId = packet["after"]["VEDTAK_ID"].asText()
         val sakId = packet["after"]["SAK_ID"].asText()
 
