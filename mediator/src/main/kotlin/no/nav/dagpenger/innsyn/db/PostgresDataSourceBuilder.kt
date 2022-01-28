@@ -8,6 +8,7 @@ import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
+import org.flywaydb.core.api.configuration.FluentConfiguration
 
 private val config = ConfigurationProperties.systemProperties() overriding EnvironmentVariables()
 
@@ -36,10 +37,12 @@ internal object PostgresDataSourceBuilder {
         }
     }
 
-    fun clean() = Flyway.configure().dataSource(dataSource).load().clean()
+    private val flyWayBuilder: FluentConfiguration = Flyway.configure().connectRetries(5)
+
+    fun clean() = flyWayBuilder.dataSource(dataSource).load().clean()
 
     internal fun runMigration(initSql: String? = null) =
-        Flyway.configure()
+        flyWayBuilder
             .dataSource(dataSource)
             .initSql(initSql)
             .load()
