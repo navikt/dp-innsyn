@@ -3,3 +3,5 @@ ingresses:
 kafka_pool: nav-dev
 db_tier: db-custom-1-3840
 db_size: 10
+dp_proxy_scope: api://dev-fss.teamdagpenger.dp-proxy/.default
+dp_proxy_url: https://dp-proxy.dev-fss-pub.nais.io

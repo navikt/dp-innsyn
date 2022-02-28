@@ -30,6 +30,7 @@ import no.nav.dagpenger.innsyn.Configuration.appName
 import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.modell.serde.SøknadJsonBuilder
 import no.nav.dagpenger.innsyn.modell.serde.VedtakJsonBuilder
+import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
 import org.slf4j.event.Level
 import java.time.LocalDate
 import java.util.UUID
@@ -41,7 +42,8 @@ internal fun Application.innsynApi(
     jwkProvider: JwkProvider,
     issuer: String,
     clientId: String,
-    personRepository: PersonRepository
+    personRepository: PersonRepository,
+    henvendelseOppslag: HenvendelseOppslag
 ) {
     install(CallId) {
         header("Nav-Call-Id")
@@ -121,6 +123,15 @@ internal fun Application.innsynApi(
                 )
 
                 call.respond(vedtak.map { VedtakJsonBuilder(it).resultat() })
+            }
+
+            get("/ettersendelser") {
+                val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
+                val fnr = jwtPrincipal!!.fnr
+                val ettersendelser = henvendelseOppslag.hentEttersendelser(
+                    fnr
+                )
+                call.respond(ettersendelser)
             }
         }
     }

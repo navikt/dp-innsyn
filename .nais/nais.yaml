@@ -59,3 +59,8 @@ spec:
           - name: innsyn
             envVarPrefix: DB
         cascadingDelete: false
+  env:
+    - name: DP_PROXY_SCOPE
+      value: {{dp_proxy_scope}}
+    - name: DP_PROXY_URL
+      value: {{dp_proxy_url}}

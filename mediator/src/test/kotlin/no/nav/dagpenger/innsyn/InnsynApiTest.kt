@@ -8,6 +8,7 @@ import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
+import io.mockk.mockk
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.JwtStub
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
@@ -17,6 +18,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Sakstilknytning
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType.NySøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
+import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -28,6 +30,7 @@ internal class InnsynApiTest {
     private val testIssuer = "test-issuer"
     private val jwtStub = JwtStub(testIssuer)
     private val clientId = "id"
+    private val henvendelseOppslag = mockk<HenvendelseOppslag>()
 
     @Test
     fun `test at bruker ikke har søknad`() = withMigratedDb {
@@ -36,7 +39,8 @@ internal class InnsynApiTest {
                 jwtStub.stubbedJwkProvider(),
                 testIssuer,
                 clientId,
-                PostgresPersonRepository()
+                PostgresPersonRepository(),
+                henvendelseOppslag
             )
         }) {
             autentisert("/soknad")
@@ -85,6 +89,7 @@ internal class InnsynApiTest {
                 testIssuer,
                 clientId,
                 personRepository,
+                henvendelseOppslag
             )
         }) {
             val fom = LocalDate.now().minusDays(100)
@@ -125,6 +130,7 @@ internal class InnsynApiTest {
                 testIssuer,
                 clientId,
                 personRepository,
+                henvendelseOppslag
             )
         }) {
             val dagensDato = LocalDate.now()
@@ -162,6 +168,7 @@ internal class InnsynApiTest {
                 testIssuer,
                 clientId,
                 personRepository,
+                henvendelseOppslag
             )
         }) {
             val dagensDato = LocalDate.now()
@@ -199,6 +206,7 @@ internal class InnsynApiTest {
                 testIssuer,
                 clientId,
                 personRepository,
+                henvendelseOppslag
             )
         }) {
             val dagensDato = LocalDate.now()
