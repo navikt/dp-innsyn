@@ -45,6 +45,9 @@ spec:
           namespace: paw
   tokenx:
     enabled: true
+  azure:
+    application:
+      enabled: true
   gcp:
     sqlInstances:
       - name: dp-innsyn
