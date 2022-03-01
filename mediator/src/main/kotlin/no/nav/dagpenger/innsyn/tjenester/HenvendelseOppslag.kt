@@ -15,6 +15,7 @@ import io.ktor.client.request.request
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import mu.KotlinLogging
+import java.time.ZonedDateTime
 
 private val logger = KotlinLogging.logger {}
 
@@ -55,4 +56,12 @@ internal class HenvendelseOppslag(
     }
 }
 
-data class Ettersendelse(val behandlingsId: String, val behandlingsKjedeId: String, val hovedskjemaKodeverkId: String)
+data class Ettersendelse(
+    val behandlingsId: String,
+    val behandlingsKjedeId: String?,
+    val hovedskjemaKodeverkId: String,
+    val sistEndret: ZonedDateTime,
+    val vedlegg: List<Vedlegg>
+) {
+    data class Vedlegg(val tilleggsTittel: String?, val kodeverkId: String)
+}
