@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.tjenester
 
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
@@ -15,7 +16,6 @@ import io.ktor.client.request.request
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import mu.KotlinLogging
-import java.time.ZonedDateTime
 
 private val logger = KotlinLogging.logger {}
 
@@ -40,28 +40,23 @@ internal class HenvendelseOppslag(
         }
     }
 
-    suspend fun hentEttersendelser(fnr: String): List<Ettersendelse> {
-        return runCatching {
-            dpProxyClient.request<List<Ettersendelse>>("$dpProxyUrl/proxy/v1/ettersendelser") {
-                method = HttpMethod.Post
-                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
-                header(HttpHeaders.ContentType, "application/json")
-                header(HttpHeaders.Accept, "application/json")
-                body = mapOf("fnr" to fnr)
-            }
-        }.getOrElse { t ->
-            logger.error(t) { "Fikk ikke hentet ettersendelser" }
-            emptyList()
+    suspend fun hentEttersendelser(fnr: String): JsonNode {
+        return dpProxyClient.request("$dpProxyUrl/proxy/v1/ettersendelser") {
+            method = HttpMethod.Post
+            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+            header(HttpHeaders.ContentType, "application/json")
+            header(HttpHeaders.Accept, "application/json")
+            body = mapOf("fnr" to fnr)
         }
     }
 }
 
-data class Ettersendelse(
-    val behandlingsId: String,
-    val behandlingsKjedeId: String?,
-    val hovedskjemaKodeverkId: String,
-    val sistEndret: ZonedDateTime,
-    val vedlegg: List<Vedlegg>
-) {
-    data class Vedlegg(val tilleggsTittel: String?, val kodeverkId: String)
-}
+// data class Ettersendelse(
+//     val behandlingsId: String,
+//     val behandlingsKjedeId: String?,
+//     val hovedskjemaKodeverkId: String,
+//     val sistEndret: ZonedDateTime,
+//     val vedlegg: List<Vedlegg>
+// ) {
+//     data class Vedlegg(val tilleggsTittel: String?, val kodeverkId: String)
+// }
