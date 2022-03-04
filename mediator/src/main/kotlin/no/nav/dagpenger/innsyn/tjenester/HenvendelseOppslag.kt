@@ -1,21 +1,18 @@
 package no.nav.dagpenger.innsyn.tjenester
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.features.DefaultRequest
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.request.header
-import io.ktor.client.request.request
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
+import io.ktor.client.*
+import io.ktor.client.engine.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.*
+import io.ktor.client.features.json.*
+import io.ktor.client.request.*
+import io.ktor.http.*
 import mu.KotlinLogging
+import java.time.ZonedDateTime
 
 private val logger = KotlinLogging.logger {}
 
@@ -40,7 +37,7 @@ internal class HenvendelseOppslag(
         }
     }
 
-    suspend fun hentEttersendelser(fnr: String): JsonNode {
+    suspend fun hentEttersendelser(fnr: String): Ettersendelse {
         return dpProxyClient.request("$dpProxyUrl/proxy/v1/ettersendelser") {
             method = HttpMethod.Post
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
@@ -51,12 +48,12 @@ internal class HenvendelseOppslag(
     }
 }
 
-// data class Ettersendelse(
-//     val behandlingsId: String,
-//     val behandlingsKjedeId: String?,
-//     val hovedskjemaKodeverkId: String,
-//     val sistEndret: ZonedDateTime,
-//     val vedlegg: List<Vedlegg>
-// ) {
-//     data class Vedlegg(val tilleggsTittel: String?, val kodeverkId: String)
-// }
+data class Ettersendelse(
+    val behandlingsId: String,
+    val hovedskjemaKodeverkId: String,
+    val sistEndret: ZonedDateTime,
+    val innsendtDato: ZonedDateTime?,
+    val vedlegg: List<Vedlegg>
+) {
+    data class Vedlegg(val tilleggsTittel: String?, val kodeverkId: String)
+}
