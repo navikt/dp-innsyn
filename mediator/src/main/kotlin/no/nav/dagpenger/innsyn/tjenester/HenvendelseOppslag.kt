@@ -4,13 +4,16 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
-import io.ktor.client.*
-import io.ktor.client.engine.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.features.DefaultRequest
+import io.ktor.client.features.json.JacksonSerializer
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.request.header
+import io.ktor.client.request.request
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import mu.KotlinLogging
 import java.time.ZonedDateTime
 
@@ -37,14 +40,15 @@ internal class HenvendelseOppslag(
         }
     }
 
-    suspend fun hentEttersendelser(fnr: String): Ettersendelse {
-        return dpProxyClient.request("$dpProxyUrl/proxy/v1/ettersendelser") {
+    suspend fun hentEttersendelser(fnr: String): List<Ettersendelse> {
+        val ettersendelser = dpProxyClient.request<List<Ettersendelse>>("$dpProxyUrl/proxy/v1/ettersendelser") {
             method = HttpMethod.Post
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Accept, "application/json")
             body = mapOf("fnr" to fnr)
         }
+        return ettersendelser
     }
 }
 
