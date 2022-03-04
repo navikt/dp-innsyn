@@ -8,6 +8,7 @@ import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
+import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.JwtStub
@@ -18,6 +19,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Sakstilknytning
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType.NySøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
+import no.nav.dagpenger.innsyn.tjenester.Ettersendelse
 import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 internal class InnsynApiTest {
     private val testIssuer = "test-issuer"
@@ -214,6 +217,34 @@ internal class InnsynApiTest {
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
             assertFalse(response.content!!.contains(Vedtak.Status.INNVILGET.toString()))
+        }
+    }
+
+    @Test
+    fun `test at bruker kan hente ut ettersendelser`() {
+        val henvendelseOppslag = mockk<HenvendelseOppslag>()
+        val ettersendelser = listOf(
+            Ettersendelse(
+                "bid",
+                "enKodeverksid",
+                ZonedDateTime.now(),
+                ZonedDateTime.now(),
+                emptyList()
+            )
+        )
+        coEvery { henvendelseOppslag.hentEttersendelser(any()) } returns ettersendelser
+        withTestApplication({
+            innsynApi(
+                jwtStub.stubbedJwkProvider(),
+                testIssuer,
+                clientId,
+                mockk<PostgresPersonRepository>(),
+                henvendelseOppslag
+            )
+        }) {
+            autentisert("/ettersendelser")
+        }.apply {
+            assertEquals(HttpStatusCode.OK, response.status())
         }
     }
 

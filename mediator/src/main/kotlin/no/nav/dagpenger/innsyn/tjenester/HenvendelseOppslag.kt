@@ -41,14 +41,13 @@ internal class HenvendelseOppslag(
     }
 
     suspend fun hentEttersendelser(fnr: String): List<Ettersendelse> {
-        val ettersendelser = dpProxyClient.request<List<Ettersendelse>>("$dpProxyUrl/proxy/v1/ettersendelser") {
+        return dpProxyClient.request("$dpProxyUrl/proxy/v1/ettersendelser") {
             method = HttpMethod.Post
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Accept, "application/json")
             body = mapOf("fnr" to fnr)
         }
-        return ettersendelser
     }
 }
 
