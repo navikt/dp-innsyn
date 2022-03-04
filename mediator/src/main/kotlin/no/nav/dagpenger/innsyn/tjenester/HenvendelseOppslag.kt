@@ -68,6 +68,5 @@ data class Ettersendelse(
 data class Påbegynt(
     val behandlingsId: String,
     val hovedskjemaKodeverkId: String,
-    val sistEndret: ZonedDateTime,
-    val innsendtDato: ZonedDateTime?
+    val sistEndret: ZonedDateTime
 )

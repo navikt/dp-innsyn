@@ -256,7 +256,6 @@ internal class InnsynApiTest {
             Påbegynt(
                 "bid",
                 "enKodeverksid",
-                ZonedDateTime.now(),
                 ZonedDateTime.now()
             )
         )
