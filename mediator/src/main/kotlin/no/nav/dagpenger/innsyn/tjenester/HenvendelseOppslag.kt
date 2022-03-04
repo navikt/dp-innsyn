@@ -14,10 +14,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.request
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import mu.KotlinLogging
 import java.time.ZonedDateTime
-
-private val logger = KotlinLogging.logger {}
 
 internal class HenvendelseOppslag(
     private val dpProxyUrl: String,
@@ -41,14 +38,21 @@ internal class HenvendelseOppslag(
     }
 
     suspend fun hentEttersendelser(fnr: String): List<Ettersendelse> {
-        return dpProxyClient.request("$dpProxyUrl/proxy/v1/ettersendelser") {
+        return hentRequestMedFnrIBody(fnr, "$dpProxyUrl/proxy/v1/ettersendelser")
+    }
+
+    suspend fun hentPåbegynte(fnr: String): List<Påbegynt> {
+        return hentRequestMedFnrIBody(fnr, "$dpProxyUrl/proxy/v1/paabegynte")
+    }
+
+    private suspend fun <T> hentRequestMedFnrIBody(fnr: String, requestUrl: String): List<T> =
+        dpProxyClient.request(requestUrl) {
             method = HttpMethod.Post
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Accept, "application/json")
             body = mapOf("fnr" to fnr)
         }
-    }
 }
 
 data class Ettersendelse(
@@ -60,3 +64,10 @@ data class Ettersendelse(
 ) {
     data class Vedlegg(val tilleggsTittel: String?, val kodeverkId: String)
 }
+
+data class Påbegynt(
+    val behandlingsId: String,
+    val hovedskjemaKodeverkId: String,
+    val sistEndret: ZonedDateTime,
+    val innsendtDato: ZonedDateTime?
+)

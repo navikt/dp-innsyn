@@ -21,6 +21,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType.NySøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.tjenester.Ettersendelse
 import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
+import no.nav.dagpenger.innsyn.tjenester.Påbegynt
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -243,6 +244,33 @@ internal class InnsynApiTest {
             )
         }) {
             autentisert("/ettersendelser")
+        }.apply {
+            assertEquals(HttpStatusCode.OK, response.status())
+        }
+    }
+
+    @Test
+    fun `test at bruker kan hente ut påbegynte søknader`() {
+        val henvendelseOppslag = mockk<HenvendelseOppslag>()
+        val påbegynte = listOf(
+            Påbegynt(
+                "bid",
+                "enKodeverksid",
+                ZonedDateTime.now(),
+                ZonedDateTime.now()
+            )
+        )
+        coEvery { henvendelseOppslag.hentPåbegynte(any()) } returns påbegynte
+        withTestApplication({
+            innsynApi(
+                jwtStub.stubbedJwkProvider(),
+                testIssuer,
+                clientId,
+                mockk<PostgresPersonRepository>(),
+                henvendelseOppslag
+            )
+        }) {
+            autentisert("/paabegynte")
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
         }

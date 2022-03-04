@@ -129,10 +129,15 @@ internal fun Application.innsynApi(
             get("/ettersendelser") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
-                val ettersendelser = henvendelseOppslag.hentEttersendelser(
-                    fnr
-                )
+                val ettersendelser = henvendelseOppslag.hentEttersendelser(fnr)
                 call.respond(ettersendelser)
+            }
+
+            get("/paabegynte") {
+                val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
+                val fnr = jwtPrincipal!!.fnr
+                val påbegynte = henvendelseOppslag.hentPåbegynte(fnr)
+                call.respond(påbegynte)
             }
         }
     }
