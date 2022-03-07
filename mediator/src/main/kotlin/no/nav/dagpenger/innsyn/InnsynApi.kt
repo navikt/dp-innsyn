@@ -88,8 +88,8 @@ internal fun Application.innsynApi(
             }
             realm = appName
             validate { credentials ->
-                requireNotNull(credentials.payload.claims.pidOrSub()) {
-                    "Token må inneholde fødselsnummer for personen i enten pid eller sub claim"
+                requireNotNull(credentials.payload.claims.pid()) {
+                    "Token må inneholde fødselsnummer for personen i enten pid claim"
                 }
 
                 JWTPrincipal(credentials.payload)
@@ -147,11 +147,6 @@ private fun String.asOptionalLocalDate() =
     takeIf(String::isNotEmpty)?.let { LocalDate.parse(it) }
 
 private val JWTPrincipal.fnr: String
-    get() = this.payload.claims.pidOrSub().asString()
+    get() = this.payload.claims.pid().asString()
 
-private fun <V : Claim> Map<String, V>.pidOrSub(): V {
-    val keys = listOf("pid", "sub")
-    return this.firstNotNullOf { it.takeIf { keys.contains(it.key) } }.also {
-        logger.trace { "Bruker ${it.key} for å finne fnr." }
-    }.value
-}
+private fun <V : Claim> Map<String, V>.pid() = firstNotNullOf { it.takeIf { it.key == "pid" } }.also {}.value
