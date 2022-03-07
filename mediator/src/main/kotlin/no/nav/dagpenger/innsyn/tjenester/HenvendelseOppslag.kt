@@ -14,6 +14,8 @@ import io.ktor.client.request.header
 import io.ktor.client.request.request
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import no.nav.dagpenger.innsyn.tjenester.ettersendelse.Ettersendelse
+import no.nav.dagpenger.innsyn.tjenester.ettersendelse.toInternal
 import java.time.ZonedDateTime
 
 internal class HenvendelseOppslag(
@@ -38,7 +40,7 @@ internal class HenvendelseOppslag(
     }
 
     suspend fun hentEttersendelser(fnr: String): List<Ettersendelse> {
-        return hentRequestMedFnrIBody(fnr, "$dpProxyUrl/proxy/v1/ettersendelser")
+        return hentRequestMedFnrIBody<ExternalEttersendelse>(fnr, "$dpProxyUrl/proxy/v1/ettersendelser").toInternal()
     }
 
     suspend fun hentPåbegynte(fnr: String): List<Påbegynt> {
@@ -55,7 +57,7 @@ internal class HenvendelseOppslag(
         }
 }
 
-data class Ettersendelse(
+data class ExternalEttersendelse(
     val behandlingsId: String,
     val hovedskjemaKodeverkId: String,
     val sistEndret: ZonedDateTime,
