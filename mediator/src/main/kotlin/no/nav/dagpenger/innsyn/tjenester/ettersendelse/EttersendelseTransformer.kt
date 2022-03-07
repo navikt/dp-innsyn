@@ -3,8 +3,8 @@ package no.nav.dagpenger.innsyn.tjenester.ettersendelse
 import no.nav.dagpenger.innsyn.tjenester.ExternalEttersendelse
 
 internal fun List<ExternalEttersendelse>.toInternal(): List<Ettersendelse> {
-    val dagpengerEttersendelser = filter { ettersendelse ->
-        dagpengeBrevkoder.containsKey(ettersendelse.hovedskjemaKodeverkId)
+    val dagpengerEttersendelser = filter { externalEttersendelse ->
+        dagpengeBrevkoder.containsKey(externalEttersendelse.hovedskjemaKodeverkId)
     }.map { externalEttersendelse ->
         externalEttersendelse.toInternal()
     }

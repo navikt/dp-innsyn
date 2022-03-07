@@ -47,7 +47,7 @@ internal class HenvendelseOppslag(
         return hentRequestMedFnrIBody(fnr, "$dpProxyUrl/proxy/v1/paabegynte")
     }
 
-    private suspend fun <T> hentRequestMedFnrIBody(fnr: String, requestUrl: String): List<T> =
+    private suspend inline fun <reified T> hentRequestMedFnrIBody(fnr: String, requestUrl: String): List<T> =
         dpProxyClient.request(requestUrl) {
             method = HttpMethod.Post
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
