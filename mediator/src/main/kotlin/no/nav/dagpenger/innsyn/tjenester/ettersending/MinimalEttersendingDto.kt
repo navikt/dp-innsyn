@@ -6,4 +6,8 @@ data class MinimalEttersendingDto(
     val søknadId: String,
     val innsendtDato: ZonedDateTime?,
     val tittel: String
-)
+) {
+    override fun equals(other: Any?) = other is MinimalEttersendingDto && this.søknadId == other.søknadId
+
+    override fun hashCode() = søknadId.hashCode()
+}

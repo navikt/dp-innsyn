@@ -1,6 +1,9 @@
 package no.nav.dagpenger.innsyn.tjenester.ettersending
 
 import no.nav.dagpenger.innsyn.tjenester.ExternalEttersendelse
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 internal fun List<ExternalEttersendelse>.toInternal(): List<MinimalEttersendingDto> {
     val dagpengerEttersendelser = filter { externalEttersendelse ->
@@ -17,6 +20,8 @@ internal fun ExternalEttersendelse.toInternal() = MinimalEttersendingDto(
     innsendtDato = this.innsendtDato,
     tittel = dagpengeBrevkoder[this.hovedskjemaKodeverkId] ?: throw IllegalArgumentException("$hovedskjemaKodeverkId er ikke en dagpengekode.")
 )
+internal val norskTidssone = ZoneId.of("Europe/Oslo")
+internal fun LocalDateTime.toZonedDateTimeInOslo(): ZonedDateTime = atZone(norskTidssone)
 
 internal val dagpengeBrevkoder = mapOf(
     "NAV 04-02.03" to "Bekreftelse på ansettelsesforhold",
