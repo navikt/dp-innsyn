@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn.tjenester.ettersendelse
 
 import no.nav.dagpenger.innsyn.objectmother.ExternalEttersendelseObjectMother
+import no.nav.dagpenger.innsyn.tjenester.ettersending.toInternal
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

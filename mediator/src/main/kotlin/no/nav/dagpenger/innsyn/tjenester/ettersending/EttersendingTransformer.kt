@@ -1,8 +1,8 @@
-package no.nav.dagpenger.innsyn.tjenester.ettersendelse
+package no.nav.dagpenger.innsyn.tjenester.ettersending
 
 import no.nav.dagpenger.innsyn.tjenester.ExternalEttersendelse
 
-internal fun List<ExternalEttersendelse>.toInternal(): List<Ettersendelse> {
+internal fun List<ExternalEttersendelse>.toInternal(): List<MinimalEttersendingDto> {
     val dagpengerEttersendelser = filter { externalEttersendelse ->
         dagpengeBrevkoder.containsKey(externalEttersendelse.hovedskjemaKodeverkId)
     }.map { externalEttersendelse ->
@@ -12,7 +12,7 @@ internal fun List<ExternalEttersendelse>.toInternal(): List<Ettersendelse> {
     return dagpengerEttersendelser
 }
 
-internal fun ExternalEttersendelse.toInternal() = Ettersendelse(
+internal fun ExternalEttersendelse.toInternal() = MinimalEttersendingDto(
     søknadId = this.behandlingsId,
     innsendtDato = this.innsendtDato,
     tittel = dagpengeBrevkoder[this.hovedskjemaKodeverkId] ?: throw IllegalArgumentException("$hovedskjemaKodeverkId er ikke en dagpengekode.")

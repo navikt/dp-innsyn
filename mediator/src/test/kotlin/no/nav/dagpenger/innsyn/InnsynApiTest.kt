@@ -21,7 +21,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType.NySøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
 import no.nav.dagpenger.innsyn.tjenester.Påbegynt
-import no.nav.dagpenger.innsyn.tjenester.ettersendelse.Ettersendelse
+import no.nav.dagpenger.innsyn.tjenester.ettersending.MinimalEttersendingDto
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -224,7 +224,7 @@ internal class InnsynApiTest {
     @Test
     fun `test at bruker kan hente ut ettersendelser`() {
         val henvendelseOppslag = mockk<HenvendelseOppslag>()
-        val ettersendelse = Ettersendelse("bid", ZonedDateTime.now(), "tittel")
+        val ettersendelse = MinimalEttersendingDto("bid", ZonedDateTime.now(), "tittel")
         coEvery { henvendelseOppslag.hentEttersendelser(any()) } returns listOf(ettersendelse)
         withTestApplication({
             innsynApi(

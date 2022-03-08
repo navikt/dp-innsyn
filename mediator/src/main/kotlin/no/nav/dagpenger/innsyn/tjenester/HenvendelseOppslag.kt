@@ -14,8 +14,8 @@ import io.ktor.client.request.header
 import io.ktor.client.request.request
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import no.nav.dagpenger.innsyn.tjenester.ettersendelse.Ettersendelse
-import no.nav.dagpenger.innsyn.tjenester.ettersendelse.toInternal
+import no.nav.dagpenger.innsyn.tjenester.ettersending.MinimalEttersendingDto
+import no.nav.dagpenger.innsyn.tjenester.ettersending.toInternal
 import java.time.ZonedDateTime
 
 internal class HenvendelseOppslag(
@@ -39,7 +39,7 @@ internal class HenvendelseOppslag(
         }
     }
 
-    suspend fun hentEttersendelser(fnr: String): List<Ettersendelse> {
+    suspend fun hentEttersendelser(fnr: String): List<MinimalEttersendingDto> {
         return hentRequestMedFnrIBody<ExternalEttersendelse>(fnr, "$dpProxyUrl/proxy/v1/ettersendelser").toInternal()
     }
 
