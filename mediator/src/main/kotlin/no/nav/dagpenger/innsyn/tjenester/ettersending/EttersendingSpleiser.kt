@@ -22,7 +22,11 @@ internal class EttersendingSpleiser(
     }
 
     private fun hentFraDB(fnr: String) = try {
-        val søknader = personRepository.hentSøknaderFor(fnr)
+        val søknader = personRepository.hentSøknaderFor(
+            fnr,
+            fom = null,
+            tom = null
+        )
         val ettersendelser = søknader.toMinimalEttersending()
         MultiSourceResult.createSuccessfulResult(ettersendelser, KildeType.DB)
     } catch (e: Exception) {

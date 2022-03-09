@@ -25,7 +25,7 @@ internal class EttersendingSpleiserTest {
 
         val personRepository = mockk<PersonRepository>()
         val nyeSøknaderFraDatabasen = listOf(SøknadObjectMother.giveDigitalSøknad(), SøknadObjectMother.giveDigitalSøknad())
-        every { personRepository.hentSøknaderFor(any()) } returns nyeSøknaderFraDatabasen
+        every { personRepository.hentSøknaderFor(fnr = any(), fom = null, tom = null) } returns nyeSøknaderFraDatabasen
 
         val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
 
@@ -45,7 +45,7 @@ internal class EttersendingSpleiserTest {
 
         val personRepository = mockk<PersonRepository>()
         val søknaderFraDatabasen = listOf(SøknadObjectMother.giveDigitalSøknad())
-        every { personRepository.hentSøknaderFor(any()) } returns søknaderFraDatabasen
+        every { personRepository.hentSøknaderFor(fnr = any(), fom = null, tom = null) } returns søknaderFraDatabasen
 
         val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
 
