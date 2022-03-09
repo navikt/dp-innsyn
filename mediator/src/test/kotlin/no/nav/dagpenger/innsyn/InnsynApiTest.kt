@@ -10,6 +10,7 @@ import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
 import io.mockk.coEvery
 import io.mockk.mockk
+import no.nav.dagpenger.innsyn.common.KildeType
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.JwtStub
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
@@ -19,10 +20,10 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Sakstilknytning
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType.NySøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
+import no.nav.dagpenger.innsyn.objectmother.MultiSourceResultObjectMother
 import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
 import no.nav.dagpenger.innsyn.tjenester.Påbegynt
 import no.nav.dagpenger.innsyn.tjenester.ettersending.EttersendingSpleiser
-import no.nav.dagpenger.innsyn.tjenester.ettersending.MinimalEttersendingDto
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -231,8 +232,7 @@ internal class InnsynApiTest {
     @Test
     fun `test at bruker kan hente ut ettersendelser`() {
         val ettersendingSpleiser = mockk<EttersendingSpleiser>()
-        val ettersending = MinimalEttersendingDto("bid", ZonedDateTime.now(), "tittel")
-        coEvery { ettersendingSpleiser.hentEttersendelser(any()) } returns listOf(ettersending)
+        coEvery { ettersendingSpleiser.hentEttersendelser(any()) } returns MultiSourceResultObjectMother.giveMeSuccessfulResult()
         withTestApplication({
             innsynApi(
                 jwtStub.stubbedJwkProvider(),
@@ -246,6 +246,27 @@ internal class InnsynApiTest {
             autentisert("/ettersendelser")
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
+        }
+    }
+
+    @Test
+    fun `test at bruker kan hente ut ettersendelser når én kilde feiler`() {
+        val ettersendingSpleiser = mockk<EttersendingSpleiser>()
+        val enFeiletOgEnVellykket = MultiSourceResultObjectMother.giveMeSuccessfulResult(KildeType.DB) + MultiSourceResultObjectMother.giveMeFailedResult(KildeType.HENVENDELSE)
+        coEvery { ettersendingSpleiser.hentEttersendelser(any()) } returns enFeiletOgEnVellykket
+        withTestApplication({
+            innsynApi(
+                jwtStub.stubbedJwkProvider(),
+                testIssuer,
+                clientId,
+                mockk<PostgresPersonRepository>(),
+                henvendelseOppslag,
+                ettersendingSpleiser
+            )
+        }) {
+            autentisert("/ettersendelser")
+        }.apply {
+            assertEquals(HttpStatusCode.PartialContent, response.status())
         }
     }
 

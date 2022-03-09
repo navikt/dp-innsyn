@@ -6,7 +6,7 @@ import no.nav.dagpenger.innsyn.tjenester.ettersending.MinimalEttersendingDto
 
 object MultiSourceResultObjectMother {
 
-    fun giveMeSuccessfulResult(source: KildeType) =
+    fun giveMeSuccessfulResult(source: KildeType = KildeType.HENVENDELSE) =
         MultiSourceResult.createSuccessfulResult(
             listOf(
                 MinimalEttersendingDtoObjectMother.giveMeEttersending()

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
+import io.ktor.application.log
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
 import io.ktor.auth.authentication
@@ -132,7 +133,13 @@ internal fun Application.innsynApi(
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
                 val ettersendelser = ettersendingSpleiser.hentEttersendelser(fnr)
-                call.respond(ettersendelser)
+                val httpKode = ettersendelser.determineHttpCode()
+                if (ettersendelser.hasErrors()) {
+                    val feilende = ettersendelser.failedSources()
+                    val vellykkede = ettersendelser.successFullSources()
+                    log.warn("Følgende kilder feilet: $feilende. Returnerer resultater fra $vellykkede sammen med HTTP-koden $httpKode.")
+                }
+                call.respond(httpKode, ettersendelser.results())
             }
 
             get("/paabegynte") {
