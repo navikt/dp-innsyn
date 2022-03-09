@@ -13,18 +13,19 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.time.ZonedDateTime
 
 internal class EttersendingSpleiserTest {
 
     @Test
     fun `Skal kunne slå sammen ettersendelser fra databasen og fra henvendelse, samt fjerne duplikater og sortere`() {
         val henvendelseOppslag = mockk<HenvendelseOppslag>()
-        val fraHenvendelse = MinimalEttersendingDtoObjectMother.giveMeEttersending(søknadId = "123")
-        coEvery { henvendelseOppslag.hentEttersendelser(any()) } returns listOf(fraHenvendelse)
+        val gammelEttersendingFraHenvendelse = MinimalEttersendingDtoObjectMother.giveMeEttersending(søknadId = "123", innsendtDato = ZonedDateTime.now().minusYears(2))
+        coEvery { henvendelseOppslag.hentEttersendelser(any()) } returns listOf(gammelEttersendingFraHenvendelse)
 
         val personRepository = mockk<PersonRepository>()
-        val søknaderFraDatabasen = listOf(SøknadObjectMother.giveDigitalSøknad(), SøknadObjectMother.giveDigitalSøknad())
-        every { personRepository.hentSøknaderFor(any()) } returns søknaderFraDatabasen
+        val nyeSøknaderFraDatabasen = listOf(SøknadObjectMother.giveDigitalSøknad(), SøknadObjectMother.giveDigitalSøknad())
+        every { personRepository.hentSøknaderFor(any()) } returns nyeSøknaderFraDatabasen
 
         val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
 
