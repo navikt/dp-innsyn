@@ -1,11 +1,11 @@
 package no.nav.dagpenger.innsyn.objectmother
 
-import no.nav.dagpenger.innsyn.tjenester.ExternalEttersendelse
+import no.nav.dagpenger.innsyn.tjenester.ExternalEttersending
 import java.time.ZonedDateTime
 
-object ExternalEttersendelseObjectMother {
+object ExternalEttersendingObjectMother {
     fun giveMeDagpengeEttersendelse() =
-        ExternalEttersendelse(
+        ExternalEttersending(
             "bid",
             "NAV 04-01.03",
             ZonedDateTime.now(),
@@ -13,7 +13,7 @@ object ExternalEttersendelseObjectMother {
             emptyList()
         )
 
-    fun giveMeBILEttersendelse() = ExternalEttersendelse(
+    fun giveMeBILEttersendelse() = ExternalEttersending(
         "bid",
         "NAV 10-07.40",
         ZonedDateTime.now(),

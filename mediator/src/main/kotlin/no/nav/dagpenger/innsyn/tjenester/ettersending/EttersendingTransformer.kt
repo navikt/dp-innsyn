@@ -1,21 +1,21 @@
 package no.nav.dagpenger.innsyn.tjenester.ettersending
 
-import no.nav.dagpenger.innsyn.tjenester.ExternalEttersendelse
+import no.nav.dagpenger.innsyn.tjenester.ExternalEttersending
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-internal fun List<ExternalEttersendelse>.toInternal(): List<MinimalEttersendingDto> {
-    val dagpengerEttersendelser = filter { externalEttersendelse ->
-        dagpengeBrevkoder.containsKey(externalEttersendelse.hovedskjemaKodeverkId)
-    }.map { externalEttersendelse ->
-        externalEttersendelse.toInternal()
+internal fun List<ExternalEttersending>.toInternal(): List<MinimalEttersendingDto> {
+    val dagpengerEttersendelser = filter { externalEttersending ->
+        dagpengeBrevkoder.containsKey(externalEttersending.hovedskjemaKodeverkId)
+    }.map { externalEttersending ->
+        externalEttersending.toInternal()
     }
 
     return dagpengerEttersendelser
 }
 
-internal fun ExternalEttersendelse.toInternal() = MinimalEttersendingDto(
+internal fun ExternalEttersending.toInternal() = MinimalEttersendingDto(
     søknadId = this.behandlingsId,
     innsendtDato = this.innsendtDato,
     tittel = dagpengeBrevkoder[this.hovedskjemaKodeverkId] ?: throw IllegalArgumentException("$hovedskjemaKodeverkId er ikke en dagpengekode.")

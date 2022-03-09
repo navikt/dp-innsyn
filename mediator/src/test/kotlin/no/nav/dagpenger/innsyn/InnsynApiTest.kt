@@ -231,8 +231,8 @@ internal class InnsynApiTest {
     @Test
     fun `test at bruker kan hente ut ettersendelser`() {
         val ettersendingSpleiser = mockk<EttersendingSpleiser>()
-        val ettersendelse = MinimalEttersendingDto("bid", ZonedDateTime.now(), "tittel")
-        coEvery { ettersendingSpleiser.hentEttersendinger(any()) } returns listOf(ettersendelse)
+        val ettersending = MinimalEttersendingDto("bid", ZonedDateTime.now(), "tittel")
+        coEvery { ettersendingSpleiser.hentEttersendelser(any()) } returns listOf(ettersending)
         withTestApplication({
             innsynApi(
                 jwtStub.stubbedJwkProvider(),

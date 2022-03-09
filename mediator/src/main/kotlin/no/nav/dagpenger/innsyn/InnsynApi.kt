@@ -131,7 +131,7 @@ internal fun Application.innsynApi(
             get("/ettersendelser") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
-                val ettersendelser = ettersendingSpleiser.hentEttersendinger(fnr)
+                val ettersendelser = ettersendingSpleiser.hentEttersendelser(fnr)
                 call.respond(ettersendelser)
             }
 

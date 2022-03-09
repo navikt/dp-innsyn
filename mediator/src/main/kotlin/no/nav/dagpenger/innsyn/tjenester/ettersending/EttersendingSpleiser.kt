@@ -9,19 +9,19 @@ internal class EttersendingSpleiser(
     val personRepository: PersonRepository
 ) {
 
-    suspend fun hentEttersendinger(fnr: String): List<MinimalEttersendingDto> {
-        val ettersendingerFraHenvendelse = henvendelseOppslag.hentEttersendelser(fnr)
+    suspend fun hentEttersendelser(fnr: String): List<MinimalEttersendingDto> {
+        val ettersendelserFraHenvendelse = henvendelseOppslag.hentEttersendelser(fnr)
         val søknaderFraDb = personRepository.hentSøknaderFor(fnr)
-        val ettersendingerFraDb = søknaderFraDb.toMinimalEttersending()
-        val alleEttersendinger = ettersendingerFraHenvendelse + ettersendingerFraDb
+        val ettersendelserFraDb = søknaderFraDb.toMinimalEttersending()
+        val alleEttersendelser = ettersendelserFraHenvendelse + ettersendelserFraDb
 
-        val unikeEttersendinger = alleEttersendinger
+        val unikeEttersendelser = alleEttersendelser
             .toSet()
             .sortedByDescending { ettersending ->
                 ettersending.innsendtDato
             }
 
-        return unikeEttersendinger
+        return unikeEttersendelser
     }
 }
 

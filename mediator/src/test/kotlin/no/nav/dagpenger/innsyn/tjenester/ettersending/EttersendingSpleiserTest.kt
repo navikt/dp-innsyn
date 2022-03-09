@@ -15,7 +15,7 @@ import java.time.ZonedDateTime
 internal class EttersendingSpleiserTest {
 
     @Test
-    fun `Skal kunne slå sammen ettersendinger fra databasen og fra henvendelse`() {
+    fun `Skal kunne slå sammen ettersendelser fra databasen og fra henvendelse`() {
         val henvendelseOppslag = mockk<HenvendelseOppslag>()
         val fraHenvendelse = createEttersendingFraHenvendelse()
         coEvery { henvendelseOppslag.hentEttersendelser(any()) } returns fraHenvendelse
@@ -26,15 +26,15 @@ internal class EttersendingSpleiserTest {
 
         val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
 
-        val alleEttersendinger = runBlocking {
-            ettersendingSpleiser.hentEttersendinger("999")
+        val alleEttersendelser = runBlocking {
+            ettersendingSpleiser.hentEttersendelser("999")
         }
 
-        assertEquals(2, alleEttersendinger.size)
-        assertNotNull(alleEttersendinger.first { it.søknadId == "456" })
-        assertNotNull(alleEttersendinger.first { it.søknadId == "678" })
-        assertEquals("456", alleEttersendinger[0].søknadId)
-        assertEquals("678", alleEttersendinger[1].søknadId)
+        assertEquals(2, alleEttersendelser.size)
+        assertNotNull(alleEttersendelser.first { it.søknadId == "456" })
+        assertNotNull(alleEttersendelser.first { it.søknadId == "678" })
+        assertEquals("456", alleEttersendelser[0].søknadId)
+        assertEquals("678", alleEttersendelser[1].søknadId)
     }
 
     private fun createEttersendingFraHenvendelse() =

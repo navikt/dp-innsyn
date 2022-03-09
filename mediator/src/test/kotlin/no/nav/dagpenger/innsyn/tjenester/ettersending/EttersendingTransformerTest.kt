@@ -1,16 +1,15 @@
-package no.nav.dagpenger.innsyn.tjenester.ettersendelse
+package no.nav.dagpenger.innsyn.tjenester.ettersending
 
-import no.nav.dagpenger.innsyn.objectmother.ExternalEttersendelseObjectMother
-import no.nav.dagpenger.innsyn.tjenester.ettersending.toInternal
+import no.nav.dagpenger.innsyn.objectmother.ExternalEttersendingObjectMother
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-internal class EttersendelseTransformerTest {
+internal class EttersendingTransformerTest {
 
     @Test
     fun `skal kunne hente kun ettersendelser for dagpenger og ha oversatt kodeverk`() {
-        val externalEttersendelser = ExternalEttersendelseObjectMother.giveMeEttersendelserForDAGOgBIL()
+        val externalEttersendelser = ExternalEttersendingObjectMother.giveMeEttersendelserForDAGOgBIL()
 
         val dagpengeEttersendelser = externalEttersendelser.toInternal()
 
@@ -22,7 +21,7 @@ internal class EttersendelseTransformerTest {
 
     @Test
     fun `Skal kaste feil dersom tittel ikke er en dagpengekode`() {
-        val bilEttersendelse = ExternalEttersendelseObjectMother.giveMeBILEttersendelse()
+        val bilEttersendelse = ExternalEttersendingObjectMother.giveMeBILEttersendelse()
 
         assertThrows<IllegalArgumentException> { bilEttersendelse.toInternal() }
     }

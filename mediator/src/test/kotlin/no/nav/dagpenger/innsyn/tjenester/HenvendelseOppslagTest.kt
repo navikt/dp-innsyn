@@ -10,7 +10,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.runBlocking
-import no.nav.dagpenger.innsyn.objectmother.ExternalEttersendelseObjectMother
+import no.nav.dagpenger.innsyn.objectmother.ExternalEttersendingObjectMother
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.ZonedDateTime
@@ -24,7 +24,7 @@ internal class HenvendelseOppslagTest {
 
     @Test
     fun `Skal klare å utlede riktig returtype ut i fra generics definisjonen for ettersendelser`() {
-        val expectedReturnValues = ExternalEttersendelseObjectMother.giveMeEttersendelserForDAGOgBIL()
+        val expectedReturnValues = ExternalEttersendingObjectMother.giveMeEttersendelserForDAGOgBIL()
         val mockHttpClient = mockHttpClientWithReturnValue(expectedReturnValues)
         val henvendelseOppslag = henvendelseOppslagWithMockClient(mockHttpClient)
 

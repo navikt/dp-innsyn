@@ -40,7 +40,7 @@ internal class HenvendelseOppslag(
     }
 
     suspend fun hentEttersendelser(fnr: String): List<MinimalEttersendingDto> {
-        return hentRequestMedFnrIBody<ExternalEttersendelse>(fnr, "$dpProxyUrl/proxy/v1/ettersendelser").toInternal()
+        return hentRequestMedFnrIBody<ExternalEttersending>(fnr, "$dpProxyUrl/proxy/v1/ettersendelser").toInternal()
     }
 
     suspend fun hentPåbegynte(fnr: String): List<Påbegynt> {
@@ -57,7 +57,7 @@ internal class HenvendelseOppslag(
         }
 }
 
-data class ExternalEttersendelse(
+data class ExternalEttersending(
     val behandlingsId: String,
     val hovedskjemaKodeverkId: String,
     val sistEndret: ZonedDateTime,
