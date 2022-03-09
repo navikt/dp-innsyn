@@ -14,5 +14,4 @@ object MinimalEttersendingDtoObjectMother {
         innsendtDato,
         tittel
     )
-
 }

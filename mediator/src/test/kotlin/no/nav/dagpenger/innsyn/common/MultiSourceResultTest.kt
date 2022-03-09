@@ -1,6 +1,6 @@
 package no.nav.dagpenger.innsyn.common
 
-import io.ktor.http.*
+import io.ktor.http.HttpStatusCode
 import no.nav.dagpenger.innsyn.objectmother.MultiSourceResultObjectMother
 import no.nav.dagpenger.innsyn.tjenester.ettersending.MinimalEttersendingDto
 import org.junit.jupiter.api.Assertions.assertEquals

@@ -50,7 +50,6 @@ data class MultiSourceResult<R, S>(
 
     private fun hasPartialResult(): Boolean = successFullSources.isNotEmpty() && failedSources.isNotEmpty()
     private fun allSourcesFailed(): Boolean = successFullSources.isEmpty() && failedSources.isNotEmpty()
-
 }
 
 enum class KildeType {
