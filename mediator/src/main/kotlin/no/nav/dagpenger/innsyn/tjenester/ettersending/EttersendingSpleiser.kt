@@ -1,5 +1,6 @@
 package no.nav.dagpenger.innsyn.tjenester.ettersending
 
+import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.common.KildeType
 import no.nav.dagpenger.innsyn.common.MultiSourceResult
 import no.nav.dagpenger.innsyn.db.PersonRepository
@@ -10,6 +11,7 @@ internal class EttersendingSpleiser(
     private val henvendelseOppslag: HenvendelseOppslag,
     private val personRepository: PersonRepository
 ) {
+    private val log = KotlinLogging.logger {}
 
     suspend fun hentEttersendelser(fnr: String): MultiSourceResult<MinimalEttersendingDto, KildeType> {
         val ettersendelserFraDb = hentFraDB(fnr)
@@ -24,6 +26,7 @@ internal class EttersendingSpleiser(
         val ettersendelser = søknader.toMinimalEttersending()
         MultiSourceResult.createSuccessfulResult(ettersendelser, KildeType.DB)
     } catch (e: Exception) {
+        log.warn("Klarte ikke å hente data fra databasen: $e", e)
         MultiSourceResult.createErrorResult(KildeType.DB)
     }
 
@@ -31,6 +34,7 @@ internal class EttersendingSpleiser(
         val ettersendelser = henvendelseOppslag.hentEttersendelser(fnr)
         MultiSourceResult.createSuccessfulResult(ettersendelser, KildeType.HENVENDELSE)
     } catch (e: Exception) {
+        log.warn("Klarte ikke å hente data fra henvendelse: $e", e)
         MultiSourceResult.createErrorResult(KildeType.HENVENDELSE)
     }
 
