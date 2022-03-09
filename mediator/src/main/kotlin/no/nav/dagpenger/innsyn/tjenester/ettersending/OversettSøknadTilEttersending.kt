@@ -5,7 +5,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.serde.SøknadVisitor
 import java.time.LocalDateTime
 
-class SøknadTilMinimalEttersendelseTransformer(søknader: List<Søknad>) : SøknadVisitor {
+class OversettSøknadTilEttersending(søknader: List<Søknad>) : SøknadVisitor {
 
     private val resultat = mutableListOf<MinimalEttersendingDto>()
 

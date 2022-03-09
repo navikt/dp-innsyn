@@ -4,12 +4,12 @@ import no.nav.dagpenger.innsyn.objectmother.SøknadObjectMother.giveMeListOfDigi
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-internal class SøknadTilMinimalEttersendelseTransformerTest {
+internal class OversettSøknadTilEttersendingTest {
 
     @Test
     fun `skal konvertere fra Søknad til MinimalEttersendelseDto`() {
         val søknader = giveMeListOfDigitalOgPapirSøknad()
-        val visitor = SøknadTilMinimalEttersendelseTransformer(søknader)
+        val visitor = OversettSøknadTilEttersending(søknader)
         val resultat = visitor.resultat()
 
         assertEquals(1, resultat.size)

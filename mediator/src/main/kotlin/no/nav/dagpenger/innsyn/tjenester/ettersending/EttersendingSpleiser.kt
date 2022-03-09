@@ -26,4 +26,4 @@ internal class EttersendingSpleiser(
 }
 
 internal fun List<Søknad>.toMinimalEttersending() =
-    SøknadTilMinimalEttersendelseTransformer(this).resultat()
+    OversettSøknadTilEttersending(this).resultat()
