@@ -18,8 +18,8 @@ internal class EttersendingMergerer(
         val unikeEttersendinger = alleEttersendinger
             .toSet()
             .sortedByDescending { ettersending ->
-            ettersending.innsendtDato
-        }
+                ettersending.innsendtDato
+            }
 
         return unikeEttersendinger
     }

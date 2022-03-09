@@ -21,6 +21,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType.NySøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
 import no.nav.dagpenger.innsyn.tjenester.Påbegynt
+import no.nav.dagpenger.innsyn.tjenester.ettersending.EttersendingMergerer
 import no.nav.dagpenger.innsyn.tjenester.ettersending.MinimalEttersendingDto
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -35,6 +36,7 @@ internal class InnsynApiTest {
     private val jwtStub = JwtStub(testIssuer)
     private val clientId = "id"
     private val henvendelseOppslag = mockk<HenvendelseOppslag>()
+    private val ettersendingMergerer = mockk<EttersendingMergerer>()
 
     @Test
     fun `test at bruker ikke har søknad`() = withMigratedDb {
@@ -44,7 +46,8 @@ internal class InnsynApiTest {
                 testIssuer,
                 clientId,
                 PostgresPersonRepository(),
-                henvendelseOppslag
+                henvendelseOppslag,
+                ettersendingMergerer
             )
         }) {
             autentisert("/soknad")
@@ -93,7 +96,8 @@ internal class InnsynApiTest {
                 testIssuer,
                 clientId,
                 personRepository,
-                henvendelseOppslag
+                henvendelseOppslag,
+                ettersendingMergerer
             )
         }) {
             val fom = LocalDate.now().minusDays(100)
@@ -134,7 +138,8 @@ internal class InnsynApiTest {
                 testIssuer,
                 clientId,
                 personRepository,
-                henvendelseOppslag
+                henvendelseOppslag,
+                ettersendingMergerer
             )
         }) {
             val dagensDato = LocalDate.now()
@@ -172,7 +177,8 @@ internal class InnsynApiTest {
                 testIssuer,
                 clientId,
                 personRepository,
-                henvendelseOppslag
+                henvendelseOppslag,
+                ettersendingMergerer
             )
         }) {
             val dagensDato = LocalDate.now()
@@ -210,7 +216,8 @@ internal class InnsynApiTest {
                 testIssuer,
                 clientId,
                 personRepository,
-                henvendelseOppslag
+                henvendelseOppslag,
+                ettersendingMergerer
             )
         }) {
             val dagensDato = LocalDate.now()
@@ -223,16 +230,17 @@ internal class InnsynApiTest {
 
     @Test
     fun `test at bruker kan hente ut ettersendelser`() {
-        val henvendelseOppslag = mockk<HenvendelseOppslag>()
+        val ettersendingMergerer = mockk<EttersendingMergerer>()
         val ettersendelse = MinimalEttersendingDto("bid", ZonedDateTime.now(), "tittel")
-        coEvery { henvendelseOppslag.hentEttersendelser(any()) } returns listOf(ettersendelse)
+        coEvery { ettersendingMergerer.hentEttersendinger(any()) } returns listOf(ettersendelse)
         withTestApplication({
             innsynApi(
                 jwtStub.stubbedJwkProvider(),
                 testIssuer,
                 clientId,
                 mockk<PostgresPersonRepository>(),
-                henvendelseOppslag
+                henvendelseOppslag,
+                ettersendingMergerer
             )
         }) {
             autentisert("/ettersendelser")
@@ -258,7 +266,8 @@ internal class InnsynApiTest {
                 testIssuer,
                 clientId,
                 mockk<PostgresPersonRepository>(),
-                henvendelseOppslag
+                henvendelseOppslag,
+                ettersendingMergerer
             )
         }) {
             autentisert("/paabegynte")

@@ -9,6 +9,7 @@ import no.nav.dagpenger.innsyn.tjenester.OppgaveMottak
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakAvsluttetMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakMottak
+import no.nav.dagpenger.innsyn.tjenester.ettersending.EttersendingMergerer
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidApplication.RapidApplicationConfig.Companion.fromEnv
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -19,10 +20,11 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
         dpProxyUrl = Configuration.dpProxyUrl,
         tokenProvider = { Configuration.dpProxyTokenProvider.clientCredentials(Configuration.dpProxyScope).accessToken },
     )
+    private val ettersendingMergerer = EttersendingMergerer(henvendelseOppslag, personRepository)
     private val personMediator = PersonMediator(personRepository)
     private val rapidsConnection = RapidApplication.Builder(fromEnv(env))
         .withKtorModule {
-            innsynApi(AuthFactory.jwkProvider, AuthFactory.issuer, AuthFactory.clientId, personRepository, henvendelseOppslag)
+            innsynApi(AuthFactory.jwkProvider, AuthFactory.issuer, AuthFactory.clientId, personRepository, henvendelseOppslag, ettersendingMergerer)
         }.build().apply {
             SøknadMottak(this, personMediator)
             JournalførtMottak(this, personMediator)
