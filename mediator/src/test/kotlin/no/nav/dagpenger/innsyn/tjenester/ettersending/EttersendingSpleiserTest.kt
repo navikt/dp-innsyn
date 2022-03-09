@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
-internal class EttersendingMergererTest {
+internal class EttersendingSpleiserTest {
 
     @Test
     fun `Skal kunne slå sammen ettersendinger fra databasen og fra henvendelse`() {
@@ -24,10 +24,10 @@ internal class EttersendingMergererTest {
         val søknaderFraDatabasen = listOf(SøknadObjectMother.giveDigitalSøknad(), SøknadObjectMother.giveDigitalSøknad())
         every { personRepository.hentSøknaderFor(any()) } returns søknaderFraDatabasen
 
-        val ettersendingMergerer = EttersendingMergerer(henvendelseOppslag, personRepository)
+        val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
 
         val alleEttersendinger = runBlocking {
-            ettersendingMergerer.hentEttersendinger("999")
+            ettersendingSpleiser.hentEttersendinger("999")
         }
 
         assertEquals(2, alleEttersendinger.size)

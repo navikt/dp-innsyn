@@ -31,7 +31,7 @@ import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.modell.serde.SøknadJsonBuilder
 import no.nav.dagpenger.innsyn.modell.serde.VedtakJsonBuilder
 import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
-import no.nav.dagpenger.innsyn.tjenester.ettersending.EttersendingMergerer
+import no.nav.dagpenger.innsyn.tjenester.ettersending.EttersendingSpleiser
 import org.slf4j.event.Level
 import java.time.LocalDate
 import java.util.UUID
@@ -45,7 +45,7 @@ internal fun Application.innsynApi(
     clientId: String,
     personRepository: PersonRepository,
     henvendelseOppslag: HenvendelseOppslag,
-    ettersendingMergerer: EttersendingMergerer
+    ettersendingSpleiser: EttersendingSpleiser
 ) {
     install(CallId) {
         header("Nav-Call-Id")
@@ -131,7 +131,7 @@ internal fun Application.innsynApi(
             get("/ettersendelser") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
-                val ettersendelser = ettersendingMergerer.hentEttersendinger(fnr)
+                val ettersendelser = ettersendingSpleiser.hentEttersendinger(fnr)
                 call.respond(ettersendelser)
             }
 

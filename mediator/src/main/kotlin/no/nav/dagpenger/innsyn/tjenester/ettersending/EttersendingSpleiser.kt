@@ -4,7 +4,7 @@ import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
 
-internal class EttersendingMergerer(
+internal class EttersendingSpleiser(
     val henvendelseOppslag: HenvendelseOppslag,
     val personRepository: PersonRepository
 ) {
