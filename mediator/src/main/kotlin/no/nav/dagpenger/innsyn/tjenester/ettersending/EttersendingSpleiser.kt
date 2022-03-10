@@ -47,7 +47,7 @@ internal class EttersendingSpleiser(
             .results()
             .toSet()
             .sortedByDescending { ettersending ->
-                ettersending.innsendtDato
+                ettersending.datoInnsendt
             }
 
         return MultiSourceResult(unikeEttersendelser, alleEttersendelser.successFullSources(), alleEttersendelser.failedSources())

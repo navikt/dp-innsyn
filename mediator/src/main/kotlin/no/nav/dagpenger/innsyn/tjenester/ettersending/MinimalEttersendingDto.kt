@@ -4,7 +4,7 @@ import java.time.ZonedDateTime
 
 data class MinimalEttersendingDto(
     val søknadId: String,
-    val innsendtDato: ZonedDateTime?,
+    val datoInnsendt: ZonedDateTime?,
     val tittel: String
 ) {
     override fun equals(other: Any?) = other is MinimalEttersendingDto && this.søknadId == other.søknadId
