@@ -10,8 +10,8 @@ object SøknadObjectMother {
         giveMePapirSøknad()
     )
 
-    fun giveMePapirSøknad() = Søknad(
-        "123",
+    fun giveMePapirSøknad(søknadId: String = "123") = Søknad(
+        søknadId,
         "journalpostId-123",
         "NAV123",
         Søknad.SøknadsType.NySøknad,
@@ -21,8 +21,8 @@ object SøknadObjectMother {
         "Papir søknad"
     )
 
-    fun giveDigitalSøknad() = Søknad(
-        "456",
+    fun giveDigitalSøknad(søknadId: String = "456") = Søknad(
+        søknadId,
         "journalpostId-456",
         "NAV456",
         Søknad.SøknadsType.NySøknad,

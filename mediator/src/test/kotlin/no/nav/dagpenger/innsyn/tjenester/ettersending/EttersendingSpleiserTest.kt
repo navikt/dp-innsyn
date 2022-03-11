@@ -13,15 +13,18 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.time.ZonedDateTime
 
 internal class EttersendingSpleiserTest {
 
     @Test
-    fun `Skal kunne slå sammen ettersendelser fra databasen og fra henvendelse, samt fjerne duplikater og sortere`() {
+    fun `Skal slå sammen ettersendelser, fjerne de uten dato, de som er for gamle og duplikater, samt sortere resultatet`() {
         val henvendelseOppslag = mockk<HenvendelseOppslag>()
-        val gammelEttersendingFraHenvendelse = MinimalEttersendingDtoObjectMother.giveMeEttersending(søknadId = "123", innsendtDato = ZonedDateTime.now().minusYears(2))
-        coEvery { henvendelseOppslag.hentEttersendelser(any()) } returns listOf(gammelEttersendingFraHenvendelse)
+        val ettersendelserFraHenvendelse = listOf(
+            MinimalEttersendingDtoObjectMother.giveMeEttersending("123"),
+            MinimalEttersendingDtoObjectMother.giveMeForGammelEttersending(),
+            MinimalEttersendingDtoObjectMother.giveMeEttersendingUtenInnsendtDato()
+        )
+        coEvery { henvendelseOppslag.hentEttersendelser(any()) } returns ettersendelserFraHenvendelse
 
         val personRepository = mockk<PersonRepository>()
         val nyeSøknaderFraDatabasen = listOf(SøknadObjectMother.giveDigitalSøknad(), SøknadObjectMother.giveDigitalSøknad())
@@ -39,12 +42,36 @@ internal class EttersendingSpleiserTest {
     }
 
     @Test
+    fun `Hvis begge kilder gir ettersending med samme id, så skal den som har dato satt velges`() {
+        val forventetKolliderendeSøknadId = "456"
+        val henvendelseOppslag = mockk<HenvendelseOppslag>()
+        val ettersendelserFraHenvendelse = listOf(
+            MinimalEttersendingDtoObjectMother.giveMeEttersendingUtenInnsendtDato(forventetKolliderendeSøknadId),
+        )
+        coEvery { henvendelseOppslag.hentEttersendelser(any()) } returns ettersendelserFraHenvendelse
+
+        val personRepository = mockk<PersonRepository>()
+        val nyeSøknaderFraDatabasen = listOf(SøknadObjectMother.giveDigitalSøknad(forventetKolliderendeSøknadId))
+        every { personRepository.hentSøknaderFor(fnr = any(), fom = null, tom = null) } returns nyeSøknaderFraDatabasen
+
+        val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
+
+        val alleEttersendelser = runBlocking {
+            ettersendingSpleiser.hentEttersendelser("999")
+        }
+
+        assertEquals(1, alleEttersendelser.results().size)
+        assertEquals(forventetKolliderendeSøknadId, alleEttersendelser.results()[0].søknadId)
+        assertNotNull(alleEttersendelser.results()[0].datoInnsendt)
+    }
+
+    @Test
     fun `skal takle at henvendelse feiler og returnere resultatet fra databasen`() {
         val henvendelseOppslag = mockk<HenvendelseOppslag>()
         coEvery { henvendelseOppslag.hentEttersendelser(any()) } throws RuntimeException("Simulert feil i en test")
 
         val personRepository = mockk<PersonRepository>()
-        val søknaderFraDatabasen = listOf(SøknadObjectMother.giveDigitalSøknad())
+        val søknaderFraDatabasen = listOf(SøknadObjectMother.giveDigitalSøknad("456"))
         every { personRepository.hentSøknaderFor(fnr = any(), fom = null, tom = null) } returns søknaderFraDatabasen
 
         val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)

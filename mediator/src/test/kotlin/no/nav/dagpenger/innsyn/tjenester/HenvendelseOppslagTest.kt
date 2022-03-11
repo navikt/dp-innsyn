@@ -40,7 +40,7 @@ internal class HenvendelseOppslagTest {
         assertDoesNotThrow { runBlocking { henvendelseOppslag.hentPåbegynte("123") } }
     }
 
-    private fun mockHttpClientWithReturnValue(returnObject: Any) = MockEngine { request ->
+    private fun mockHttpClientWithReturnValue(returnObject: Any) = MockEngine {
         val jsonResponse = objectMapper.writeValueAsString(returnObject)
         respond(
             content = jsonResponse,
