@@ -16,6 +16,8 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import no.nav.dagpenger.innsyn.tjenester.ettersending.MinimalEttersendingDto
 import no.nav.dagpenger.innsyn.tjenester.ettersending.toInternal
+import no.nav.dagpenger.innsyn.tjenester.paabegynt.Påbegynt
+import no.nav.dagpenger.innsyn.tjenester.paabegynt.toInternal
 import java.time.ZonedDateTime
 
 internal class HenvendelseOppslag(
@@ -44,7 +46,7 @@ internal class HenvendelseOppslag(
     }
 
     suspend fun hentPåbegynte(fnr: String): List<Påbegynt> {
-        return hentRequestMedFnrIBody(fnr, "$dpProxyUrl/proxy/v1/paabegynte")
+        return hentRequestMedFnrIBody<ExternalPåbegynt>(fnr, "$dpProxyUrl/proxy/v1/paabegynte").toInternal()
     }
 
     private suspend inline fun <reified T> hentRequestMedFnrIBody(fnr: String, requestUrl: String): List<T> =
@@ -67,7 +69,7 @@ data class ExternalEttersending(
     data class Vedlegg(val tilleggsTittel: String?, val kodeverkId: String)
 }
 
-data class Påbegynt(
+data class ExternalPåbegynt(
     val behandlingsId: String,
     val hovedskjemaKodeverkId: String,
     val sistEndret: ZonedDateTime

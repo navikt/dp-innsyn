@@ -33,7 +33,7 @@ internal class HenvendelseOppslagTest {
 
     @Test
     fun `Skal klare å utlede riktig returtype ut i fra generics definisjonen for påbegynte`() {
-        val expectedReturnValues = listOf(Påbegynt("bid", "kode", ZonedDateTime.now()))
+        val expectedReturnValues = listOf(ExternalPåbegynt("bid", "kode", ZonedDateTime.now()))
         val mockHttpClient = mockHttpClientWithReturnValue(expectedReturnValues)
         val henvendelseOppslag = henvendelseOppslagWithMockClient(mockHttpClient)
 

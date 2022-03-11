@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-internal class EttersendingTransformerTest {
+internal class EttersendingTransformeringTest {
 
     @Test
     fun `skal kunne hente kun ettersendelser for dagpenger og ha oversatt kodeverk`() {

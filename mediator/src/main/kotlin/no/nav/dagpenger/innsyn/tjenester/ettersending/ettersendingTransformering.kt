@@ -11,15 +11,16 @@ internal fun List<ExternalEttersending>.toInternal(): List<MinimalEttersendingDt
     }.map { externalEttersending ->
         externalEttersending.toInternal()
     }
-
     return dagpengerEttersendelser
 }
 
 internal fun ExternalEttersending.toInternal() = MinimalEttersendingDto(
     søknadId = this.behandlingsId,
     datoInnsendt = this.innsendtDato,
-    tittel = dagpengeBrevkoder[this.hovedskjemaKodeverkId] ?: throw IllegalArgumentException("$hovedskjemaKodeverkId er ikke en dagpengekode.")
+    tittel = dagpengeBrevkoder[this.hovedskjemaKodeverkId]
+        ?: throw IllegalArgumentException("$hovedskjemaKodeverkId er ikke en dagpengekode.")
 )
+
 internal val norskTidssone = ZoneId.of("Europe/Oslo")
 internal fun LocalDateTime.toZonedDateTimeInOslo(): ZonedDateTime = atZone(norskTidssone)
 

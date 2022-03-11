@@ -22,8 +22,8 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType.NySøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.objectmother.MultiSourceResultObjectMother
 import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
-import no.nav.dagpenger.innsyn.tjenester.Påbegynt
 import no.nav.dagpenger.innsyn.tjenester.ettersending.EttersendingSpleiser
+import no.nav.dagpenger.innsyn.tjenester.paabegynt.Påbegynt
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -275,8 +275,8 @@ internal class InnsynApiTest {
         val henvendelseOppslag = mockk<HenvendelseOppslag>()
         val påbegynte = listOf(
             Påbegynt(
+                "En tittel oversatt fra kodeverk",
                 "bid",
-                "enKodeverksid",
                 ZonedDateTime.now()
             )
         )
