@@ -1,5 +1,6 @@
 package no.nav.dagpenger.innsyn
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -266,7 +267,12 @@ internal class InnsynApiTest {
         }) {
             autentisert("/ettersendelser")
         }.apply {
-            assertEquals(HttpStatusCode.PartialContent, response.status())
+
+            with(jacksonObjectMapper().readTree(response.content)) {
+                assertTrue(this.has("failedSources"))
+                assertTrue(this.has("results"))
+            }
+            assertEquals(HttpStatusCode.OK, response.status())
         }
     }
 

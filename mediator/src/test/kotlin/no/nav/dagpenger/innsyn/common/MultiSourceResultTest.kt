@@ -55,7 +55,7 @@ internal class MultiSourceResultTest {
         assertTrue(sum.successFullSources().contains(expectedSuccessfulSource))
 
         assertTrue(sum.hasErrors())
-        assertEquals(sum.determineHttpCode(), HttpStatusCode.PartialContent)
+        assertEquals(sum.determineHttpCode(), HttpStatusCode.OK)
     }
 
     @Test

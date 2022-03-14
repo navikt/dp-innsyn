@@ -139,7 +139,7 @@ internal fun Application.innsynApi(
                     val vellykkede = ettersendelser.successFullSources()
                     log.warn("Følgende kilder feilet: $feilende. Returnerer resultater fra $vellykkede sammen med HTTP-koden $httpKode.")
                 }
-                call.respond(httpKode, ettersendelser.results())
+                call.respond(httpKode, ettersendelser)
             }
 
             get("/paabegynte") {

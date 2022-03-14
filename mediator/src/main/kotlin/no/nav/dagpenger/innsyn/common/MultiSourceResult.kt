@@ -3,9 +3,9 @@ package no.nav.dagpenger.innsyn.common
 import io.ktor.http.HttpStatusCode
 
 data class MultiSourceResult<R, S>(
-    private val results: List<R>,
-    private val successFullSources: List<S>,
-    private val failedSources: List<S> = emptyList()
+    val results: List<R>,
+    val successFullSources: List<S>,
+    val failedSources: List<S> = emptyList()
 ) {
 
     companion object {
@@ -42,7 +42,6 @@ data class MultiSourceResult<R, S>(
 
     fun determineHttpCode(): HttpStatusCode {
         return when {
-            hasPartialResult() -> HttpStatusCode.PartialContent
             allSourcesFailed() -> HttpStatusCode.ServiceUnavailable
             else -> HttpStatusCode.OK
         }
