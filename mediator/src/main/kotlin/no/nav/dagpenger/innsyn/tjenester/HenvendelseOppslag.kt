@@ -25,7 +25,7 @@ internal class HenvendelseOppslag(
     private val dpProxyUrl: String,
     private val tokenProvider: () -> String,
     httpClientEngine: HttpClientEngine = CIO.create(),
-    baseName: String = "dp-innsyn"
+    baseName: String = "dp_innsyn"
 ) {
 
     private val dpProxyClient = HttpClient(httpClientEngine) {
