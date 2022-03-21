@@ -26,7 +26,7 @@ internal class HenvendelseOppslagTest {
     fun `Skal klare å utlede riktig returtype ut i fra generics definisjonen for ettersendelser`() {
         val expectedReturnValues = ExternalEttersendingObjectMother.giveMeEttersendelserForDAGOgBIL()
         val mockHttpClient = mockHttpClientWithReturnValue(expectedReturnValues)
-        val henvendelseOppslag = henvendelseOppslagWithMockClient(mockHttpClient)
+        val henvendelseOppslag = henvendelseOppslagWithMockClient(mockHttpClient, "test1")
 
         assertDoesNotThrow { runBlocking { henvendelseOppslag.hentEttersendelser("123") } }
     }
@@ -35,8 +35,7 @@ internal class HenvendelseOppslagTest {
     fun `Skal klare å utlede riktig returtype ut i fra generics definisjonen for påbegynte`() {
         val expectedReturnValues = listOf(ExternalPåbegynt("bid", "kode", ZonedDateTime.now()))
         val mockHttpClient = mockHttpClientWithReturnValue(expectedReturnValues)
-        val henvendelseOppslag = henvendelseOppslagWithMockClient(mockHttpClient)
-
+        val henvendelseOppslag = henvendelseOppslagWithMockClient(mockHttpClient, "test2")
         assertDoesNotThrow { runBlocking { henvendelseOppslag.hentPåbegynte("123") } }
     }
 
@@ -49,10 +48,11 @@ internal class HenvendelseOppslagTest {
         )
     }
 
-    private fun henvendelseOppslagWithMockClient(mockHttpClient: MockEngine) =
+    private fun henvendelseOppslagWithMockClient(mockHttpClient: MockEngine, baseName: String) =
         HenvendelseOppslag(
             dpProxyUrl = "dummyUrl",
             tokenProvider = { "dummyToken" },
-            httpClientEngine = mockHttpClient
+            httpClientEngine = mockHttpClient,
+            baseName = baseName
         )
 }

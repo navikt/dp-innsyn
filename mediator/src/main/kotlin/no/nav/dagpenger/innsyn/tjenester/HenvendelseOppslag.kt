@@ -18,15 +18,21 @@ import no.nav.dagpenger.innsyn.tjenester.ettersending.MinimalEttersendingDto
 import no.nav.dagpenger.innsyn.tjenester.ettersending.toInternal
 import no.nav.dagpenger.innsyn.tjenester.paabegynt.Påbegynt
 import no.nav.dagpenger.innsyn.tjenester.paabegynt.toInternal
+import no.nav.dagpenger.ktor.client.metrics.PrometheusMetrics
 import java.time.ZonedDateTime
 
 internal class HenvendelseOppslag(
     private val dpProxyUrl: String,
     private val tokenProvider: () -> String,
-    httpClientEngine: HttpClientEngine = CIO.create()
+    httpClientEngine: HttpClientEngine = CIO.create(),
+    baseName: String = "dp-innsyn"
 ) {
 
     private val dpProxyClient = HttpClient(httpClientEngine) {
+
+        install(PrometheusMetrics) {
+            this.baseName = baseName
+        }
 
         install(DefaultRequest) {
         }

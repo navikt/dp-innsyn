@@ -7,6 +7,8 @@ application {
 }
 
 dependencies {
+    // ktor http client
+    implementation(Dagpenger.Biblioteker.Ktor.Client.metrics)
     implementation(Ktor.library("auth"))
     implementation(Ktor.library("auth-jwt"))
     implementation(Ktor.library("client-cio"))
