@@ -21,14 +21,14 @@ object SøknadObjectMother {
         "Papir søknad"
     )
 
-    fun giveDigitalSøknad(søknadId: String = "456") = Søknad(
+    fun giveDigitalSøknad(søknadId: String = "456", skjemakode: String? = "NAV456", tittel: String? = "Digital søknad") = Søknad(
         søknadId,
         "journalpostId-456",
-        "NAV456",
+        skjemakode,
         Søknad.SøknadsType.NySøknad,
         Kanal.Digital,
         LocalDateTime.now(),
         emptyList(),
-        "Digital søknad"
+        tittel
     )
 }
