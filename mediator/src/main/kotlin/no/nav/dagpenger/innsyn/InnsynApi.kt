@@ -25,6 +25,7 @@ import io.ktor.features.callIdMdc
 import io.ktor.http.HttpStatusCode
 import io.ktor.jackson.jackson
 import io.ktor.request.document
+import io.ktor.request.path
 import io.ktor.response.respond
 import io.ktor.routing.get
 import io.ktor.routing.routing
@@ -72,7 +73,7 @@ internal fun Application.innsynApi(
 
     install(StatusPages) {
         exception<Throwable> { cause ->
-            logger.error(cause) { "Feilet API ${call.request.document()} kall. Feil: ${cause.message}" }
+            logger.error(cause) { "${call.request.path()} feilet ${call.request.path()}. Feilmelding: ${cause.message}" }
             call.respond(HttpStatusCode.InternalServerError)
         }
     }
