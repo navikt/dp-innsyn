@@ -72,7 +72,7 @@ internal fun Application.innsynApi(
 
     install(StatusPages) {
         exception<Throwable> { cause ->
-            logger.error(cause) { "Feilet API kall. Feil: ${cause.message}" }
+            logger.error(cause) { "Feilet API ${call.request.document()} kall. Feil: ${cause.message}" }
             call.respond(HttpStatusCode.InternalServerError)
         }
     }
