@@ -73,7 +73,7 @@ internal fun Application.innsynApi(
 
     install(StatusPages) {
         exception<Throwable> { cause ->
-            logger.error(cause) { "${call.request.path()} feilet ${call.request.path()}. Feilmelding: ${cause.message}" }
+            logger.error(cause) { "Kall mot ${call.request.path()} feilet. Feilmelding: ${cause.message}" }
             call.respond(HttpStatusCode.InternalServerError)
         }
     }
