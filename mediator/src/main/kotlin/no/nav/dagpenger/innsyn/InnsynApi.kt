@@ -20,7 +20,9 @@ import io.ktor.features.CallLogging
 import io.ktor.features.Compression
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
+import io.ktor.features.StatusPages
 import io.ktor.features.callIdMdc
+import io.ktor.http.HttpStatusCode
 import io.ktor.jackson.jackson
 import io.ktor.request.document
 import io.ktor.response.respond
@@ -65,6 +67,13 @@ internal fun Application.innsynApi(
                 "isready",
                 "metrics"
             ).contains(call.request.document())
+        }
+    }
+
+    install(StatusPages) {
+        exception<Throwable> { cause ->
+            logger.error(cause) { "Feilet API kall. Feil: ${cause.message}" }
+            call.respond(HttpStatusCode.InternalServerError)
         }
     }
 
