@@ -58,6 +58,9 @@ spec:
         diskSize: {{ db_size }}
         diskAutoresize: true
         autoBackupTime: "03:00"
+        maintenance:
+          day: 1
+          hour: 4
         databases:
           - name: innsyn
             envVarPrefix: DB
