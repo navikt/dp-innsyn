@@ -8,10 +8,11 @@ import com.natpryce.konfig.PropertyGroup
 import com.natpryce.konfig.getValue
 import com.natpryce.konfig.stringType
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
+import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.innsyn.Configuration.properties
 import java.net.URL
@@ -24,7 +25,7 @@ object AuthFactory {
     }
 
     private val openIdConfiguration = runBlocking {
-        httpClient.get<AzureAdOpenIdConfiguration>(properties[token_x.well_known_url])
+        httpClient.get(properties[token_x.well_known_url]).body<AzureAdOpenIdConfiguration>()
     }
     val clientId = properties[token_x.client_id]
     val issuer = openIdConfiguration.issuer
@@ -51,8 +52,8 @@ private data class AzureAdOpenIdConfiguration(
 )
 
 private val httpClient = HttpClient(CIO) {
-    install(JsonFeature) {
-        serializer = JacksonSerializer {
+    install(ContentNegotiation) {
+        jackson {
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         }
     }
