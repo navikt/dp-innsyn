@@ -9,13 +9,13 @@ spec:
   image: {{image}}
   port: 8080
   liveness:
-    path: "/internal/isalive"
+    path: "/isalive"
     failureThreshold: 10
     initialDelay: 20
     periodSeconds: 20
     timeout: 5
   readiness:
-    path: "/internal/isready"
+    path: "/isready"
     failureThreshold: 10
     initialDelay: 20
     periodSeconds: 20

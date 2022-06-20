@@ -41,46 +41,6 @@ internal class InnsynApiTest {
     private val ettersendingSpleiser = mockk<EttersendingSpleiser>()
 
     @Test
-    fun `svarer ok paa isalive`() = withMigratedDb {
-        withTestApplication({
-            innsynApi(
-                jwtStub.stubbedJwkProvider(),
-                testIssuer,
-                clientId,
-                PostgresPersonRepository(),
-                henvendelseOppslag,
-                ettersendingSpleiser
-            )
-        }) {
-            handleRequest(HttpMethod.Get, "/internal/isalive") {
-            }
-        }.apply {
-            assertEquals(HttpStatusCode.OK, response.status())
-            assertEquals("isalive", response.content!!)
-        }
-    }
-
-    @Test
-    fun `svarer ok paa isready`() = withMigratedDb {
-        withTestApplication({
-            innsynApi(
-                jwtStub.stubbedJwkProvider(),
-                testIssuer,
-                clientId,
-                PostgresPersonRepository(),
-                henvendelseOppslag,
-                ettersendingSpleiser
-            )
-        }) {
-            handleRequest(HttpMethod.Get, "/internal/isready") {
-            }
-        }.apply {
-            assertEquals(HttpStatusCode.OK, response.status())
-            assertEquals("isready", response.content!!)
-        }
-    }
-
-    @Test
     fun `test at bruker ikke har søknad`() = withMigratedDb {
         withTestApplication({
             innsynApi(
@@ -293,10 +253,7 @@ internal class InnsynApiTest {
     @Test
     fun `test at bruker kan hente ut ettersendelser når én kilde feiler`() {
         val ettersendingSpleiser = mockk<EttersendingSpleiser>()
-        val enFeiletOgEnVellykket =
-            MultiSourceResultObjectMother.giveMeSuccessfulResult(KildeType.DB) + MultiSourceResultObjectMother.giveMeFailedResult(
-                KildeType.HENVENDELSE
-            )
+        val enFeiletOgEnVellykket = MultiSourceResultObjectMother.giveMeSuccessfulResult(KildeType.DB) + MultiSourceResultObjectMother.giveMeFailedResult(KildeType.HENVENDELSE)
         coEvery { ettersendingSpleiser.hentEttersendelser(any()) } returns enFeiletOgEnVellykket
         withTestApplication({
             innsynApi(
