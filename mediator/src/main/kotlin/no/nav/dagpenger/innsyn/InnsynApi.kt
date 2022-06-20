@@ -64,8 +64,8 @@ internal fun Application.innsynApi(
         level = Level.DEBUG
         filter { call ->
             !setOf(
-//                "isalive",
-//                "isready",
+                "isalive",
+                "isready",
                 "metrics"
             ).contains(call.request.document())
         }
