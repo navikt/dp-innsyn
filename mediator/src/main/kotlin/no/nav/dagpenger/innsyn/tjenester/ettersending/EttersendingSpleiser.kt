@@ -44,7 +44,7 @@ internal class EttersendingSpleiser(
 
     private fun List<Søknad>.toMinimalEttersending() = OversettSøknadTilEttersending(this).resultat()
 
-    private suspend fun hentFraHenvendelse(fnr: String): MultiSourceResult<MinimalEttersendingDto, KildeType> = try {
+    private suspend fun hentFraHenvendelse(fnr: String) = try {
         val ettersendelser = henvendelseOppslag.hentEttersendelser(fnr)
         MultiSourceResult.createSuccessfulResult(ettersendelser, KildeType.HENVENDELSE)
     } catch (e: Exception) {
