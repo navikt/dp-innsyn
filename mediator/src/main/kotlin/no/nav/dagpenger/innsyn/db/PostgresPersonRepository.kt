@@ -239,7 +239,7 @@ class PostgresPersonRepository : PersonRepository {
                 mapOf(
                     "fnr" to fnr,
                     "fom" to fattetFom,
-                    "tom" to fattetTom?.plusDays(1),
+                    "tom" to fattetTom,
                     "limit" to limit,
                     "offset" to offset
                 )
@@ -269,7 +269,7 @@ class PostgresPersonRepository : PersonRepository {
                 mapOf(
                     "fnr" to fnr.param(),
                     "fom" to fom,
-                    "tom" to tom?.plusDays(1),
+                    "tom" to tom,
                     "limit" to limit,
                     "offset" to offset
                 )
