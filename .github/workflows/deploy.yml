@@ -81,7 +81,7 @@ jobs:
 
   deploy-prod:
     name: Deploy to Production
-    needs: [deploy-dev]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: Fetch NAIS yaml
