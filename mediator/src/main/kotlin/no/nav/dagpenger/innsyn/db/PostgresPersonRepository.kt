@@ -232,7 +232,7 @@ class PostgresPersonRepository : PersonRepository {
                 FROM vedtak v, person p
                 WHERE p.person_id = v.person_id
                     AND p.fnr = :fnr 
-                    AND TSRANGE(:fom, :tom) @> v.fattet
+                    AND v.fattet <@ TSRANGE(:fom, :tom) 
                 ORDER BY v.fattet DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
@@ -262,7 +262,7 @@ class PostgresPersonRepository : PersonRepository {
                 FROM søknad s, person p 
                 WHERE p.person_id = s.person_id 
                     AND p.fnr = :fnr
-                    AND TSRANGE(:fom, :tom) @> s.dato_innsendt
+                    AND s.dato_innsendt <@ TSRANGE(:fom, :tom)
                 ORDER BY s.dato_innsendt DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
