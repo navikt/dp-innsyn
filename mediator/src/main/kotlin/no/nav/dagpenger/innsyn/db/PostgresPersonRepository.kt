@@ -232,7 +232,7 @@ class PostgresPersonRepository : PersonRepository {
                 FROM vedtak v
                 INNER JOIN person p ON p.person_id = v.person_id
                 WHERE p.fnr = :fnr 
-                    AND v.fattet BETWEEN :fom::timestamp AND :tom::timestamp
+                    AND CONCAT('[',:fom::TIMESTAMP,',',:tom::TIMESTAMP,']')::tsrange @> v.fattet
                 ORDER BY v.fattet DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
@@ -261,8 +261,8 @@ class PostgresPersonRepository : PersonRepository {
                 """SELECT *
                 FROM søknad s
                 INNER JOIN person p ON p.person_id = s.person_id
-                WHERE  p.fnr = :fnr
-                    AND s.dato_innsendt BETWEEN :fom::timestamp AND :tom::timestamp
+                WHERE p.fnr = :fnr
+                    AND CONCAT('[',:fom::TIMESTAMP,',',:tom::TIMESTAMP,']')::tsrange @> s.dato_innsendt
                 ORDER BY s.dato_innsendt DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),

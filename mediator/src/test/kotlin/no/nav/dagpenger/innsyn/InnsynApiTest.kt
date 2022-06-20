@@ -223,7 +223,9 @@ internal class InnsynApiTest {
             )
         }) {
             val dagensDato = LocalDate.now()
-            autentisert("/vedtak?fattetFom=${dagensDato.minusDays(30)}&fattetTom=$dagensDato")
+            autentisert(
+                "/vedtak?fattetFom=${dagensDato.minusDays(30)}&fattetTom=$dagensDato",
+            )
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
             assertFalse(response.content!!.contains(Vedtak.Status.INNVILGET.toString()))
@@ -253,7 +255,10 @@ internal class InnsynApiTest {
     @Test
     fun `test at bruker kan hente ut ettersendelser når én kilde feiler`() {
         val ettersendingSpleiser = mockk<EttersendingSpleiser>()
-        val enFeiletOgEnVellykket = MultiSourceResultObjectMother.giveMeSuccessfulResult(KildeType.DB) + MultiSourceResultObjectMother.giveMeFailedResult(KildeType.HENVENDELSE)
+        val enFeiletOgEnVellykket =
+            MultiSourceResultObjectMother.giveMeSuccessfulResult(KildeType.DB) + MultiSourceResultObjectMother.giveMeFailedResult(
+                KildeType.HENVENDELSE
+            )
         coEvery { ettersendingSpleiser.hentEttersendelser(any()) } returns enFeiletOgEnVellykket
         withTestApplication({
             innsynApi(
@@ -267,7 +272,6 @@ internal class InnsynApiTest {
         }) {
             autentisert("/ettersendelser")
         }.apply {
-
             with(jacksonObjectMapper().readTree(response.content)) {
                 assertTrue(this.has("failedSources"))
                 assertTrue(this.has("results"))
