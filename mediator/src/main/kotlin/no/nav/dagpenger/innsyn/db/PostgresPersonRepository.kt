@@ -208,7 +208,12 @@ class PostgresPersonRepository : PersonRepository {
         using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf( //language=PostgreSQL
-                    "SELECT * FROM vedtak WHERE person_id = (SELECT person_id FROM person WHERE fnr = ?)", fnr
+                    """
+                        SELECT * FROM vedtak v
+                        INNER JOIN person p on p.person_id = v.person_id
+                        WHERE p.fnr = ?
+                    """.trimIndent(),
+                    fnr
                 ).map { row -> row.toVedtak() }.asList
             )
         }
@@ -224,11 +229,12 @@ class PostgresPersonRepository : PersonRepository {
         session.run(
             queryOf( //language=PostgreSQL
                 """SELECT *
-                FROM vedtak
-                WHERE person_id = (SELECT person_id FROM person WHERE fnr = :fnr) 
-                    AND (:fom::DATE IS NULL OR fattet::DATE >= :fom)
-                    AND (:tom::DATE IS NULL OR fattet::DATE <= :tom)
-                ORDER BY fattet DESC
+                FROM vedtak v
+                INNER JOIN person p on p.person_id = v.person_id
+                WHERE p.fnr = :fnr 
+                    AND (:fom::DATE IS NULL OR v.fattet::DATE >= :fom)
+                    AND (:tom::DATE IS NULL OR v.fattet::DATE <= :tom)
+                ORDER BY v.fattet DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
                 mapOf(
@@ -254,11 +260,12 @@ class PostgresPersonRepository : PersonRepository {
         session.run(
             queryOf( //language=PostgreSQL
                 """SELECT *
-                FROM søknad
-                WHERE person_id = (SELECT person_id FROM person WHERE fnr = :fnr) 
-                    AND (:fom::DATE IS NULL OR dato_innsendt::DATE >= :fom)
-                    AND (:tom::DATE IS NULL OR dato_innsendt::DATE <= :tom)
-                ORDER BY dato_innsendt DESC
+                FROM søknad s
+                INNER JOIN person p on p.person_id = s.person_id
+                WHERE  p.fnr = :fnr
+                    AND (:fom::DATE IS NULL OR s.dato_innsendt::DATE >= :fom)
+                    AND (:tom::DATE IS NULL OR s.dato_innsendt::DATE <= :tom)
+                ORDER BY s.dato_innsendt DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
                 mapOf(
