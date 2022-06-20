@@ -229,17 +229,17 @@ class PostgresPersonRepository : PersonRepository {
         session.run(
             queryOf( //language=PostgreSQL
                 """SELECT *
-                FROM vedtak v
-                INNER JOIN person p ON p.person_id = v.person_id
-                WHERE p.fnr = :fnr 
-                    AND tsrange(:fom, :tom) @> v.fattet
+                FROM vedtak v, person p
+                WHERE p.person_id = v.person_id
+                    AND p.fnr = :fnr 
+                    AND TSRANGE(:fom, :tom) @> v.fattet
                 ORDER BY v.fattet DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
                 mapOf(
                     "fnr" to fnr,
                     "fom" to fattetFom,
-                    "tom" to fattetTom?.let { it.plusDays(1) },
+                    "tom" to fattetTom?.plusDays(1),
                     "limit" to limit,
                     "offset" to offset
                 )
@@ -259,17 +259,17 @@ class PostgresPersonRepository : PersonRepository {
         session.run(
             queryOf( //language=PostgreSQL
                 """SELECT *
-                FROM søknad s
-                INNER JOIN person p ON p.person_id = s.person_id
-                WHERE p.fnr = :fnr
-                    AND tsrange(:fom, :tom) @> s.dato_innsendt
+                FROM søknad s, person p 
+                WHERE p.person_id = s.person_id 
+                    AND p.fnr = :fnr
+                    AND TSRANGE(:fom, :tom) @> s.dato_innsendt
                 ORDER BY s.dato_innsendt DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
                 mapOf(
                     "fnr" to fnr.param(),
                     "fom" to fom,
-                    "tom" to tom?.let { it.plusDays(1) },
+                    "tom" to tom?.plusDays(1),
                     "limit" to limit,
                     "offset" to offset
                 )
