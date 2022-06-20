@@ -111,11 +111,16 @@ internal class PostgresPersonRepositoryTest {
             person.håndter(
                 vedtak
             )
+
+            (0..10000).forEach {
+                person.håndter(Vedtak(it.toString(), "fasdf", Vedtak.Status.INNVILGET, LocalDateTime.now().minusDays(it.toLong()), LocalDateTime.now(), LocalDateTime.now()))
+            }
+
             repository.lagre(person)
 
             repository.person(person.fnr).also {
                 with(PersonInspektør(it)) {
-                    assertEquals(1, this.vedtak)
+                    assertEquals(10001, this.vedtak)
                     assertEquals(0, vedlegg)
                 }
             }
