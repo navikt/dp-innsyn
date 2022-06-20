@@ -13,6 +13,7 @@ import no.nav.dagpenger.innsyn.modell.serde.SøknadVisitor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -49,6 +50,15 @@ internal class PostgresPersonRepositoryTest {
 
             repository.hentSøknaderFor(person.fnr).also {
                 assertSøknadEquals(søknad, it.first())
+            }
+            repository.hentSøknaderFor(fnr = person.fnr, fom = LocalDate.now().minusDays(30)).also {
+                assertEquals(1, it.size)
+            }
+            repository.hentSøknaderFor(fnr = person.fnr, fom = LocalDate.now().minusDays(30), tom = LocalDate.now().plusDays(2)).also {
+                assertEquals(1, it.size)
+            }
+            repository.hentSøknaderFor(fnr = person.fnr, tom = LocalDate.now().plusDays(2)).also {
+                assertEquals(1, it.size)
             }
         }
     }
@@ -107,6 +117,37 @@ internal class PostgresPersonRepositoryTest {
                 with(PersonInspektør(it)) {
                     assertEquals(1, this.vedtak)
                     assertEquals(0, vedlegg)
+                }
+            }
+
+            assertDoesNotThrow {
+                repository.hentVedtakFor(
+                    fnr = "123",
+                    fattetFom = null,
+                    fattetTom = null
+                ).also {
+                    assertEquals(1, it.size)
+                }
+                repository.hentVedtakFor(
+                    fnr = "123",
+                    fattetFom = LocalDate.now().minusDays(2),
+                    fattetTom = null
+                ).also {
+                    assertEquals(1, it.size)
+                }
+                repository.hentVedtakFor(
+                    fnr = "123",
+                    fattetFom = LocalDate.of(2021, 4, 30),
+                    fattetTom = LocalDate.of(2021, 5, 30)
+                ).also {
+                    assertEquals(0, it.size)
+                }
+                repository.hentVedtakFor(
+                    fnr = "123",
+                    fattetFom = null,
+                    fattetTom = LocalDate.now().plusDays(2)
+                ).also {
+                    assertEquals(1, it.size)
                 }
             }
         }

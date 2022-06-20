@@ -210,7 +210,7 @@ class PostgresPersonRepository : PersonRepository {
                 queryOf( //language=PostgreSQL
                     """
                         SELECT * FROM vedtak v
-                        INNER JOIN person p on p.person_id = v.person_id
+                        INNER JOIN person p ON p.person_id = v.person_id
                         WHERE p.fnr = ?
                     """.trimIndent(),
                     fnr
@@ -230,10 +230,9 @@ class PostgresPersonRepository : PersonRepository {
             queryOf( //language=PostgreSQL
                 """SELECT *
                 FROM vedtak v
-                INNER JOIN person p on p.person_id = v.person_id
+                INNER JOIN person p ON p.person_id = v.person_id
                 WHERE p.fnr = :fnr 
-                    AND (:fom::DATE IS NULL OR v.fattet::DATE >= :fom)
-                    AND (:tom::DATE IS NULL OR v.fattet::DATE <= :tom)
+                AND CONCAT('[',:fom::DATE,',',:tom::DATE,']')::daterange @> v.fattet::DATE
                 ORDER BY v.fattet DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
@@ -261,10 +260,9 @@ class PostgresPersonRepository : PersonRepository {
             queryOf( //language=PostgreSQL
                 """SELECT *
                 FROM søknad s
-                INNER JOIN person p on p.person_id = s.person_id
+                INNER JOIN person p ON p.person_id = s.person_id
                 WHERE  p.fnr = :fnr
-                    AND (:fom::DATE IS NULL OR s.dato_innsendt::DATE >= :fom)
-                    AND (:tom::DATE IS NULL OR s.dato_innsendt::DATE <= :tom)
+                AND CONCAT('[',:fom::DATE,',',:tom::DATE,']')::daterange @> s.dato_innsendt::DATE
                 ORDER BY s.dato_innsendt DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
