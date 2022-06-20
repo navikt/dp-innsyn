@@ -54,7 +54,7 @@ internal class PostgresPersonRepositoryTest {
             repository.hentSøknaderFor(fnr = person.fnr, fom = LocalDate.now().minusDays(30)).also {
                 assertEquals(1, it.size)
             }
-            repository.hentSøknaderFor(fnr = person.fnr, fom = LocalDate.now().minusDays(30), tom = LocalDate.now().plusDays(2)).also {
+            repository.hentSøknaderFor(fnr = person.fnr, fom = LocalDate.now().minusDays(30), tom = LocalDate.now().plusDays(0)).also {
                 assertEquals(1, it.size)
             }
             repository.hentSøknaderFor(fnr = person.fnr, tom = LocalDate.now().plusDays(2)).also {
