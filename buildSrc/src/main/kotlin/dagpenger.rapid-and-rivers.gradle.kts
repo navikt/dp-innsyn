@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation(RapidAndRiversKtor2)
+    implementation(RapidAndRivers)
 
     implementation(Konfig.konfig)
     implementation(Kotlin.Logging.kotlinLogging)

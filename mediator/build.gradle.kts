@@ -7,21 +7,14 @@ application {
 }
 
 dependencies {
-    implementation("com.github.navikt.dp-biblioteker:ktor-client-metrics:2022.06.02-09.13.7b5fc99c5517")
-    implementation(Ktor2.Server.library("auth"))
-    implementation(Ktor2.Server.library("auth-jwt"))
-    implementation(Ktor2.Server.library("core"))
-    implementation(Ktor2.Server.library("call-id"))
-    implementation(Ktor2.Server.library("call-logging"))
-    implementation(Ktor2.Server.library("content-negotiation"))
-    implementation(Ktor2.Server.library("compression"))
-    implementation(Ktor2.Server.library("cio"))
-    implementation(Ktor2.Server.library("default-headers"))
-    implementation(Ktor2.Server.library("metrics-micrometer"))
-    implementation(Ktor2.Server.library("status-pages"))
-    implementation("io.ktor:ktor-serialization-jackson:${Ktor2.version}")
-    implementation(Ktor2.Client.library("cio"))
-    implementation(Ktor2.Client.library("content-negotiation"))
+    // ktor http client
+    implementation(Dagpenger.Biblioteker.Ktor.Client.metrics)
+    implementation(Ktor.library("auth"))
+    implementation(Ktor.library("auth-jwt"))
+    implementation(Ktor.library("client-cio"))
+    implementation(Ktor.library("client-jackson"))
+    implementation(Ktor.library("jackson"))
+    implementation(Ktor.library("server-cio"))
 
     implementation(project(":modell"))
 
@@ -34,10 +27,10 @@ dependencies {
     implementation(Jackson.jsr310)
     implementation(Jackson.kotlin)
 
-    implementation("com.github.navikt.dp-biblioteker:oauth2-klient:2022.05.30-09.37.623ee13a49dd")
+    implementation("com.github.navikt.dp-biblioteker:oauth2-klient:2022.02.05-16.32.da1deab37b31")
 
-    testImplementation(Ktor2.Client.library("mock"))
-    testImplementation(Ktor2.Server.library("test-host"))
+    testImplementation(Ktor.library("client-mock"))
+    testImplementation(Ktor.library("server-test-host"))
     testImplementation(TestContainers.postgresql)
     testImplementation(Mockk.mockk)
 }
