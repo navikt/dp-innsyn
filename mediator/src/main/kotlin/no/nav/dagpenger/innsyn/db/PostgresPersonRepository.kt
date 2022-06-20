@@ -232,14 +232,14 @@ class PostgresPersonRepository : PersonRepository {
                 FROM vedtak v,
                      person p
                 WHERE p.person_id = v.person_id
-                    AND p.fnr = :fnr
-                    AND (v.fattet BETWEEN :fom::timestamp AND :tom::timestamp)
-                   OR (:fom::date IS NULL
-                    AND :tom::timestamp IS NULL)
-                   OR (:fom::date IS NULL
-                    AND v.fattet <= :tom::timestamp)
-                   OR (:tom::date IS NULL
-                    AND v.fattet >= :fom::timestamp)
+                  AND p.fnr = :fnr
+                  AND ((v.fattet BETWEEN :fom::timestamp AND :tom::timestamp)
+                    OR (:fom::date IS NULL
+                        AND :tom::timestamp IS NULL)
+                    OR (:fom::date IS NULL
+                        AND v.fattet <= :tom::timestamp)
+                    OR (:tom::date IS NULL
+                        AND v.fattet >= :fom::timestamp))
                 ORDER BY v.fattet DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
@@ -266,16 +266,17 @@ class PostgresPersonRepository : PersonRepository {
         session.run(
             queryOf( //language=PostgreSQL
                 """SELECT *
-                FROM søknad s, person p 
-                WHERE p.person_id = s.person_id 
-                    AND p.fnr = :fnr
-                    AND (s.dato_innsendt BETWEEN :fom::timestamp AND :tom::timestamp)
-                   OR (:fom::date IS NULL
-                    AND :tom::timestamp IS NULL)
-                   OR (:fom::date IS NULL
-                    AND s.dato_innsendt <= :tom::timestamp)
-                   OR (:tom::date IS NULL
-                    AND s.dato_innsendt >= :fom::timestamp)
+                FROM søknad s,
+                     person p
+                WHERE p.person_id = s.person_id
+                  AND p.fnr = :fnr
+                  AND ((s.dato_innsendt BETWEEN :fom::timestamp AND :tom::timestamp)
+                    OR (:fom::date IS NULL
+                        AND :tom::timestamp IS NULL)
+                    OR (:fom::date IS NULL
+                        AND s.dato_innsendt <= :tom::timestamp)
+                    OR (:tom::date IS NULL
+                        AND s.dato_innsendt >= :fom::timestamp))
                 ORDER BY s.dato_innsendt DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
