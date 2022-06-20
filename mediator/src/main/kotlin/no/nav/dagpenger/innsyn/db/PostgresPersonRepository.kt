@@ -210,7 +210,7 @@ class PostgresPersonRepository : PersonRepository {
                 queryOf( //language=PostgreSQL
                     """
                         SELECT * FROM vedtak v
-                        INNER JOIN person p on p.person_id = v.person_id
+                        INNER JOIN person p ON p.person_id = v.person_id
                         WHERE p.fnr = ?
                     """.trimIndent(),
                     fnr
@@ -230,17 +230,16 @@ class PostgresPersonRepository : PersonRepository {
             queryOf( //language=PostgreSQL
                 """SELECT *
                 FROM vedtak v
-                INNER JOIN person p on p.person_id = v.person_id
+                INNER JOIN person p ON p.person_id = v.person_id
                 WHERE p.fnr = :fnr 
-                    AND (:fom::DATE IS NULL OR v.fattet::DATE >= :fom)
-                    AND (:tom::DATE IS NULL OR v.fattet::DATE <= :tom)
+                    AND v.fattet BETWEEN :fom::timestamp AND :tom::timestamp
                 ORDER BY v.fattet DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
                 mapOf(
                     "fnr" to fnr,
                     "fom" to fattetFom,
-                    "tom" to fattetTom,
+                    "tom" to fattetTom?.let { it.plusDays(1) },
                     "limit" to limit,
                     "offset" to offset
                 )
@@ -261,17 +260,16 @@ class PostgresPersonRepository : PersonRepository {
             queryOf( //language=PostgreSQL
                 """SELECT *
                 FROM søknad s
-                INNER JOIN person p on p.person_id = s.person_id
+                INNER JOIN person p ON p.person_id = s.person_id
                 WHERE  p.fnr = :fnr
-                    AND (:fom::DATE IS NULL OR s.dato_innsendt::DATE >= :fom)
-                    AND (:tom::DATE IS NULL OR s.dato_innsendt::DATE <= :tom)
+                    AND s.dato_innsendt BETWEEN :fom::timestamp AND :tom::timestamp
                 ORDER BY s.dato_innsendt DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
                 mapOf(
                     "fnr" to fnr.param(),
                     "fom" to fom,
-                    "tom" to tom,
+                    "tom" to tom?.let { it.plusDays(1) },
                     "limit" to limit,
                     "offset" to offset
                 )
