@@ -111,6 +111,14 @@ internal fun Application.innsynApi(
     }
 
     routing {
+        get("/internal/isalive") {
+            call.respond(HttpStatusCode.OK, "isalive")
+        }
+
+        get("/internal/isready") {
+            call.respond(HttpStatusCode.OK, "isready")
+        }
+
         authenticate {
             get("/soknad") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
