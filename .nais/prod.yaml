@@ -1,7 +1,8 @@
 ingresses:
   - "https://dp-innsyn.intern.nav.no"
 kafka_pool: nav-prod
-db_tier: db-custom-1-3840
-db_size: 10
+db_tier: db-custom-2-7680
+db_size: 20
+db_ha: true
 dp_proxy_scope: api://prod-fss.teamdagpenger.dp-proxy/.default
 dp_proxy_url: https://dp-proxy.prod-fss-pub.nais.io

@@ -63,7 +63,7 @@ spec:
         type: POSTGRES_12
         tier: {{ db_tier }}
         diskType: SSD
-        highAvailability: false
+        highAvailability: {{ db_ha }}
         diskSize: {{ db_size }}
         diskAutoresize: true
         autoBackupTime: "03:00"
