@@ -233,15 +233,7 @@ class PostgresPersonRepository : PersonRepository {
                      person p
                 WHERE p.person_id = v.person_id
                   AND p.fnr = :fnr
-                  AND ((:fom::date IS NOT NULL AND :tom::date IS NOT NULL AND
-                        (v.fattet BETWEEN :fom::timestamp AND :tom::timestamp))
-                    OR (:fom::date IS NULL
-                        AND :tom::date IS NULL)
-                    OR (:fom::date IS NULL
-                        AND v.fattet <= :tom::timestamp)
-                    OR (:tom::date IS NULL
-                        AND v.fattet >= :fom::timestamp)
-                    )
+                  AND v.fattet <@ TSRANGE(:fom, :tom) 
                 ORDER BY v.fattet DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
@@ -272,13 +264,7 @@ class PostgresPersonRepository : PersonRepository {
                      person p
                 WHERE p.person_id = s.person_id
                   AND p.fnr = :fnr
-                  AND ((s.dato_innsendt BETWEEN :fom::timestamp AND :tom::timestamp)
-                    OR (:fom::date IS NULL
-                        AND :tom::timestamp IS NULL)
-                    OR (:fom::date IS NULL
-                        AND s.dato_innsendt <= :tom::timestamp)
-                    OR (:tom::date IS NULL
-                        AND s.dato_innsendt >= :fom::timestamp))
+                  AND s.dato_innsendt <@ TSRANGE(:fom, :tom) 
                 ORDER BY s.dato_innsendt DESC
                 LIMIT :limit OFFSET :offset
                 """.trimIndent(),
