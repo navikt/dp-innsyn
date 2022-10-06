@@ -3,23 +3,21 @@ package no.nav.dagpenger.innsyn.behandlingsstatus
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.FerdigBehandlet
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.UnderBehandling
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.UnderOgFerdigBehandlet
-import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
-import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 
-class Behandlingsstatus(vedtak: List<Vedtak>, søknader: List<Søknad>) {
-    internal var status: Status?
+class Behandlingsstatus(antallSøknader: Int, antallVedtak: Int) {
+    internal var antattStatus: Status?
 
     init {
-        status = status(vedtak, søknader)
+        antattStatus = status(antallVedtak, antallSøknader)
     }
 
-    private fun status(vedtak: List<Vedtak>, søknader: List<Søknad>) =
+    private fun status(antallVedtak: Int, antallSøknader: Int) =
         when {
-            søknader.isEmpty() && vedtak.isNotEmpty() -> null
-            søknader.size > vedtak.size && vedtak.isNotEmpty() -> UnderOgFerdigBehandlet
-            vedtak.isNotEmpty() -> FerdigBehandlet
-            søknader.isNotEmpty() -> UnderBehandling
-            vedtak.isEmpty() || søknader.isEmpty() -> null
+            antallSøknader == 0 && antallVedtak == 0 -> null
+            antallSøknader > antallVedtak && antallVedtak > 0 -> UnderOgFerdigBehandlet
+            antallVedtak > 0 -> FerdigBehandlet
+            antallSøknader > 0 -> UnderBehandling
+            antallVedtak == 0 || antallSøknader == 0 -> null
             else -> null
         }
 
