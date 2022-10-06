@@ -11,6 +11,7 @@ import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
 import io.mockk.coEvery
 import io.mockk.mockk
+import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.FerdigBehandlet
 import no.nav.dagpenger.innsyn.common.KildeType
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.JwtStub
@@ -304,6 +305,45 @@ internal class InnsynApiTest {
             autentisert("/paabegynte")
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
+        }
+    }
+
+    @Test
+    fun `får behandlingsstatus FerdigBehandlet når det er 1 søknad og 1 vedtak`() = withMigratedDb {
+        val personRepository = PostgresPersonRepository().also {
+            it.person("test@nav.no").also { person ->
+                person.håndter(
+                    søknad()
+                )
+                person.håndter(Sakstilknytning("11", "arenaId"))
+                person.håndter(
+                    Vedtak(
+                        "2",
+                        "arenaId",
+                        Vedtak.Status.INNVILGET,
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
+                        null
+                    )
+                )
+                it.lagre(person)
+            }
+        }
+        withTestApplication({
+            innsynApi(
+                jwtStub.stubbedJwkProvider(),
+                testIssuer,
+                clientId,
+                personRepository,
+                henvendelseOppslag,
+                ettersendingSpleiser
+            )
+        }) {
+            val dagensDato = LocalDate.now()
+            autentisert("/behandlingsstatus?fattetFom=$dagensDato&fattetTom=$dagensDato")
+        }.apply {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertTrue(response.content!!.contains(FerdigBehandlet.toString()))
         }
     }
 

@@ -31,6 +31,7 @@ import io.ktor.routing.get
 import io.ktor.routing.routing
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.Configuration.appName
+import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus
 import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.modell.serde.SøknadJsonBuilder
 import no.nav.dagpenger.innsyn.modell.serde.VedtakJsonBuilder
@@ -49,7 +50,7 @@ internal fun Application.innsynApi(
     clientId: String,
     personRepository: PersonRepository,
     henvendelseOppslag: HenvendelseOppslag,
-    ettersendingSpleiser: EttersendingSpleiser
+    ettersendingSpleiser: EttersendingSpleiser,
 ) {
     install(CallId) {
         header("Nav-Call-Id")
@@ -139,6 +140,30 @@ internal fun Application.innsynApi(
                 call.respond(vedtak.map { VedtakJsonBuilder(it).resultat() })
             }
 
+            get("/behandlingsstatus") {
+                val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
+                val fnr = jwtPrincipal!!.fnr
+
+                val fraDatoForInnsyn = LocalDate.now().minusDays(28)
+                val fraDatoForKvittering = call.request.queryParameters["søknadInnsendtFra"]
+                val søknadInnsendtFra = when {
+                    fraDatoForKvittering != null -> LocalDate.parse(fraDatoForKvittering)
+                    else -> fraDatoForInnsyn
+                }
+
+                val antallSøknader = personRepository.hentSøknaderFor(
+                    fnr, fom = søknadInnsendtFra, tom = LocalDate.now()
+                ).size
+
+                val antallVedtak = personRepository.hentVedtakFor(
+                    fnr, fattetFom = søknadInnsendtFra, fattetTom = LocalDate.now()
+                ).size
+
+                val behandlingsstatus = Behandlingsstatus(antallSøknader = antallSøknader, antallVedtak = antallVedtak)
+
+                call.respond(HttpStatusCode.OK, behandlingsstatus)
+            }
+
             get("/ettersendelser") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
@@ -162,7 +187,7 @@ internal fun Application.innsynApi(
     }
 }
 
-private fun String.asOptionalLocalDate() =
+private fun String.asOptionalLocalDate(): LocalDate? =
     takeIf(String::isNotEmpty)?.let { LocalDate.parse(it) }
 
 private val JWTPrincipal.fnr: String
