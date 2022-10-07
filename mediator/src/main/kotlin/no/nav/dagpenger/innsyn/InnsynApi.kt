@@ -144,24 +144,13 @@ internal fun Application.innsynApi(
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
 
-                val fraDatoForInnsyn = LocalDate.now().minusDays(28)
-                val fraDatoForKvittering = call.request.queryParameters["søknadInnsendtFra"]
-                val søknadInnsendtFra = when {
-                    fraDatoForKvittering != null -> LocalDate.parse(fraDatoForKvittering)
-                    else -> fraDatoForInnsyn
-                }
+                val fraDatoForKvittering = call.request.queryParameters["søknadInnsendtFra"] ?: throw IllegalArgumentException("Mangler fra dato")
+                val fraDato = LocalDate.parse(fraDatoForKvittering)
 
-                val antallSøknader = personRepository.hentSøknaderFor(
-                    fnr, fom = søknadInnsendtFra, tom = LocalDate.now()
-                ).size
+                // Kalle behandlingsstatusRepo.hentBehandlingsstatus(...
+                val dummyBehandlingsstatus = Behandlingsstatus(antallSøknader = 0, antallVedtak = 0)
 
-                val antallVedtak = personRepository.hentVedtakFor(
-                    fnr, fattetFom = søknadInnsendtFra, fattetTom = LocalDate.now()
-                ).size
-
-                val behandlingsstatus = Behandlingsstatus(antallSøknader = antallSøknader, antallVedtak = antallVedtak)
-
-                call.respond(HttpStatusCode.OK, behandlingsstatus)
+                call.respond(HttpStatusCode.OK, dummyBehandlingsstatus)
             }
 
             get("/ettersendelser") {
