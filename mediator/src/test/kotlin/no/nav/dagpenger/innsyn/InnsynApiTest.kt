@@ -1,6 +1,7 @@
 package no.nav.dagpenger.innsyn
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.ktor.application.Application
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -340,10 +341,36 @@ internal class InnsynApiTest {
             )
         }) {
             val dagensDato = LocalDate.now()
-            autentisert("/behandlingsstatus?fattetFom=$dagensDato&fattetTom=$dagensDato")
+            autentisert("/behandlingsstatus?fom=$dagensDato")
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
             assertTrue(response.content!!.contains(FerdigBehandlet.toString()))
+        }
+    }
+
+    @Test
+    fun `kaster feil ved ikke oppgitt fra og med dato`() = withMigratedDb {
+        val mocketApi: Application.() -> Unit = {
+            innsynApi(
+                jwtStub.stubbedJwkProvider(),
+                testIssuer,
+                clientId,
+                PostgresPersonRepository(),
+                henvendelseOppslag,
+                ettersendingSpleiser
+            )
+        }
+
+        withTestApplication(mocketApi) {
+            autentisert("/behandlingsstatus")
+        }.apply {
+            assertEquals(HttpStatusCode.InternalServerError, response.status())
+        }
+
+        withTestApplication(mocketApi) {
+            autentisert("/behandlingsstatus?fom=null")
+        }.apply {
+            assertEquals(HttpStatusCode.InternalServerError, response.status())
         }
     }
 

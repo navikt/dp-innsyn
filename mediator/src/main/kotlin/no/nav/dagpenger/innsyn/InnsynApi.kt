@@ -31,7 +31,7 @@ import io.ktor.routing.get
 import io.ktor.routing.routing
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.Configuration.appName
-import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus
+import no.nav.dagpenger.innsyn.behandlingsstatus.AvgjørBehandlingsstatus
 import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.modell.serde.SøknadJsonBuilder
 import no.nav.dagpenger.innsyn.modell.serde.VedtakJsonBuilder
@@ -111,6 +111,7 @@ internal fun Application.innsynApi(
         }
     }
 
+    val avgjørBehandlingsstatus = AvgjørBehandlingsstatus(personRepository)
     routing {
         authenticate {
             get("/soknad") {
@@ -144,13 +145,11 @@ internal fun Application.innsynApi(
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
 
-                val fraDatoForKvittering = call.request.queryParameters["søknadInnsendtFra"] ?: throw IllegalArgumentException("Mangler fra dato")
-                val fraDato = LocalDate.parse(fraDatoForKvittering)
+                val fom = call.request.queryParameters["fom"]?.asOptionalLocalDate() ?: throw IllegalArgumentException("Fra og med dato mangler")
 
-                // Kalle behandlingsstatusRepo.hentBehandlingsstatus(...
-                val dummyBehandlingsstatus = Behandlingsstatus(antallSøknader = 0, antallVedtak = 0)
+                val behandlingsstatus = avgjørBehandlingsstatus.hentStatus(fnr, fom)
 
-                call.respond(HttpStatusCode.OK, dummyBehandlingsstatus)
+                call.respond(HttpStatusCode.OK, behandlingsstatus)
             }
 
             get("/ettersendelser") {
