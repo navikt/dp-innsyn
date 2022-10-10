@@ -144,8 +144,7 @@ internal fun Application.innsynApi(
             get("/behandlingsstatus") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
-
-                val fom = call.request.queryParameters["fom"]?.asOptionalLocalDate() ?: throw IllegalArgumentException("Fra og med dato mangler")
+                val fom = call.request.queryParameters["fom"]?.asOptionalLocalDate()
 
                 val behandlingsstatus = avgjørBehandlingsstatus.hentStatus(fnr, fom)
 

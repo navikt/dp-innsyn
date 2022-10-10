@@ -5,9 +5,12 @@ import java.time.LocalDate
 
 internal class AvgjørBehandlingsstatus(private val personRepository: PersonRepository) {
 
-    internal fun hentStatus(fnr: String, fra: LocalDate, tom: LocalDate = LocalDate.now()): Behandlingsstatus {
-        val antallSøknader = personRepository.hentSøknaderFor(fnr, fra, tom).size
-        val antallVedtak = personRepository.hentVedtakFor(fnr, fra, tom).size
+    private val innsynFom = LocalDate.now().minusDays(28)
+
+    internal fun hentStatus(fnr: String, kvitteringFom: LocalDate?, tom: LocalDate = LocalDate.now()): Behandlingsstatus {
+        val fom: LocalDate = kvitteringFom ?: innsynFom
+        val antallSøknader = personRepository.hentSøknaderFor(fnr, fom, tom).size
+        val antallVedtak = personRepository.hentVedtakFor(fnr, fom, tom).size
         return Behandlingsstatus(antallSøknader, antallVedtak)
     }
 }
