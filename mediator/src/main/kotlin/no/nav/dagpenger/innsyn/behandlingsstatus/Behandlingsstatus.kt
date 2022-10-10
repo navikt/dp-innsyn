@@ -8,16 +8,15 @@ class Behandlingsstatus(antallSøknader: Int, antallVedtak: Int) {
     internal var antattStatus: Status?
 
     init {
-        antattStatus = status(antallVedtak, antallSøknader)
+        antattStatus = status(antallSøknader, antallVedtak)
     }
 
-    private fun status(antallVedtak: Int, antallSøknader: Int) =
+    private fun status(antallSøknader: Int, antallVedtak: Int) =
         when {
-            antallSøknader == 0 && antallVedtak == 0 -> null
+            antallSøknader == 0 -> null
+            antallSøknader > 0 && antallVedtak == 0 -> UnderBehandling
             antallSøknader > antallVedtak && antallVedtak > 0 -> UnderOgFerdigBehandlet
-            antallVedtak > 0 -> FerdigBehandlet
-            antallSøknader > 0 -> UnderBehandling
-            antallVedtak == 0 || antallSøknader == 0 -> null
+            antallVedtak > 0 && antallSøknader > 0 -> FerdigBehandlet
             else -> null
         }
 

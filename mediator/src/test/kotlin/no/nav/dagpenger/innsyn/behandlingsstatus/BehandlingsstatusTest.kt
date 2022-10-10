@@ -31,7 +31,7 @@ class BehandlingsstatusTest {
     @Test
     fun `Behandlingsstatus er null når det finnes 0 søknader og 1 vedtak`() {
         assertEquals(
-            FerdigBehandlet, // TODO: Er dette riktig?
+            null,
             Behandlingsstatus(antallSøknader = 0, antallVedtak = 1).antattStatus
         )
     }
