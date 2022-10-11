@@ -20,9 +20,11 @@ class Behandlingsstatus(antallSøknader: Int, antallVedtak: Int) {
             else -> null
         }
 
-    internal enum class Status {
+    enum class Status {
         UnderOgFerdigBehandlet,
         FerdigBehandlet,
         UnderBehandling
     }
 }
+
+data class BehandlingsstatusDTO(val behandlingsstatus: Behandlingsstatus.Status?)

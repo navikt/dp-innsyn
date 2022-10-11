@@ -32,6 +32,7 @@ import io.ktor.routing.routing
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.Configuration.appName
 import no.nav.dagpenger.innsyn.behandlingsstatus.AvgjørBehandlingsstatus
+import no.nav.dagpenger.innsyn.behandlingsstatus.BehandlingsstatusDTO
 import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.modell.serde.SøknadJsonBuilder
 import no.nav.dagpenger.innsyn.modell.serde.VedtakJsonBuilder
@@ -148,7 +149,7 @@ internal fun Application.innsynApi(
 
                 val behandlingsstatus = avgjørBehandlingsstatus.hentStatus(fnr, fom)
 
-                call.respond(HttpStatusCode.OK, behandlingsstatus)
+                call.respond(HttpStatusCode.OK, BehandlingsstatusDTO(behandlingsstatus))
             }
 
             get("/ettersendelser") {
