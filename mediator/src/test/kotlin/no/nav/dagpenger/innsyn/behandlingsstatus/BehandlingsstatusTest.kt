@@ -1,8 +1,8 @@
 package no.nav.dagpenger.innsyn.behandlingsstatus
 
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.FerdigBehandlet
+import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.Ukjent
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.UnderBehandling
-import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.UnderOgFerdigBehandlet
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -47,7 +47,7 @@ class BehandlingsstatusTest {
     @Test
     fun `Behandlingsstatus er Ukjent når det finnes 2 søknader og 1 vedtak`() {
         assertEquals(
-            UnderOgFerdigBehandlet,
+            Ukjent,
             Behandlingsstatus(antallSøknader = 2, antallVedtak = 1).antattStatus
         )
     }
