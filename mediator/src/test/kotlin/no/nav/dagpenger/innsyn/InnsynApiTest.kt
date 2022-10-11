@@ -13,7 +13,6 @@ import io.ktor.server.testing.withTestApplication
 import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.FerdigBehandlet
-import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.UnderBehandling
 import no.nav.dagpenger.innsyn.common.KildeType
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.JwtStub
@@ -350,35 +349,6 @@ internal class InnsynApiTest {
     }
 
     @Test
-    fun `får behandlingsstatus UnderBehandling når det er 1 søknad og 0 vedtak`() = withMigratedDb {
-        val personRepository = PostgresPersonRepository().also {
-            it.person("test@nav.no").also { person ->
-                person.håndter(søknad())
-                person.håndter(Sakstilknytning("11", "arenaId"))
-                it.lagre(person)
-            }
-        }
-
-        val mocketApi: Application.() -> Unit = {
-            innsynApi(
-                jwtStub.stubbedJwkProvider(),
-                testIssuer,
-                clientId,
-                personRepository,
-                henvendelseOppslag,
-                ettersendingSpleiser
-            )
-        }
-
-        withTestApplication(mocketApi) {
-            autentisert("/behandlingsstatus")
-        }.apply {
-            assertEquals(HttpStatusCode.OK, response.status())
-            assertTrue(response.content!!.contains(UnderBehandling.name))
-        }
-    }
-
-    @Test
     fun `InternalServerError når man ikke kan parse fom dato`() = withMigratedDb {
         val mocketApi: Application.() -> Unit = {
             innsynApi(
@@ -393,6 +363,12 @@ internal class InnsynApiTest {
 
         withTestApplication(mocketApi) {
             autentisert("/behandlingsstatus?fom=ugyldig_fom")
+        }.apply {
+            assertEquals(HttpStatusCode.InternalServerError, response.status())
+        }
+
+        withTestApplication(mocketApi) {
+            autentisert("/behandlingsstatus")
         }.apply {
             assertEquals(HttpStatusCode.InternalServerError, response.status())
         }

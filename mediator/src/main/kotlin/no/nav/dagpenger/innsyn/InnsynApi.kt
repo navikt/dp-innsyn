@@ -145,9 +145,9 @@ internal fun Application.innsynApi(
             get("/behandlingsstatus") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
-                val fom = call.request.queryParameters["fom"]?.asOptionalLocalDate()
+                val fom = call.request.queryParameters["fom"] ?: throw IllegalArgumentException("Mangler fom queryparameter i url")
 
-                val behandlingsstatus = avgjørBehandlingsstatus.hentStatus(fnr, fom)
+                val behandlingsstatus = avgjørBehandlingsstatus.hentStatus(fnr, LocalDate.parse(fom))
 
                 call.respond(HttpStatusCode.OK, BehandlingsstatusDTO(behandlingsstatus))
             }
