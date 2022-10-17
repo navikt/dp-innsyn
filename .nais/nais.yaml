@@ -46,6 +46,7 @@ spec:
       rules:
         - application: dp-dagpenger
         - application: dp-soknad-veileder
+        - application: dp-soknad
         - application: veientilarbeid
           namespace: paw
         - application: paw-auth-proxy
