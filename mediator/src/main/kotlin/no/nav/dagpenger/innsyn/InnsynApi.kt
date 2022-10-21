@@ -43,7 +43,6 @@ import java.time.LocalDate
 import java.util.UUID
 
 private val logger = KotlinLogging.logger { }
-private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 internal fun Application.innsynApi(
     jwkProvider: JwkProvider,
@@ -98,7 +97,6 @@ internal fun Application.innsynApi(
 
     install(Authentication) {
         jwt {
-            sikkerlogg.info { "Lager jwt verifier med issuer=$issuer, clientId=$clientId" }
             verifier(jwkProvider, issuer) {
                 withAudience(clientId)
             }
