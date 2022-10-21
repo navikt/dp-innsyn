@@ -51,7 +51,7 @@ internal fun Application.innsynApi(
     clientId: String,
     personRepository: PersonRepository,
     henvendelseOppslag: HenvendelseOppslag,
-    ettersendingSpleiser: EttersendingSpleiser,
+    ettersendingSpleiser: EttersendingSpleiser
 ) {
     install(CallId) {
         header("Nav-Call-Id")
@@ -99,6 +99,7 @@ internal fun Application.innsynApi(
     install(Authentication) {
         jwt {
             verifier(jwkProvider, issuer) {
+                sikkerlogg.info { "Verifiserer token med jwkProvider=$jwkProvider, issuer=$issuer, clientId=$clientId" }
                 withAudience(clientId)
             }
             realm = appName
@@ -111,7 +112,6 @@ internal fun Application.innsynApi(
             }
         }
     }
-
     val avgjørBehandlingsstatus = AvgjørBehandlingsstatus(personRepository)
     routing {
         authenticate {
@@ -123,7 +123,7 @@ internal fun Application.innsynApi(
                 val søknader = personRepository.hentSøknaderFor(
                     fnr,
                     fom = fom,
-                    tom = tom,
+                    tom = tom
                 )
 
                 call.respond(søknader.map { SøknadJsonBuilder(it).resultat() })
@@ -136,7 +136,7 @@ internal fun Application.innsynApi(
                 val vedtak = personRepository.hentVedtakFor(
                     fnr,
                     fattetFom = fattetFom,
-                    fattetTom = fattetTom,
+                    fattetTom = fattetTom
                 )
 
                 call.respond(vedtak.map { VedtakJsonBuilder(it).resultat() })
@@ -145,8 +145,8 @@ internal fun Application.innsynApi(
             get("/behandlingsstatus") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
-                val fom = call.request.queryParameters["fom"] ?: throw IllegalArgumentException("Mangler fom queryparameter i url")
-
+                val fom = call.request.queryParameters["fom"]
+                    ?: throw IllegalArgumentException("Mangler fom queryparameter i url")
                 val behandlingsstatus = avgjørBehandlingsstatus.hentStatus(fnr, LocalDate.parse(fom))
 
                 call.respond(HttpStatusCode.OK, BehandlingsstatusDTO(behandlingsstatus))
