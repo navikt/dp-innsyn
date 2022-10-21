@@ -98,8 +98,8 @@ internal fun Application.innsynApi(
 
     install(Authentication) {
         jwt {
+            sikkerlogg.info { "Lager jwt verifier med issuer=$issuer, clientId=$clientId" }
             verifier(jwkProvider, issuer) {
-                sikkerlogg.info { "Verifiserer token med jwkProvider=$jwkProvider, issuer=$issuer, clientId=$clientId" }
                 withAudience(clientId)
             }
             realm = appName
