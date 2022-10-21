@@ -24,7 +24,7 @@ object AuthFactory {
     }
 
     private val openIdConfiguration = runBlocking {
-        httpClient.get<AzureAdOpenIdConfiguration>(properties[token_x.well_known_url])
+        httpClient.get<OpenIdConfiguration>(properties[token_x.well_known_url])
     }
     val clientId = properties[token_x.client_id]
     val issuer = openIdConfiguration.issuer
@@ -39,7 +39,7 @@ object AuthFactory {
             .build()
 }
 
-private data class AzureAdOpenIdConfiguration(
+private data class OpenIdConfiguration(
     @JsonProperty("jwks_uri")
     val jwksUri: String,
     @JsonProperty("issuer")
