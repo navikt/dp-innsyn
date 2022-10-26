@@ -8,7 +8,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.header
 import io.ktor.client.request.request
@@ -17,12 +17,16 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.jackson.JacksonConverter
+import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.tjenester.ettersending.MinimalEttersendingDto
 import no.nav.dagpenger.innsyn.tjenester.ettersending.toInternal
 import no.nav.dagpenger.innsyn.tjenester.paabegynt.Påbegynt
 import no.nav.dagpenger.innsyn.tjenester.paabegynt.toInternal
 import no.nav.dagpenger.ktor.client.metrics.PrometheusMetricsPlugin
 import java.time.ZonedDateTime
+import kotlin.time.Duration.Companion.seconds
+
+private val logg = KotlinLogging.logger {}
 
 internal class HenvendelseOppslag(
     private val dpProxyUrl: String,
@@ -37,8 +41,12 @@ internal class HenvendelseOppslag(
             this.baseName = baseName
         }
 
-        install(DefaultRequest) {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 15.seconds.inWholeMilliseconds
+            connectTimeoutMillis = 5.seconds.inWholeMilliseconds
+            socketTimeoutMillis = 5.seconds.inWholeMilliseconds
         }
+
         install(ContentNegotiation) {
             register(
                 ContentType.Application.Json,
@@ -62,13 +70,17 @@ internal class HenvendelseOppslag(
     }
 
     private suspend inline fun <reified T> hentRequestMedFnrIBody(fnr: String, requestUrl: String): List<T> =
-        dpProxyClient.request(requestUrl) {
-            method = HttpMethod.Post
-            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
-            header(HttpHeaders.ContentType, "application/json")
-            header(HttpHeaders.Accept, "application/json")
-            setBody(mapOf("fnr" to fnr))
-        }.body()
+        kotlin.runCatching {
+            dpProxyClient.request(requestUrl) {
+                method = HttpMethod.Post
+                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+                header(HttpHeaders.ContentType, "application/json")
+                header(HttpHeaders.Accept, "application/json")
+                setBody(mapOf("fnr" to fnr))
+            }.body<List<T>>()
+        }
+            .onFailure { e -> logg.error(e) { "Feil i hentRequestMedFnrIBody mot: $requestUrl" } }
+            .getOrThrow()
 }
 
 data class ExternalEttersending(

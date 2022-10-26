@@ -1,11 +1,8 @@
 package no.nav.dagpenger.innsyn
 
 import io.prometheus.client.Histogram
-import mu.KotlinLogging
 import java.time.Duration
 import java.time.LocalDateTime
-
-private val logg = KotlinLogging.logger {}
 
 internal object Metrikker {
     private const val DAGPENGER_NAMESPACE = "dagpenger"
