@@ -1,22 +1,25 @@
 package no.nav.dagpenger.innsyn.melding
 
-import no.nav.dagpenger.innsyn.modell.hendelser.Kanal.Papir
+import no.nav.dagpenger.innsyn.modell.hendelser.Kanal.Digital
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.helse.rapids_rivers.JsonMessage
 
-internal class PapirSøknadsMelding(packet: JsonMessage) : SøknadMelding(packet) {
-    override val søknadId: String?
-        get() = null
+internal class LegacySøknadsmelding(packet: JsonMessage) : SøknadMelding(packet) {
 
+    companion object {
+        const val søknadIdNøkkel = "søknadsData.brukerBehandlingId"
+    }
+
+    override val søknadId = packet[søknadIdNøkkel].asText()
     override val søknad
         get() = Søknad(
             søknadId = søknadId,
             journalpostId = journalpostId,
             skjemaKode = skjemaKode,
             søknadsType = søknadsType,
-            kanal = Papir,
+            kanal = Digital,
             datoInnsendt = datoRegistrert,
-            vedlegg = emptyList(),
+            vedlegg = vedlegg,
             tittel = tittel
         )
 }

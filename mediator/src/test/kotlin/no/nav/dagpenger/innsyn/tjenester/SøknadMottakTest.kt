@@ -2,23 +2,28 @@ package no.nav.dagpenger.innsyn.tjenester
 
 import io.mockk.confirmVerified
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.CollectorRegistry.defaultRegistry
 import no.nav.dagpenger.innsyn.PersonMediator
+import no.nav.dagpenger.innsyn.melding.LegacySøknadsmelding
 import no.nav.dagpenger.innsyn.melding.PapirSøknadsMelding
-import no.nav.dagpenger.innsyn.melding.Søknadsmelding
-import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
+import no.nav.dagpenger.innsyn.melding.QuizSøknadMelding
+import no.nav.dagpenger.innsyn.melding.SøknadMelding
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
+import java.util.UUID
 
 class SøknadMottakTest {
     private val testRapid = TestRapid()
     private val personMediator = mockk<PersonMediator>(relaxed = true)
+    private val søknadMeldingSlot = slot<SøknadMelding>()
 
     init {
         SøknadMottak(testRapid, personMediator)
@@ -27,13 +32,16 @@ class SøknadMottakTest {
     @BeforeEach
     internal fun setUp() {
         testRapid.reset()
+        søknadMeldingSlot.clear()
     }
 
     @Test
     fun `vi kan motta søknader`() {
         testRapid.sendTestMessage(søknadJson)
-        verify { personMediator.håndter(any<Søknad>(), any<Søknadsmelding>()) }
+        verify { personMediator.håndter(any(), capture(søknadMeldingSlot)) }
         confirmVerified(personMediator)
+        assertTrue(søknadMeldingSlot.isCaptured)
+        assertEquals(søknadMeldingSlot.captured.javaClass.name, LegacySøknadsmelding::class.java.name)
 
         defaultRegistry.getSampleValue(
             "dagpenger_mottak_forsinkelse_sum",
@@ -52,8 +60,19 @@ class SøknadMottakTest {
     @Test
     fun `vi kan motta papirsøknad`() {
         testRapid.sendTestMessage(papirsøknadJson)
-        verify { personMediator.håndter(any<Søknad>(), any<PapirSøknadsMelding>()) }
+        verify { personMediator.håndter(any(), capture(søknadMeldingSlot)) }
         confirmVerified(personMediator)
+        assertTrue(søknadMeldingSlot.isCaptured)
+        assertEquals(søknadMeldingSlot.captured.javaClass.name, PapirSøknadsMelding::class.java.name)
+    }
+
+    @Test
+    fun `vi kan motta søknad fra ny søknadssdialog (quiz-format)`() {
+        testRapid.sendTestMessage(søknadJsonFraNyQuiz)
+        verify { personMediator.håndter(any(), capture(søknadMeldingSlot)) }
+        confirmVerified(personMediator)
+        assertTrue(søknadMeldingSlot.isCaptured)
+        assertEquals(søknadMeldingSlot.captured.javaClass.name, QuizSøknadMelding::class.java.name)
     }
 }
 
@@ -99,5 +118,21 @@ private val papirsøknadJson = """{
   "søknadsData": {},
   "@event_name": "innsending_mottatt",
   "system_read_count": 0
+}
+""".trimIndent()
+
+@Language("JSON")
+private val søknadJsonFraNyQuiz = """{
+  "@event_name": "innsending_mottatt",
+  "@opprettet": "${LocalDateTime.now()}",
+  "fødselsnummer": "123",
+  "journalpostId": "123",
+  "skjemaKode": "NAV 03-102.23",
+  "tittel": "Tittel",
+  "type": "NySøknad",
+  "datoRegistrert": "${LocalDateTime.now().minusSeconds(syntheticDelaySeconds)}",
+  "søknadsData": {
+    "søknad_uuid": "${UUID.randomUUID()}"
+  }
 }
 """.trimIndent()

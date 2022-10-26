@@ -1,21 +1,22 @@
 package no.nav.dagpenger.innsyn.melding
 
-import no.nav.dagpenger.innsyn.modell.hendelser.Kanal.Digital
+import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
-import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType
 import no.nav.helse.rapids_rivers.JsonMessage
 
-internal class Søknadsmelding(packet: JsonMessage) : Innsendingsmelding(packet) {
-    private val søknadId = packet["søknadsData.brukerBehandlingId"].asText()
-    private val søknadsType = SøknadsType.valueOf(packet["type"].asText())
+internal class QuizSøknadMelding(packet: JsonMessage) : SøknadMelding(packet) {
 
-    internal val søknad
+    companion object {
+        const val søknadIdNøkkel = "søknadsData.søknad_uuid"
+    }
+    override val søknadId = packet[søknadIdNøkkel].asText()
+    override val søknad
         get() = Søknad(
             søknadId = søknadId,
             journalpostId = journalpostId,
             skjemaKode = skjemaKode,
             søknadsType = søknadsType,
-            kanal = Digital,
+            kanal = Kanal.Digital,
             datoInnsendt = datoRegistrert,
             vedlegg = vedlegg,
             tittel = tittel
