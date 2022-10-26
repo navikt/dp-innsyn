@@ -1,15 +1,18 @@
 package no.nav.dagpenger.innsyn
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.ktor.application.Application
+import io.ktor.client.HttpClient
+import io.ktor.client.request.headers
+import io.ktor.client.request.request
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.testing.TestApplicationEngine
-import io.ktor.server.testing.handleRequest
-import io.ktor.server.testing.setBody
-import io.ktor.server.testing.withTestApplication
+import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.FerdigBehandlet
@@ -44,20 +47,21 @@ internal class InnsynApiTest {
 
     @Test
     fun `test at bruker ikke har søknad`() = withMigratedDb {
-        withTestApplication({
-            innsynApi(
-                jwtStub.stubbedJwkProvider(),
-                testIssuer,
-                clientId,
-                PostgresPersonRepository(),
-                henvendelseOppslag,
-                ettersendingSpleiser
-            )
-        }) {
-            autentisert("/soknad")
-        }.apply {
-            assertEquals(HttpStatusCode.OK, response.status())
-            assertEquals("[ ]", response.content!!)
+        testApplication {
+            application {
+                innsynApi(
+                    jwtStub.stubbedJwkProvider(),
+                    testIssuer,
+                    clientId,
+                    PostgresPersonRepository(),
+                    henvendelseOppslag,
+                    ettersendingSpleiser
+                )
+            }
+            client.autentisert("/soknad").let { response ->
+                assertEquals(HttpStatusCode.OK, response.status)
+                assertEquals("[ ]", response.bodyAsText())
+            }
         }
     }
 
@@ -94,24 +98,27 @@ internal class InnsynApiTest {
                 it.lagre(person)
             }
         }
-        withTestApplication({
-            innsynApi(
-                jwtStub.stubbedJwkProvider(),
-                testIssuer,
-                clientId,
-                personRepository,
-                henvendelseOppslag,
-                ettersendingSpleiser
-            )
-        }) {
+        testApplication {
+            application {
+                innsynApi(
+                    jwtStub.stubbedJwkProvider(),
+                    testIssuer,
+                    clientId,
+                    personRepository,
+                    henvendelseOppslag,
+                    ettersendingSpleiser
+                )
+            }
             val fom = LocalDate.now().minusDays(100)
             val dagensDato = LocalDate.now()
-            autentisert("/soknad?soktFom=$fom&soktTom=$dagensDato")
-        }.apply {
-            assertEquals(HttpStatusCode.OK, response.status())
-            assertTrue(response.content!!.contains(NySøknad.toString()))
-            assertTrue(response.content!!.contains(Innsending.Vedlegg.Status.LastetOpp.toString()))
-            assertTrue(response.content!!.contains("Søknad om"))
+            client.autentisert("/soknad?soktFom=$fom&soktTom=$dagensDato").let { response ->
+                assertEquals(HttpStatusCode.OK, response.status)
+                response.bodyAsText().let { content ->
+                    assertTrue(content.contains(NySøknad.toString()))
+                    assertTrue(content.contains(Innsending.Vedlegg.Status.LastetOpp.toString()))
+                    assertTrue(content.contains("Søknad om"))
+                }
+            }
         }
     }
 
@@ -136,21 +143,22 @@ internal class InnsynApiTest {
                 it.lagre(person)
             }
         }
-        withTestApplication({
-            innsynApi(
-                jwtStub.stubbedJwkProvider(),
-                testIssuer,
-                clientId,
-                personRepository,
-                henvendelseOppslag,
-                ettersendingSpleiser
-            )
-        }) {
+        testApplication {
+            application {
+                innsynApi(
+                    jwtStub.stubbedJwkProvider(),
+                    testIssuer,
+                    clientId,
+                    personRepository,
+                    henvendelseOppslag,
+                    ettersendingSpleiser
+                )
+            }
             val dagensDato = LocalDate.now()
-            autentisert("/soknad?soktFom=${dagensDato.minusDays(30)}&soktTom=$dagensDato")
-        }.apply {
-            assertEquals(HttpStatusCode.OK, response.status())
-            assertFalse(response.content!!.contains(NySøknad.toString()))
+            client.autentisert("/soknad?soktFom=${dagensDato.minusDays(30)}&soktTom=$dagensDato").let { response ->
+                assertEquals(HttpStatusCode.OK, response.status)
+                assertFalse(response.bodyAsText().contains(NySøknad.toString()))
+            }
         }
     }
 
@@ -175,21 +183,22 @@ internal class InnsynApiTest {
                 it.lagre(person)
             }
         }
-        withTestApplication({
-            innsynApi(
-                jwtStub.stubbedJwkProvider(),
-                testIssuer,
-                clientId,
-                personRepository,
-                henvendelseOppslag,
-                ettersendingSpleiser
-            )
-        }) {
+        testApplication {
+            application {
+                innsynApi(
+                    jwtStub.stubbedJwkProvider(),
+                    testIssuer,
+                    clientId,
+                    personRepository,
+                    henvendelseOppslag,
+                    ettersendingSpleiser
+                )
+            }
             val dagensDato = LocalDate.now()
-            autentisert("/vedtak?fattetFom=$dagensDato&fattetTom=$dagensDato")
-        }.apply {
-            assertEquals(HttpStatusCode.OK, response.status())
-            assertTrue(response.content!!.contains(Vedtak.Status.INNVILGET.toString()))
+            client.autentisert("/vedtak?fattetFom=$dagensDato&fattetTom=$dagensDato").let { response ->
+                assertEquals(HttpStatusCode.OK, response.status)
+                assertTrue(response.bodyAsText().contains(Vedtak.Status.INNVILGET.toString()))
+            }
         }
     }
 
@@ -214,23 +223,22 @@ internal class InnsynApiTest {
                 it.lagre(person)
             }
         }
-        withTestApplication({
-            innsynApi(
-                jwtStub.stubbedJwkProvider(),
-                testIssuer,
-                clientId,
-                personRepository,
-                henvendelseOppslag,
-                ettersendingSpleiser
-            )
-        }) {
+        testApplication {
+            application {
+                innsynApi(
+                    jwtStub.stubbedJwkProvider(),
+                    testIssuer,
+                    clientId,
+                    personRepository,
+                    henvendelseOppslag,
+                    ettersendingSpleiser
+                )
+            }
             val dagensDato = LocalDate.now()
-            autentisert(
-                "/vedtak?fattetFom=${dagensDato.minusDays(30)}&fattetTom=$dagensDato",
-            )
-        }.apply {
-            assertEquals(HttpStatusCode.OK, response.status())
-            assertFalse(response.content!!.contains(Vedtak.Status.INNVILGET.toString()))
+            client.autentisert("/vedtak?fattetFom=${dagensDato.minusDays(30)}&fattetTom=$dagensDato").let { response ->
+                assertEquals(HttpStatusCode.OK, response.status)
+                assertFalse(response.bodyAsText().contains(Vedtak.Status.INNVILGET.toString()))
+            }
         }
     }
 
@@ -238,19 +246,20 @@ internal class InnsynApiTest {
     fun `test at bruker kan hente ut ettersendelser`() {
         val ettersendingSpleiser = mockk<EttersendingSpleiser>()
         coEvery { ettersendingSpleiser.hentEttersendelser(any()) } returns MultiSourceResultObjectMother.giveMeSuccessfulResult()
-        withTestApplication({
-            innsynApi(
-                jwtStub.stubbedJwkProvider(),
-                testIssuer,
-                clientId,
-                mockk<PostgresPersonRepository>(),
-                henvendelseOppslag,
-                ettersendingSpleiser
-            )
-        }) {
-            autentisert("/ettersendelser")
-        }.apply {
-            assertEquals(HttpStatusCode.OK, response.status())
+        testApplication {
+            application {
+                innsynApi(
+                    jwtStub.stubbedJwkProvider(),
+                    testIssuer,
+                    clientId,
+                    mockk<PostgresPersonRepository>(),
+                    henvendelseOppslag,
+                    ettersendingSpleiser
+                )
+            }
+            client.autentisert("/ettersendelser").let { response ->
+                assertEquals(HttpStatusCode.OK, response.status)
+            }
         }
     }
 
@@ -262,23 +271,25 @@ internal class InnsynApiTest {
                 KildeType.HENVENDELSE
             )
         coEvery { ettersendingSpleiser.hentEttersendelser(any()) } returns enFeiletOgEnVellykket
-        withTestApplication({
-            innsynApi(
-                jwtStub.stubbedJwkProvider(),
-                testIssuer,
-                clientId,
-                mockk<PostgresPersonRepository>(),
-                henvendelseOppslag,
-                ettersendingSpleiser
-            )
-        }) {
-            autentisert("/ettersendelser")
-        }.apply {
-            with(jacksonObjectMapper().readTree(response.content)) {
-                assertTrue(this.has("failedSources"))
-                assertTrue(this.has("results"))
+
+        testApplication {
+            application {
+                innsynApi(
+                    jwtStub.stubbedJwkProvider(),
+                    testIssuer,
+                    clientId,
+                    mockk<PostgresPersonRepository>(),
+                    henvendelseOppslag,
+                    ettersendingSpleiser
+                )
             }
-            assertEquals(HttpStatusCode.OK, response.status())
+            client.autentisert("/ettersendelser").let { response ->
+                assertEquals(HttpStatusCode.OK, response.status)
+                jacksonObjectMapper().readTree(response.bodyAsText()).let {
+                    assertTrue(it.has("failedSources"))
+                    assertTrue(it.has("results"))
+                }
+            }
         }
     }
 
@@ -293,19 +304,18 @@ internal class InnsynApiTest {
             )
         )
         coEvery { henvendelseOppslag.hentPåbegynte(any()) } returns påbegynte
-        withTestApplication({
-            innsynApi(
-                jwtStub.stubbedJwkProvider(),
-                testIssuer,
-                clientId,
-                mockk<PostgresPersonRepository>(),
-                henvendelseOppslag,
-                ettersendingSpleiser
-            )
-        }) {
-            autentisert("/paabegynte")
-        }.apply {
-            assertEquals(HttpStatusCode.OK, response.status())
+        testApplication {
+            application {
+                innsynApi(
+                    jwtStub.stubbedJwkProvider(),
+                    testIssuer,
+                    clientId,
+                    mockk<PostgresPersonRepository>(),
+                    henvendelseOppslag,
+                    ettersendingSpleiser
+                )
+            }
+            assertEquals(HttpStatusCode.OK, client.autentisert("/paabegynte").status)
         }
     }
 
@@ -330,68 +340,67 @@ internal class InnsynApiTest {
                 it.lagre(person)
             }
         }
-        withTestApplication({
-            innsynApi(
-                jwtStub.stubbedJwkProvider(),
-                testIssuer,
-                clientId,
-                personRepository,
-                henvendelseOppslag,
-                ettersendingSpleiser
-            )
-        }) {
+        testApplication {
+            application {
+                innsynApi(
+                    jwtStub.stubbedJwkProvider(),
+                    testIssuer,
+                    clientId,
+                    personRepository,
+                    henvendelseOppslag,
+                    ettersendingSpleiser
+                )
+            }
             val dagensDato = LocalDate.now()
-            autentisert("/behandlingsstatus?fom=$dagensDato")
-        }.apply {
-            assertEquals(HttpStatusCode.OK, response.status())
-            assertTrue(response.content!!.contains(FerdigBehandlet.toString()))
+            client.autentisert("/behandlingsstatus?fom=$dagensDato").let { response ->
+                assertEquals(HttpStatusCode.OK, response.status)
+                assertTrue(response.bodyAsText().contains(FerdigBehandlet.toString()))
+            }
         }
     }
 
     @Test
     fun `InternalServerError når man ikke kan parse fom dato`() = withMigratedDb {
-        val mocketApi: Application.() -> Unit = {
-            innsynApi(
-                jwtStub.stubbedJwkProvider(),
-                testIssuer,
-                clientId,
-                PostgresPersonRepository(),
-                henvendelseOppslag,
-                ettersendingSpleiser
+        testApplication {
+            application {
+                innsynApi(
+                    jwtStub.stubbedJwkProvider(),
+                    testIssuer,
+                    clientId,
+                    PostgresPersonRepository(),
+                    henvendelseOppslag,
+                    ettersendingSpleiser
+                )
+            }
+            assertEquals(
+                HttpStatusCode.InternalServerError,
+                client.autentisert("/behandlingsstatus?fom=ugyldig_fom").status
             )
-        }
-
-        withTestApplication(mocketApi) {
-            autentisert("/behandlingsstatus?fom=ugyldig_fom")
-        }.apply {
-            assertEquals(HttpStatusCode.InternalServerError, response.status())
-        }
-
-        withTestApplication(mocketApi) {
-            autentisert("/behandlingsstatus")
-        }.apply {
-            assertEquals(HttpStatusCode.InternalServerError, response.status())
+            assertEquals(
+                HttpStatusCode.InternalServerError,
+                client.autentisert("/behandlingsstatus").status
+            )
         }
     }
 
-    private fun TestApplicationEngine.autentisert(
+    private suspend fun HttpClient.autentisert(
         endepunkt: String,
         token: String = jwtStub.createTokenFor("test@nav.no", "id"),
         httpMethod: HttpMethod = HttpMethod.Get,
         body: String? = null
-    ) = handleRequest(httpMethod, endepunkt) {
-        addHeader(
-            HttpHeaders.Accept,
-            ContentType.Application.Json.toString()
-        )
-        addHeader(
-            HttpHeaders.ContentType,
-            ContentType.Application.Json.toString()
-        )
-        addHeader(HttpHeaders.Authorization, "Bearer $token")
-        addHeader("Nav-Call-Id", "random call id")
-        addHeader("Nav-Consumer-Id", "dp-test")
-        body?.also { setBody(it) }
+    ): HttpResponse {
+        return this.request {
+            this.url(endepunkt)
+            this.method = httpMethod
+            headers {
+                append(HttpHeaders.Accept, ContentType.Application.Json.toString())
+                append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                append(HttpHeaders.Authorization, "Bearer $token")
+                append("Nav-Call-Id", "random call id")
+                append("Nav-Consumer-Id", "dp-test")
+            }
+            body?.let { this.setBody(it) }
+        }
     }
 
     private fun søknad(

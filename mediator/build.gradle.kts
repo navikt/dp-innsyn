@@ -7,14 +7,22 @@ application {
 }
 
 dependencies {
-    // ktor http client
-    implementation(Dagpenger.Biblioteker.Ktor.Client.metrics)
-    implementation(Ktor.library("auth"))
-    implementation(Ktor.library("auth-jwt"))
-    implementation(Ktor.library("client-cio"))
-    implementation(Ktor.library("client-jackson"))
-    implementation(Ktor.library("jackson"))
-    implementation(Ktor.library("server-cio"))
+    val dpBibliotekerVersion = "2022.10.22-09.05.6fcf3395aa4f"
+
+    implementation("com.github.navikt.dp-biblioteker:ktor-client-metrics:$dpBibliotekerVersion")
+    implementation(Ktor2.Server.library("auth"))
+    implementation(Ktor2.Server.library("auth-jwt"))
+    implementation(Ktor2.Server.library("cio"))
+    implementation(Ktor2.Server.library("call-id"))
+    implementation(Ktor2.Server.library("content-negotiation"))
+    implementation(Ktor2.Server.library("compression"))
+    implementation(Ktor2.Server.library("default-headers"))
+    implementation(Ktor2.Server.library("status-pages"))
+
+    implementation(Ktor2.Client.library("content-negotiation"))
+    implementation(Ktor2.Client.library("cio"))
+
+    implementation("io.ktor:ktor-serialization-jackson:${Ktor2.version}")
 
     implementation(project(":modell"))
 
@@ -27,10 +35,10 @@ dependencies {
     implementation(Jackson.jsr310)
     implementation(Jackson.kotlin)
 
-    implementation("com.github.navikt.dp-biblioteker:oauth2-klient:2022.02.05-16.32.da1deab37b31")
+    implementation("com.github.navikt.dp-biblioteker:oauth2-klient:$dpBibliotekerVersion")
 
-    testImplementation(Ktor.library("client-mock"))
-    testImplementation(Ktor.library("server-test-host"))
+    testImplementation(Ktor2.Client.library("mock"))
+    testImplementation(Ktor2.Server.library("test-host"))
     testImplementation(TestContainers.postgresql)
     testImplementation(Mockk.mockk)
 }
