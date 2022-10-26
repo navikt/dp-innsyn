@@ -4,8 +4,10 @@ import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.innsyn.Metrikker
 import no.nav.dagpenger.innsyn.PersonMediator
+import no.nav.dagpenger.innsyn.melding.LegacySøknadsmelding
 import no.nav.dagpenger.innsyn.melding.PapirSøknadsMelding
-import no.nav.dagpenger.innsyn.melding.Søknadsmelding
+import no.nav.dagpenger.innsyn.melding.QuizSøknadMelding
+import no.nav.dagpenger.innsyn.melding.SøknadMelding
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
@@ -38,32 +40,26 @@ internal class SøknadMottak(
             validate {
                 it.interestedIn(
                     "søknadsData.vedlegg",
-                    "søknadsData.brukerBehandlingId"
+                    QuizSøknadMelding.søknadIdNøkkel,
+                    LegacySøknadsmelding.søknadIdNøkkel
                 )
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        val søknadMelding: SøknadMelding = packet.tilSøknadMelding()
         val fnr = packet["fødselsnummer"].asText()
-        val søknadId = packet["søknadsData.brukerBehandlingId"].asText()
+        val søknadId = søknadMelding.søknadId
         val journalpostId = packet["journalpostId"].asText()
 
         withLoggingContext(
             "søknadId" to søknadId,
             "journalpostId" to journalpostId
         ) {
-            logg.info { "Mottok ny søknad." }
+            logg.info { "Mottok ny søknad av typen ${søknadMelding.javaClass.simpleName}." }
             sikkerlogg.info { "Mottok ny søknad for person $fnr: ${packet.toJson()}" }
-
-            when (packet["søknadsData.brukerBehandlingId"].isTextual) {
-                false -> PapirSøknadsMelding(packet).also {
-                    personMediator.håndter(it.søknad, it)
-                }
-                true -> Søknadsmelding(packet).also {
-                    personMediator.håndter(it.søknad, it)
-                }
-            }
+            personMediator.håndter(søknadMelding.søknad, søknadMelding)
         }.also {
             logg.info {
                 val datoRegistrert = packet["datoRegistrert"].asLocalDateTime().also {
@@ -79,3 +75,16 @@ internal class SøknadMottak(
         logg.debug { problems }
     }
 }
+
+private fun JsonMessage.tilSøknadMelding(): SøknadMelding {
+    return if (this.harSøknadIdFraQuiz()) {
+        QuizSøknadMelding(this)
+    } else if (this.harSøknadIdFraLegacy()) {
+        LegacySøknadsmelding(this)
+    } else {
+        PapirSøknadsMelding(this)
+    }
+}
+
+private fun JsonMessage.harSøknadIdFraQuiz() = !this[QuizSøknadMelding.søknadIdNøkkel].isMissingNode
+private fun JsonMessage.harSøknadIdFraLegacy() = !this[LegacySøknadsmelding.søknadIdNøkkel].isMissingNode
