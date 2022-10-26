@@ -1,0 +1,1 @@
+ALTER TABLE søknad ALTER COLUMN søknad_id TYPE TEXT;

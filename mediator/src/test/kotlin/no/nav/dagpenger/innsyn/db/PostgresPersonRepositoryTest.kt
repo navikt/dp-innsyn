@@ -17,6 +17,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.util.UUID
 
 internal class PostgresPersonRepositoryTest {
     private val repository = PostgresPersonRepository()
@@ -173,6 +174,27 @@ internal class PostgresPersonRepositoryTest {
                 assertFalse(it.isEmpty())
                 assertSøknadEquals(søknad, it.first())
             }
+        }
+    }
+
+    @Test
+    fun `skal kunne lagre søknad med UUID som identifikator`() {
+        withMigratedDb {
+            val fnr = "1234567891"
+            val person = repository.person(fnr)
+            val søknad = Søknad(
+                UUID.randomUUID().toString(),
+                "journalpostId",
+                "NAV01",
+                Søknad.SøknadsType.NySøknad,
+                Kanal.Papir,
+                LocalDateTime.now(),
+                emptyList(),
+                "tittel"
+            )
+            person.håndter(søknad)
+            repository.lagre(person)
+            assertEquals(1, repository.hentSøknaderFor(fnr).size)
         }
     }
 
