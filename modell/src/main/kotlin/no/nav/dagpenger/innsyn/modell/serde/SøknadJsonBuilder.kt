@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import no.nav.dagpenger.innsyn.modell.hendelser.Innsending
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
+import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
+import java.util.UUID
 
 class SøknadJsonBuilder(val søknad: Søknad) : SøknadVisitor {
     private val mapper = ObjectMapper()
@@ -27,7 +29,10 @@ class SøknadJsonBuilder(val søknad: Søknad) : SøknadVisitor {
         datoInnsendt: LocalDateTime,
         tittel: String?
     ) {
-        søknadId?.let { root.put("søknadId", it) }
+        søknadId?.let {
+            root.put("søknadId", it)
+            root.put("legacy", erFraGammelSøknad(it))
+        }
         skjemaKode?.let {
             root.put("skjemaKode", it)
             finnTittel(it)?.let { tittel -> root.put("tittel", tittel) }
@@ -38,6 +43,14 @@ class SøknadJsonBuilder(val søknad: Søknad) : SøknadVisitor {
         root.put("kanal", kanal.toString())
         root.put("datoInnsendt", datoInnsendt.toString())
         root.set<ArrayNode>("vedlegg", vedlegg)
+    }
+
+    // TODO: Dette kan fjernes så fort vi er fullstendig over på ny søknadsdialog
+    private fun erFraGammelSøknad(søknadId: String) = try {
+        UUID.fromString(søknadId)
+        false
+    } catch (e: IllegalArgumentException) {
+        true
     }
 
     override fun visitVedlegg(skjemaNummer: String, navn: String, status: Innsending.Vedlegg.Status) {

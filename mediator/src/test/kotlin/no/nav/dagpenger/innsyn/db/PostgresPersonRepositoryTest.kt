@@ -2,7 +2,6 @@ package no.nav.dagpenger.innsyn.db
 
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
 import no.nav.dagpenger.innsyn.modell.Person
-import no.nav.dagpenger.innsyn.modell.hendelser.Innsending
 import no.nav.dagpenger.innsyn.modell.hendelser.Innsending.Vedlegg
 import no.nav.dagpenger.innsyn.modell.hendelser.Innsending.Vedlegg.Status.LastetOpp
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
@@ -260,7 +259,7 @@ internal class PostgresPersonRepositoryTest {
         }
     }
 
-    private class SøknadInspektør(val søknad: Søknad) : SøknadVisitor {
+    private class SøknadInspektør(søknad: Søknad) : SøknadVisitor {
         var søknadId: String? = null
         var skjemaKode: String? = null
         var tittel: String? = null
@@ -296,7 +295,7 @@ internal class PostgresPersonRepositoryTest {
         override fun visitVedlegg(
             skjemaNummer: String,
             navn: String,
-            status: Innsending.Vedlegg.Status
+            status: Vedlegg.Status
         ) {
             antallVedlegg++
         }

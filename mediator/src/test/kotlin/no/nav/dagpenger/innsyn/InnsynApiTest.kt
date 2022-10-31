@@ -1,5 +1,6 @@
 package no.nav.dagpenger.innsyn
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.request.headers
@@ -37,6 +38,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
+import java.util.UUID
 
 internal class InnsynApiTest {
     private val testIssuer = "test-issuer"
@@ -117,6 +119,43 @@ internal class InnsynApiTest {
                     assertTrue(content.contains(NySøknad.toString()))
                     assertTrue(content.contains(Innsending.Vedlegg.Status.LastetOpp.toString()))
                     assertTrue(content.contains("Søknad om"))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Søknad fra ny søknadsdialog får legacy false og motsatt`() = withMigratedDb {
+        val søknadIdGammeltFormat = "1"
+        val søknadIdNyttFormat = UUID.randomUUID().toString()
+        val personRepository = PostgresPersonRepository().also {
+            it.person("test@nav.no").also { person ->
+                person.håndter(
+                    søknad(søknadIdGammeltFormat, "1", LocalDateTime.now().minusDays(90))
+                )
+                person.håndter(
+                    søknad(søknadIdNyttFormat, "11", LocalDateTime.now().minusDays(90))
+                )
+                it.lagre(person)
+            }
+        }
+        testApplication {
+            application {
+                innsynApi(
+                    jwtStub.stubbedJwkProvider(),
+                    testIssuer,
+                    clientId,
+                    personRepository,
+                    henvendelseOppslag,
+                    ettersendingSpleiser
+                )
+            }
+            val fom = LocalDate.now().minusDays(100)
+            val dagensDato = LocalDate.now()
+            client.autentisert("/soknad?soktFom=$fom&soktTom=$dagensDato").let { response ->
+                ObjectMapper().readTree(response.bodyAsText()).let { jsonNode ->
+                    assertFalse(jsonNode[0]["legacy"].asBoolean()) { "Forventet at legacy: false. $jsonNode" }
+                    assertTrue(jsonNode[1]["legacy"].asBoolean()) { "Forventet at legacy: true.  $jsonNode" }
                 }
             }
         }
