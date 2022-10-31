@@ -154,8 +154,8 @@ internal class InnsynApiTest {
             val dagensDato = LocalDate.now()
             client.autentisert("/soknad?soktFom=$fom&soktTom=$dagensDato").let { response ->
                 ObjectMapper().readTree(response.bodyAsText()).let { jsonNode ->
-                    assertFalse(jsonNode[0]["legacy"].asBoolean()) { "Forventet at legacy: false. $jsonNode" }
-                    assertTrue(jsonNode[1]["legacy"].asBoolean()) { "Forventet at legacy: true.  $jsonNode" }
+                    assertTrue(jsonNode[0]["erNySøknadsdialog"].asBoolean()) { "Forventet at erNySøknadsdialog: true. $jsonNode" }
+                    assertFalse(jsonNode[1]["erNySøknadsdialog"].asBoolean()) { "Forventet at erNySøknadsdialog: false.  $jsonNode" }
                 }
             }
         }
