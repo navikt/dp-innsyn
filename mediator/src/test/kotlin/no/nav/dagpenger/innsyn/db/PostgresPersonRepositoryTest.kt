@@ -55,7 +55,11 @@ internal class PostgresPersonRepositoryTest {
             repository.hentSøknaderFor(fnr = person.fnr, fom = LocalDate.now().minusDays(30)).also {
                 assertEquals(1, it.size)
             }
-            repository.hentSøknaderFor(fnr = person.fnr, fom = LocalDate.now().minusDays(30), tom = LocalDate.now().plusDays(0)).also {
+            repository.hentSøknaderFor(
+                fnr = person.fnr,
+                fom = LocalDate.now().minusDays(30),
+                tom = LocalDate.now().plusDays(0)
+            ).also {
                 assertEquals(1, it.size)
             }
             repository.hentSøknaderFor(fnr = person.fnr, tom = LocalDate.now().plusDays(2)).also {
@@ -182,14 +186,19 @@ internal class PostgresPersonRepositoryTest {
         withMigratedDb {
             val fnr = "1234567891"
             val person = repository.person(fnr)
+            val søknadId = UUID.randomUUID().toString()
             val søknad = Søknad(
-                UUID.randomUUID().toString(),
+                søknadId,
                 "journalpostId",
                 "NAV01",
                 Søknad.SøknadsType.NySøknad,
                 Kanal.Papir,
                 LocalDateTime.now(),
-                emptyList(),
+                listOf(
+                    Vedlegg(
+                        "skjemanummer", "navn", LastetOpp
+                    )
+                ),
                 "tittel"
             )
             person.håndter(søknad)

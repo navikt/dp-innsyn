@@ -1,0 +1,1 @@
+ALTER TABLE vedlegg ALTER COLUMN søknad_id TYPE TEXT;
