@@ -183,7 +183,8 @@ internal fun Application.innsynApi(
                                     søknadId = it.uuid.toString(),
                                     behandlingsId = it.uuid.toString(),
                                     sistEndret = it.sistEndret,
-                                    tittel = "Søknad om dagpenger"
+                                    tittel = "Søknad om dagpenger",
+                                    erNySøknadsdialog = true
                                 )
                             )
                         }

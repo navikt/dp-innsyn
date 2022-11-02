@@ -355,7 +355,8 @@ internal class InnsynApiTest {
                 tittel = "En tittel oversatt fra kodeverk",
                 behandlingsId = søknadId,
                 søknadId = søknadId,
-                sistEndret = nå
+                sistEndret = nå,
+                erNySøknadsdialog = false
             )
         )
         val uuid = UUID.randomUUID()
@@ -383,16 +384,20 @@ internal class InnsynApiTest {
             assertEquals(HttpStatusCode.OK, response.status)
             val json = response.bodyAsText().let { jacksonObjectMapper.readTree(it) }
 
-            assertEquals("En tittel oversatt fra kodeverk", json[0]["tittel"].asText())
-            assertEquals("En tittel oversatt fra kodeverk", json[0]["tittel"].asText())
-            assertEquals("bid", json[0]["søknadId"].asText())
-            assertEquals("bid", json[0]["behandlingsId"].asText())
-            assertEquals(nå.toOffsetDateTime(), json[0]["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() })
+            val fraGammelSøknadsdialog = json[0]
+            assertEquals("En tittel oversatt fra kodeverk", fraGammelSøknadsdialog["tittel"].asText())
+            assertEquals("En tittel oversatt fra kodeverk", fraGammelSøknadsdialog["tittel"].asText())
+            assertEquals("bid", fraGammelSøknadsdialog["søknadId"].asText())
+            assertEquals("bid", fraGammelSøknadsdialog["behandlingsId"].asText())
+            assertFalse(fraGammelSøknadsdialog["erNySøknadsdialog"].asBoolean())
+            assertEquals(nå.toOffsetDateTime(), fraGammelSøknadsdialog["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() })
 
-            assertEquals("Søknad om dagpenger", json[1]["tittel"].asText())
-            assertEquals(uuid.toString(), json[1]["søknadId"].asText())
-            assertEquals(uuid.toString(), json[1]["behandlingsId"].asText())
-            assertEquals(nå.toOffsetDateTime(), json[1]["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() })
+            val fraNySøknadsdialog = json[1]
+            assertEquals("Søknad om dagpenger", fraNySøknadsdialog["tittel"].asText())
+            assertEquals(uuid.toString(), fraNySøknadsdialog["søknadId"].asText())
+            assertEquals(uuid.toString(), fraNySøknadsdialog["behandlingsId"].asText())
+            assertTrue(fraNySøknadsdialog["erNySøknadsdialog"].asBoolean())
+            assertEquals(nå.toOffsetDateTime(), fraNySøknadsdialog["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() })
         }
     }
 

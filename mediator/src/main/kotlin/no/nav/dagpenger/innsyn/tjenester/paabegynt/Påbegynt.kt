@@ -7,5 +7,6 @@ data class Påbegynt(
     @Deprecated("Bruk #søknadId i stedet")
     val behandlingsId: String,
     val søknadId: String,
-    val sistEndret: ZonedDateTime
+    val sistEndret: ZonedDateTime,
+    val erNySøknadsdialog: Boolean
 )
