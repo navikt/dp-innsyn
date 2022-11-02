@@ -37,6 +37,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -46,6 +47,7 @@ internal class InnsynApiTest {
     private val clientId = "id"
     private val henvendelseOppslag = mockk<HenvendelseOppslag>()
     private val ettersendingSpleiser = mockk<EttersendingSpleiser>()
+    private val jacksonObjectMapper = jacksonObjectMapper()
 
     @Test
     fun `test at bruker ikke har søknad`() = withMigratedDb {
@@ -324,7 +326,7 @@ internal class InnsynApiTest {
             }
             client.autentisert("/ettersendelser").let { response ->
                 assertEquals(HttpStatusCode.OK, response.status)
-                jacksonObjectMapper().readTree(response.bodyAsText()).let {
+                jacksonObjectMapper.readTree(response.bodyAsText()).let {
                     assertTrue(it.has("failedSources"))
                     assertTrue(it.has("results"))
                 }
@@ -335,14 +337,18 @@ internal class InnsynApiTest {
     @Test
     fun `test at bruker kan hente ut påbegynte søknader`() {
         val henvendelseOppslag = mockk<HenvendelseOppslag>()
+        val søknadId = "bid"
+        val nå = ZonedDateTime.now()
         val påbegynte = listOf(
             Påbegynt(
-                "En tittel oversatt fra kodeverk",
-                "bid",
-                ZonedDateTime.now()
+                tittel = "En tittel oversatt fra kodeverk",
+                behandlingsId = søknadId,
+                søknadId = søknadId,
+                sistEndret = nå
             )
         )
         coEvery { henvendelseOppslag.hentPåbegynte(any()) } returns påbegynte
+
         testApplication {
             application {
                 innsynApi(
@@ -354,7 +360,15 @@ internal class InnsynApiTest {
                     ettersendingSpleiser
                 )
             }
-            assertEquals(HttpStatusCode.OK, client.autentisert("/paabegynte").status)
+            val response = client.autentisert("/paabegynte")
+            assertEquals(HttpStatusCode.OK, response.status)
+            val json = response.bodyAsText().let { jacksonObjectMapper.readTree(it) }
+
+            assertEquals("En tittel oversatt fra kodeverk", json[0]["tittel"].asText())
+            assertEquals("En tittel oversatt fra kodeverk", json[0]["tittel"].asText())
+            assertEquals("bid", json[0]["søknadId"].asText())
+            assertEquals("bid", json[0]["behandlingsId"].asText())
+            assertEquals(nå, json[0]["sistEndret"].asText().let { ZonedDateTime.parse(it).withZoneSameInstant(ZoneId.of("Europe/Oslo")) })
         }
     }
 

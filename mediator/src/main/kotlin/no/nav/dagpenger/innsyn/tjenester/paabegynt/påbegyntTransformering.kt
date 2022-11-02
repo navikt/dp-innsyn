@@ -16,5 +16,6 @@ internal fun ExternalPåbegynt.toInternal() = Påbegynt(
     tittel = dagpengeBrevkoder[this.hovedskjemaKodeverkId]
         ?: throw IllegalArgumentException("$hovedskjemaKodeverkId er ikke en dagpengekode."),
     behandlingsId = this.behandlingsId,
+    søknadId = this.behandlingsId,
     sistEndret = this.sistEndret,
 )
