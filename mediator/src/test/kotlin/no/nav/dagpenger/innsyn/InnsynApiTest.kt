@@ -37,7 +37,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -368,7 +367,7 @@ internal class InnsynApiTest {
             assertEquals("En tittel oversatt fra kodeverk", json[0]["tittel"].asText())
             assertEquals("bid", json[0]["søknadId"].asText())
             assertEquals("bid", json[0]["behandlingsId"].asText())
-            assertEquals(nå, json[0]["sistEndret"].asText().let { ZonedDateTime.parse(it).withZoneSameInstant(ZoneId.of("Europe/Oslo")) })
+            assertEquals(nå.toOffsetDateTime(), json[0]["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() })
         }
     }
 
