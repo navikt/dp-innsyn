@@ -10,6 +10,7 @@ import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
 
 internal object Configuration {
+
     const val appName = "dp-innsyn"
     private val localProperties = ConfigurationMap(
         mapOf(
@@ -47,11 +48,22 @@ internal object Configuration {
     val dpProxyUrl by lazy { properties[Key("DP_PROXY_URL", stringType)] }
     val dpProxyScope by lazy { properties[Key("DP_PROXY_SCOPE", stringType)] }
 
+    val dpSoknadUrl by lazy { properties[Key("DP_SOKNAD_URL", stringType)] }
+    val dpSoknadAudience by lazy { properties[Key("DP_SOKNAD_AUDIENCE", stringType)] }
+
     val dpProxyTokenProvider by lazy {
         val azureAd = OAuth2Config.AzureAd(properties)
         CachedOauth2Client(
             tokenEndpointUrl = azureAd.tokenEndpointUrl,
             authType = azureAd.clientSecret(),
+        )
+    }
+
+    val tokenXClient by lazy {
+        val tokenX = OAuth2Config.TokenX(properties)
+        CachedOauth2Client(
+            tokenEndpointUrl = tokenX.tokenEndpointUrl,
+            authType = tokenX.privateKey()
         )
     }
 

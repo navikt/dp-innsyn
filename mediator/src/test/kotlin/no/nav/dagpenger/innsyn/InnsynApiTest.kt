@@ -29,6 +29,8 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType.NySøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.objectmother.MultiSourceResultObjectMother
 import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
+import no.nav.dagpenger.innsyn.tjenester.PåbegyntOppslag
+import no.nav.dagpenger.innsyn.tjenester.PåbegyntSøknadDto
 import no.nav.dagpenger.innsyn.tjenester.ettersending.EttersendingSpleiser
 import no.nav.dagpenger.innsyn.tjenester.paabegynt.Påbegynt
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -37,6 +39,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -58,7 +61,8 @@ internal class InnsynApiTest {
                     clientId,
                     PostgresPersonRepository(),
                     henvendelseOppslag,
-                    ettersendingSpleiser
+                    ettersendingSpleiser,
+                    mockk()
                 )
             }
             client.autentisert("/soknad").let { response ->
@@ -109,7 +113,8 @@ internal class InnsynApiTest {
                     clientId,
                     personRepository,
                     henvendelseOppslag,
-                    ettersendingSpleiser
+                    ettersendingSpleiser,
+                    mockk()
                 )
             }
             val fom = LocalDate.now().minusDays(100)
@@ -148,7 +153,8 @@ internal class InnsynApiTest {
                     clientId,
                     personRepository,
                     henvendelseOppslag,
-                    ettersendingSpleiser
+                    ettersendingSpleiser,
+                    mockk()
                 )
             }
             val fom = LocalDate.now().minusDays(100)
@@ -191,7 +197,8 @@ internal class InnsynApiTest {
                     clientId,
                     personRepository,
                     henvendelseOppslag,
-                    ettersendingSpleiser
+                    ettersendingSpleiser,
+                    mockk()
                 )
             }
             val dagensDato = LocalDate.now()
@@ -231,7 +238,8 @@ internal class InnsynApiTest {
                     clientId,
                     personRepository,
                     henvendelseOppslag,
-                    ettersendingSpleiser
+                    ettersendingSpleiser,
+                    mockk()
                 )
             }
             val dagensDato = LocalDate.now()
@@ -271,7 +279,8 @@ internal class InnsynApiTest {
                     clientId,
                     personRepository,
                     henvendelseOppslag,
-                    ettersendingSpleiser
+                    ettersendingSpleiser,
+                    mockk()
                 )
             }
             val dagensDato = LocalDate.now()
@@ -294,7 +303,8 @@ internal class InnsynApiTest {
                     clientId,
                     mockk<PostgresPersonRepository>(),
                     henvendelseOppslag,
-                    ettersendingSpleiser
+                    ettersendingSpleiser,
+                    mockk()
                 )
             }
             client.autentisert("/ettersendelser").let { response ->
@@ -320,7 +330,8 @@ internal class InnsynApiTest {
                     clientId,
                     mockk<PostgresPersonRepository>(),
                     henvendelseOppslag,
-                    ettersendingSpleiser
+                    ettersendingSpleiser,
+                    mockk(),
                 )
             }
             client.autentisert("/ettersendelser").let { response ->
@@ -334,7 +345,8 @@ internal class InnsynApiTest {
     }
 
     @Test
-    fun `test at bruker kan hente ut påbegynte søknader`() {
+    fun `test at bruker kan hente ut påbegynte søknader fra gammel og ny stack`() {
+        val påbegyntOppslagMock = mockk<PåbegyntOppslag>()
         val henvendelseOppslag = mockk<HenvendelseOppslag>()
         val søknadId = "bid"
         val nå = ZonedDateTime.now()
@@ -346,7 +358,14 @@ internal class InnsynApiTest {
                 sistEndret = nå
             )
         )
+        val uuid = UUID.randomUUID()
+        val påbegyntNySøknadsdialog = PåbegyntSøknadDto(
+            uuid = uuid,
+            opprettet = ZonedDateTime.of(LocalDateTime.MAX, ZoneId.of("Europe/Oslo")),
+            sistEndret = nå
+        )
         coEvery { henvendelseOppslag.hentPåbegynte(any()) } returns påbegynte
+        coEvery { påbegyntOppslagMock.hentPåbegyntSøknad(any()) } returns påbegyntNySøknadsdialog
 
         testApplication {
             application {
@@ -356,7 +375,8 @@ internal class InnsynApiTest {
                     clientId,
                     mockk<PostgresPersonRepository>(),
                     henvendelseOppslag,
-                    ettersendingSpleiser
+                    ettersendingSpleiser,
+                    påbegyntOppslagMock
                 )
             }
             val response = client.autentisert("/paabegynte")
@@ -368,6 +388,11 @@ internal class InnsynApiTest {
             assertEquals("bid", json[0]["søknadId"].asText())
             assertEquals("bid", json[0]["behandlingsId"].asText())
             assertEquals(nå.toOffsetDateTime(), json[0]["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() })
+
+            assertEquals("Søknad om dagpenger", json[1]["tittel"].asText())
+            assertEquals(uuid.toString(), json[1]["søknadId"].asText())
+            assertEquals(uuid.toString(), json[1]["behandlingsId"].asText())
+            assertEquals(nå.toOffsetDateTime(), json[1]["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() })
         }
     }
 
@@ -400,7 +425,8 @@ internal class InnsynApiTest {
                     clientId,
                     personRepository,
                     henvendelseOppslag,
-                    ettersendingSpleiser
+                    ettersendingSpleiser,
+                    mockk()
                 )
             }
             val dagensDato = LocalDate.now()
@@ -421,7 +447,8 @@ internal class InnsynApiTest {
                     clientId,
                     PostgresPersonRepository(),
                     henvendelseOppslag,
-                    ettersendingSpleiser
+                    ettersendingSpleiser,
+                    mockk()
                 )
             }
             assertEquals(

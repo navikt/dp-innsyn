@@ -6,6 +6,7 @@ import no.nav.dagpenger.innsyn.tjenester.EttersendingMottak
 import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
 import no.nav.dagpenger.innsyn.tjenester.JournalførtMottak
 import no.nav.dagpenger.innsyn.tjenester.OppgaveMottak
+import no.nav.dagpenger.innsyn.tjenester.PåbegyntOppslag
 import no.nav.dagpenger.innsyn.tjenester.SøknadMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakAvsluttetMottak
 import no.nav.dagpenger.innsyn.tjenester.VedtakMottak
@@ -18,13 +19,25 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val personRepository = PostgresPersonRepository()
     private val henvendelseOppslag = HenvendelseOppslag(
         dpProxyUrl = Configuration.dpProxyUrl,
-        tokenProvider = { Configuration.dpProxyTokenProvider.clientCredentials(Configuration.dpProxyScope).accessToken },
+        tokenProvider = { Configuration.dpProxyTokenProvider.clientCredentials(Configuration.dpProxyScope).accessToken }
     )
     private val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
+    private val påbegyntOppslag = PåbegyntOppslag(
+        Configuration.dpSoknadUrl,
+        Configuration.dpSoknadAudience,
+    )
     private val personMediator = PersonMediator(personRepository)
     private val rapidsConnection = RapidApplication.Builder(fromEnv(env))
         .withKtorModule {
-            innsynApi(AuthFactory.jwkProvider, AuthFactory.issuer, AuthFactory.clientId, personRepository, henvendelseOppslag, ettersendingSpleiser)
+            innsynApi(
+                AuthFactory.jwkProvider,
+                AuthFactory.issuer,
+                AuthFactory.clientId,
+                personRepository,
+                henvendelseOppslag,
+                ettersendingSpleiser,
+                påbegyntOppslag
+            )
         }.build().apply {
             SøknadMottak(this, personMediator)
             JournalførtMottak(this, personMediator)

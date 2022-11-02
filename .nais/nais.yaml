@@ -53,6 +53,9 @@ spec:
           namespace: paw
         - application: aia-backend
           namespace: paw
+    outbound:
+      rules:
+        - application: dp-soknad
   tokenx:
     enabled: true
   azure:
@@ -80,3 +83,7 @@ spec:
       value: {{dp_proxy_scope}}
     - name: DP_PROXY_URL
       value: {{dp_proxy_url}}
+    - name: DP_SOKNAD_URL
+      value:  {{dp_soknad.url}}
+    - name: DP_SOKNAD_AUDIENCE
+      value: {{dp_soknad.audience}}

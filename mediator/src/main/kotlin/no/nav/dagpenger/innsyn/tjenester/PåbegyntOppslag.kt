@@ -19,7 +19,7 @@ import java.util.UUID
 
 internal class PåbegyntOppslag(
     private val baseUrl: String,
-    private val soknadAudience: String = "soknadAudience",
+    private val soknadAudience: String,
     private val tokenProvider: (token: String, audience: String) -> String = exchangeToOboToken,
     engine: HttpClientEngine = CIO.create()
 ) {
@@ -54,11 +54,9 @@ data class PåbegyntSøknadDto(
     @JsonProperty("opprettet")
     val opprettet: ZonedDateTime,
     @JsonProperty("sistEndret")
-    val sistEndret: ZonedDateTime?,
+    val sistEndret: ZonedDateTime
 )
 
 private val exchangeToOboToken = { token: String, audience: String ->
-    "dummyToken"
-    // val accessTokenResponse = Configuration.tokenXClient.tokenExchange(token, audience)
-    // accessTokenResponse.accessToken
+    no.nav.dagpenger.innsyn.Configuration.tokenXClient.tokenExchange(token, audience).accessToken
 }

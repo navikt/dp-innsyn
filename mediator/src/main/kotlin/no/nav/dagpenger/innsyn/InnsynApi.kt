@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
@@ -16,6 +17,7 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
+import io.ktor.server.auth.parseAuthorizationHeader
 import io.ktor.server.plugins.callid.CallId
 import io.ktor.server.plugins.callid.callIdMdc
 import io.ktor.server.plugins.callloging.CallLogging
@@ -23,11 +25,14 @@ import io.ktor.server.plugins.compression.Compression
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.defaultheaders.DefaultHeaders
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.request.ApplicationRequest
 import io.ktor.server.request.document
 import io.ktor.server.request.path
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.Configuration.appName
 import no.nav.dagpenger.innsyn.behandlingsstatus.AvgjørBehandlingsstatus
@@ -36,7 +41,9 @@ import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.modell.serde.SøknadJsonBuilder
 import no.nav.dagpenger.innsyn.modell.serde.VedtakJsonBuilder
 import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
+import no.nav.dagpenger.innsyn.tjenester.PåbegyntOppslag
 import no.nav.dagpenger.innsyn.tjenester.ettersending.EttersendingSpleiser
+import no.nav.dagpenger.innsyn.tjenester.paabegynt.Påbegynt
 import org.slf4j.event.Level
 import java.time.LocalDate
 import java.util.UUID
@@ -49,7 +56,8 @@ internal fun Application.innsynApi(
     clientId: String,
     personRepository: PersonRepository,
     henvendelseOppslag: HenvendelseOppslag,
-    ettersendingSpleiser: EttersendingSpleiser
+    ettersendingSpleiser: EttersendingSpleiser,
+    påbegyntOppslag: PåbegyntOppslag
 ) {
     install(CallId) {
         header("Nav-Call-Id")
@@ -165,8 +173,27 @@ internal fun Application.innsynApi(
             get("/paabegynte") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
-                val påbegynte = henvendelseOppslag.hentPåbegynte(fnr)
-                call.respond(påbegynte)
+                val token = call.request.jwt()
+                val påbegynte = async { henvendelseOppslag.hentPåbegynte(fnr) }
+                val påbegyntSøknadFraNySøknadsdialog = async {
+                    try {
+                        påbegyntOppslag.hentPåbegyntSøknad(token).let {
+                            listOf(
+                                Påbegynt(
+                                    søknadId = it.uuid.toString(),
+                                    behandlingsId = it.uuid.toString(),
+                                    sistEndret = it.sistEndret,
+                                    tittel = "Søknad om dagpenger"
+                                )
+                            )
+                        }
+                    } catch (e: Exception) {
+                        logger.error(e) { "Klarte ikke å hente påbegynt søknad fra dp-soknad " }
+                        emptyList()
+                    }
+                }
+                val søknader = awaitAll(påbegynte, påbegyntSøknadFraNySøknadsdialog).flatten()
+                call.respond(søknader)
             }
         }
     }
@@ -177,5 +204,9 @@ private fun String.asOptionalLocalDate(): LocalDate? =
 
 private val JWTPrincipal.fnr: String
     get() = this.payload.claims.pid().asString()
+
+internal fun ApplicationRequest.jwt(): String = this.parseAuthorizationHeader().let { authHeader ->
+    (authHeader as? HttpAuthHeader.Single)?.blob ?: throw IllegalArgumentException("JWT not found")
+}
 
 private fun <V : Claim> Map<String, V>.pid() = firstNotNullOf { it.takeIf { it.key == "pid" } }.value
