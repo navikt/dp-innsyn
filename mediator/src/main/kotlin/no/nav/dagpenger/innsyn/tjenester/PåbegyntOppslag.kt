@@ -7,11 +7,13 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
 import java.time.ZonedDateTime
@@ -35,12 +37,19 @@ internal class PåbegyntOppslag(
         }
     }
 
-    internal suspend fun hentPåbegyntSøknad(subjectToken: String): PåbegyntSøknadDto {
+    internal suspend fun hentPåbegyntSøknad(subjectToken: String): PåbegyntSøknadDto? {
         val url = "$baseUrl/soknad/paabegynt"
-        return httpClient.get(url) {
-            addBearerToken(subjectToken)
-            contentType(ContentType.Application.Json)
-        }.body()
+        return try {
+            httpClient.get(url) {
+                addBearerToken(subjectToken)
+                contentType(ContentType.Application.Json)
+            }.body()
+        } catch (e: ClientRequestException) {
+            when (e.response.status) {
+                HttpStatusCode.NotFound -> null
+                else -> throw e
+            }
+        }
     }
 
     private fun HttpRequestBuilder.addBearerToken(subjectToken: String) {

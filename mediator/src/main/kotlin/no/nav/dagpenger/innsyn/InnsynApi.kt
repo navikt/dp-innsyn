@@ -177,7 +177,7 @@ internal fun Application.innsynApi(
                 val påbegynte = async { henvendelseOppslag.hentPåbegynte(fnr) }
                 val påbegyntSøknadFraNySøknadsdialog = async {
                     try {
-                        påbegyntOppslag.hentPåbegyntSøknad(token).let {
+                        påbegyntOppslag.hentPåbegyntSøknad(token)?.let {
                             listOf(
                                 Påbegynt(
                                     søknadId = it.uuid.toString(),
@@ -187,7 +187,7 @@ internal fun Application.innsynApi(
                                     erNySøknadsdialog = true
                                 )
                             )
-                        }
+                        } ?: emptyList()
                     } catch (e: Exception) {
                         logger.error(e) { "Klarte ikke å hente påbegynt søknad fra dp-soknad " }
                         emptyList()
