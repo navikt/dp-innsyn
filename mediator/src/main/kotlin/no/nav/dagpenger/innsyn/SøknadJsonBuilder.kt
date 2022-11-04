@@ -1,10 +1,12 @@
-package no.nav.dagpenger.innsyn.modell.serde
+package no.nav.dagpenger.innsyn
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import no.nav.dagpenger.innsyn.modell.hendelser.Innsending
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
+import no.nav.dagpenger.innsyn.modell.serde.SøknadVisitor
+import no.nav.dagpenger.innsyn.tjenester.Lenker
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,6 +33,7 @@ class SøknadJsonBuilder(val søknad: Søknad) : SøknadVisitor {
         søknadId?.let { søknadIden ->
             root.put("søknadId", søknadIden)
             root.put("erNySøknadsdialog", søknadIden.erFraNySøknadsdialog())
+            root.put("endreLenke", if (søknadIden.erFraNySøknadsdialog()) Lenker.ettersendelseNySøknadsdialog(søknadIden) else Lenker.ettersendelseGammelSøknadsdialog(søknadIden))
         }
         skjemaKode?.let {
             root.put("skjemaKode", it)

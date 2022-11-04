@@ -57,7 +57,7 @@ class PåbegynteOppslagTest {
             val påbegyntResponse = påbegyntOppslag.hentPåbegyntSøknad(subjectToken = "testToken")
             assertEquals(søknadUuid, påbegyntResponse.uuid)
             assertEquals(opprettet.toOffsetDateTime(), påbegyntResponse.opprettet.toOffsetDateTime())
-            assertEquals(sistEndret.toOffsetDateTime(), påbegyntResponse.sistEndret!!.toOffsetDateTime())
+            assertEquals(sistEndret.toOffsetDateTime(), påbegyntResponse.sistEndret.toOffsetDateTime())
         }
     }
 

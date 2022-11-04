@@ -87,3 +87,7 @@ spec:
       value:  {{dp_soknad.url}}
     - name: DP_SOKNAD_AUDIENCE
       value: {{dp_soknad.audience}}
+    - name: NY_SOKNADSDIALOG_INGRESS
+      value: {{ny_soknadsdialog.ingress}}
+    - name: GAMMEL_SOKNADSDIALOG_INGRESS
+      value: {{gammel_soknadsdialog.ingress}}

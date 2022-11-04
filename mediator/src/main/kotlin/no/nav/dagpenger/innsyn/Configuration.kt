@@ -18,7 +18,9 @@ internal object Configuration {
             "KAFKA_RAPID_TOPIC" to "private-dagpenger-behov-v2",
             "KAFKA_RESET_POLICY" to "earliest",
             "HTTP_PORT" to "8080",
-            "KAFKA_BROKERS" to "localhost:9092"
+            "KAFKA_BROKERS" to "localhost:9092",
+            "NY_SOKNADSDIALOG_INGRESS" to "http://www.nav.no/dagpenger/soknad",
+            "GAMMEL_SOKNADSDIALOG_INGRESS" to "https://tjenester.nav.no/soknaddagpenger-innsending"
         )
     )
 
@@ -50,6 +52,9 @@ internal object Configuration {
 
     val dpSoknadUrl by lazy { properties[Key("DP_SOKNAD_URL", stringType)] }
     val dpSoknadAudience by lazy { properties[Key("DP_SOKNAD_AUDIENCE", stringType)] }
+
+    val nySøknadsdialogIngress by lazy { properties[Key("NY_SOKNADSDIALOG_INGRESS", stringType)] }
+    val gammelSøknadsdialogIngress by lazy { properties[Key("GAMMEL_SOKNADSDIALOG_INGRESS", stringType)] }
 
     val dpProxyTokenProvider by lazy {
         val azureAd = OAuth2Config.AzureAd(properties)
