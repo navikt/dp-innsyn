@@ -132,7 +132,7 @@ internal class InnsynApiTest {
 
     @Test
     fun `Søknad fra ny søknadsdialog får legacy false og motsatt`() = withMigratedDb {
-        val søknadIdGammeltFormat = "1"
+        val søknadIdGammeltFormat = "1234TEST"
         val søknadIdNyttFormat = UUID.randomUUID().toString()
         val personRepository = PostgresPersonRepository().also {
             it.person("test@nav.no").also { person ->
@@ -161,8 +161,12 @@ internal class InnsynApiTest {
             val dagensDato = LocalDate.now()
             client.autentisert("/soknad?soktFom=$fom&soktTom=$dagensDato").let { response ->
                 ObjectMapper().readTree(response.bodyAsText()).let { jsonNode ->
-                    assertTrue(jsonNode[0]["erNySøknadsdialog"].asBoolean()) { "Forventet at erNySøknadsdialog: true. $jsonNode" }
-                    assertFalse(jsonNode[1]["erNySøknadsdialog"].asBoolean()) { "Forventet at erNySøknadsdialog: false.  $jsonNode" }
+                    val fraNySøknadsdialog = jsonNode[0]
+                    assertTrue(fraNySøknadsdialog["erNySøknadsdialog"].asBoolean()) { "Forventet at erNySøknadsdialog: true. $jsonNode" }
+                    assertEquals("http://www.nav.no/dagpenger/soknad/$søknadIdNyttFormat/kvittering", fraNySøknadsdialog["endreLenke"].asText())
+                    val fraGammelSøknadsdialog = jsonNode[1]
+                    assertFalse(fraGammelSøknadsdialog["erNySøknadsdialog"].asBoolean()) { "Forventet at erNySøknadsdialog: false.  $jsonNode" }
+                    assertEquals("https://tjenester.nav.no/soknaddagpenger-innsending/startettersending/1234TEST", fraGammelSøknadsdialog["endreLenke"].asText())
                 }
             }
         }
@@ -348,7 +352,7 @@ internal class InnsynApiTest {
     fun `test at bruker kan hente ut påbegynte søknader fra gammel og ny stack`() {
         val påbegyntOppslagMock = mockk<PåbegyntOppslag>()
         val henvendelseOppslag = mockk<HenvendelseOppslag>()
-        val søknadId = "bid"
+        val søknadId = "1234TEST"
         val nå = ZonedDateTime.now()
         val påbegynte = listOf(
             Påbegynt(
@@ -387,10 +391,11 @@ internal class InnsynApiTest {
             val fraGammelSøknadsdialog = json[0]
             assertEquals("En tittel oversatt fra kodeverk", fraGammelSøknadsdialog["tittel"].asText())
             assertEquals("En tittel oversatt fra kodeverk", fraGammelSøknadsdialog["tittel"].asText())
-            assertEquals("bid", fraGammelSøknadsdialog["søknadId"].asText())
-            assertEquals("bid", fraGammelSøknadsdialog["behandlingsId"].asText())
+            assertEquals("1234TEST", fraGammelSøknadsdialog["søknadId"].asText())
+            assertEquals("1234TEST", fraGammelSøknadsdialog["behandlingsId"].asText())
             assertFalse(fraGammelSøknadsdialog["erNySøknadsdialog"].asBoolean())
             assertEquals(nå.toOffsetDateTime(), fraGammelSøknadsdialog["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() })
+            assertEquals("https://tjenester.nav.no/soknaddagpenger-innsending/soknad/1234TEST", fraGammelSøknadsdialog["endreLenke"].asText())
 
             val fraNySøknadsdialog = json[1]
             assertEquals("Søknad om dagpenger", fraNySøknadsdialog["tittel"].asText())
@@ -398,6 +403,7 @@ internal class InnsynApiTest {
             assertEquals(uuid.toString(), fraNySøknadsdialog["behandlingsId"].asText())
             assertTrue(fraNySøknadsdialog["erNySøknadsdialog"].asBoolean())
             assertEquals(nå.toOffsetDateTime(), fraNySøknadsdialog["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() })
+            assertEquals("http://www.nav.no/dagpenger/soknad/$uuid", fraNySøknadsdialog["endreLenke"].asText())
         }
     }
 

@@ -16,6 +16,7 @@ internal class PåbegynteTransformeringTest {
 
         assertEquals(1, dagpengeEttersendelser.size)
         assertEquals(externalEttersendelser[1].behandlingsId, dagpengeEttersendelser[0].behandlingsId)
+        assertEquals(externalEttersendelser[1].behandlingsId, dagpengeEttersendelser[0].behandlingsId)
         assertEquals(externalEttersendelser[1].sistEndret, dagpengeEttersendelser[0].sistEndret)
         assertEquals("Søknad om dagpenger (ikke permittert)", dagpengeEttersendelser[0].tittel)
     }
