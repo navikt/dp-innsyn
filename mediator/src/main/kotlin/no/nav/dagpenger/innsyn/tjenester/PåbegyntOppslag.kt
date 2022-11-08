@@ -11,6 +11,7 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -37,11 +38,12 @@ internal class PåbegyntOppslag(
         }
     }
 
-    internal suspend fun hentPåbegyntSøknad(subjectToken: String): PåbegyntSøknadDto? {
+    internal suspend fun hentPåbegyntSøknad(subjectToken: String, XRequestId: String? = UUID.randomUUID().toString()): PåbegyntSøknadDto? {
         val url = "$baseUrl/soknad/paabegynt"
         return try {
             httpClient.get(url) {
                 addBearerToken(subjectToken)
+                header(HttpHeaders.XRequestId, XRequestId)
                 contentType(ContentType.Application.Json)
             }.body()
         } catch (e: ClientRequestException) {

@@ -370,7 +370,7 @@ internal class InnsynApiTest {
             sistEndret = nå
         )
         coEvery { henvendelseOppslag.hentPåbegynte(any()) } returns påbegynte
-        coEvery { påbegyntOppslagMock.hentPåbegyntSøknad(any()) } returns påbegyntNySøknadsdialog
+        coEvery { påbegyntOppslagMock.hentPåbegyntSøknad(any(), any()) } returns påbegyntNySøknadsdialog
 
         testApplication {
             application {

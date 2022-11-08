@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.serialization.jackson.jackson
@@ -27,6 +28,7 @@ import io.ktor.server.plugins.defaultheaders.DefaultHeaders
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.request.ApplicationRequest
 import io.ktor.server.request.document
+import io.ktor.server.request.header
 import io.ktor.server.request.path
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
@@ -171,12 +173,13 @@ internal fun Application.innsynApi(
 
             get("/paabegynte") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
+                val requestId: String? = call.request.header("Nav-Consumer-Id") ?: call.request.header(HttpHeaders.XRequestId)
                 val fnr = jwtPrincipal!!.fnr
                 val token = call.request.jwt()
                 val påbegynte = async { henvendelseOppslag.hentPåbegynte(fnr) }
                 val påbegyntSøknadFraNySøknadsdialog = async {
                     try {
-                        påbegyntOppslag.hentPåbegyntSøknad(token)?.let {
+                        påbegyntOppslag.hentPåbegyntSøknad(token, requestId)?.let {
                             listOf(
                                 Påbegynt(
                                     søknadId = it.uuid.toString(),
