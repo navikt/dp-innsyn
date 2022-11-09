@@ -34,7 +34,7 @@ class PåbegynteOppslagTest {
                 soknadAudience,
                 testTokenProvider,
                 engine = MockEngine { request ->
-                    assertEquals("$baseUrl/soknad/paabegynt", request.url.toString())
+                    assertEquals("$baseUrl/arbeid/dagpenger/soknadapi/soknad/paabegynt", request.url.toString())
                     assertEquals(HttpMethod.Get, request.method)
                     assertEquals(
                         "Bearer ${testTokenProvider.invoke(subjectToken, soknadAudience)}",

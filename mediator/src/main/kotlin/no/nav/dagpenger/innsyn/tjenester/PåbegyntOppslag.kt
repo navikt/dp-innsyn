@@ -39,7 +39,7 @@ internal class PåbegyntOppslag(
     }
 
     internal suspend fun hentPåbegyntSøknad(subjectToken: String, XRequestId: String? = UUID.randomUUID().toString()): PåbegyntSøknadDto? {
-        val url = "$baseUrl/soknad/paabegynt"
+        val url = "$baseUrl/arbeid/dagpenger/soknadapi/soknad/paabegynt"
         return try {
             httpClient.get(url) {
                 addBearerToken(subjectToken)
