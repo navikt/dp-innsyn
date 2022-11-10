@@ -49,8 +49,6 @@ spec:
         - application: dp-soknad
         - application: paw-auth-proxy
           namespace: paw
-        - application: bakveientilarbeid
-          namespace: paw
         - application: aia-backend
           namespace: paw
     outbound:
