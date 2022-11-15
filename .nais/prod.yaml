@@ -10,6 +10,6 @@ dp_soknad:
   url: "http://dp-soknad"
   audience: "prod-gcp:teamdagpenger:dp-soknad"
 ny_soknadsdialog:
-  ingress: "https://www.nav.no/dagpenger/soknad"
+  ingress: "https://www.nav.no/dagpenger/dialog/soknad"
 gammel_soknadsdialog:
   ingress: "https://tjenester.nav.no/soknaddagpenger-innsending"

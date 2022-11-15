@@ -163,7 +163,7 @@ internal class InnsynApiTest {
                 ObjectMapper().readTree(response.bodyAsText()).let { jsonNode ->
                     val fraNySøknadsdialog = jsonNode[0]
                     assertTrue(fraNySøknadsdialog["erNySøknadsdialog"].asBoolean()) { "Forventet at erNySøknadsdialog: true. $jsonNode" }
-                    assertEquals("https://arbeid.dev.nav.no/dagpenger/soknad/$søknadIdNyttFormat/kvittering", fraNySøknadsdialog["endreLenke"].asText())
+                    assertEquals("https://arbeid.dev.nav.no/dagpenger/dialog/soknad/$søknadIdNyttFormat/kvittering", fraNySøknadsdialog["endreLenke"].asText())
                     val fraGammelSøknadsdialog = jsonNode[1]
                     assertFalse(fraGammelSøknadsdialog["erNySøknadsdialog"].asBoolean()) { "Forventet at erNySøknadsdialog: false.  $jsonNode" }
                     assertEquals("https://tjenester.nav.no/soknaddagpenger-innsending/startettersending/1234TEST", fraGammelSøknadsdialog["endreLenke"].asText())
@@ -403,7 +403,7 @@ internal class InnsynApiTest {
             assertEquals(uuid.toString(), fraNySøknadsdialog["behandlingsId"].asText())
             assertTrue(fraNySøknadsdialog["erNySøknadsdialog"].asBoolean())
             assertEquals(nå.toOffsetDateTime(), fraNySøknadsdialog["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() })
-            assertEquals("https://arbeid.dev.nav.no/dagpenger/soknad/$uuid", fraNySøknadsdialog["endreLenke"].asText())
+            assertEquals("https://arbeid.dev.nav.no/dagpenger/dialog/soknad/$uuid", fraNySøknadsdialog["endreLenke"].asText())
         }
     }
 
