@@ -50,6 +50,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 private val logger = KotlinLogging.logger { }
+private val sikkerlogg = KotlinLogging.logger("tjenestekall.InnsynApi")
 
 internal fun Application.innsynApi(
     jwkProvider: JwkProvider,
@@ -154,7 +155,7 @@ internal fun Application.innsynApi(
                 val fom = call.request.queryParameters["fom"]
                     ?: throw IllegalArgumentException("Mangler fom queryparameter i url")
                 val behandlingsstatus = avgjørBehandlingsstatus.hentStatus(fnr, LocalDate.parse(fom))
-
+                sikkerlogg.info { "Behandlingsstatus: $behandlingsstatus" }
                 call.respond(HttpStatusCode.OK, BehandlingsstatusDTO(behandlingsstatus))
             }
 
