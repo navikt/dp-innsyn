@@ -24,9 +24,7 @@ spec:
     min: 2
     max: 3
     cpuThresholdPercentage: 50
-  preStopHook:
-    http:
-      path: /stop
+  terminationGracePeriodSeconds: 180
   prometheus:
     enabled: true
   resources:
