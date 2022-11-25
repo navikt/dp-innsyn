@@ -7,7 +7,7 @@ application {
 }
 
 dependencies {
-    val dpBibliotekerVersion = "2022.10.22-09.05.6fcf3395aa4f"
+    val dpBibliotekerVersion = Dagpenger.Biblioteker.version
 
     implementation("com.github.navikt.dp-biblioteker:ktor-client-metrics:$dpBibliotekerVersion")
     implementation(Ktor2.Server.library("auth"))
