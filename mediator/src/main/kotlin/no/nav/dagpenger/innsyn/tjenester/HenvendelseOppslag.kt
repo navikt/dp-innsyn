@@ -34,13 +34,13 @@ internal class HenvendelseOppslag(
     httpClientEngine: HttpClientEngine = CIO.create() {
         requestTimeout = 0
     },
-    baseName: String = "dp_innsyn"
+    baseName: String? = null
 ) {
 
     private val dpProxyClient = HttpClient(httpClientEngine) {
         expectSuccess = true
         install(PrometheusMetricsPlugin) {
-            this.baseName = baseName
+            baseName?.let { this.baseName = it }
         }
 
         install(HttpTimeout) {
