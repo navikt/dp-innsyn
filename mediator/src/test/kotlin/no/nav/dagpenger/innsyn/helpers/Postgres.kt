@@ -30,7 +30,6 @@ internal object Postgres {
     }
 
     private fun setup() {
-        System.setProperty(ConfigUtils.CLEAN_DISABLED, "false")
         System.setProperty(db.host.name, instance.host)
         System.setProperty(
             db.port.name,
