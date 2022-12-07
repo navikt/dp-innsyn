@@ -31,7 +31,9 @@ private val logg = KotlinLogging.logger {}
 internal class HenvendelseOppslag(
     private val dpProxyUrl: String,
     private val tokenProvider: () -> String,
-    httpClientEngine: HttpClientEngine = CIO.create(),
+    httpClientEngine: HttpClientEngine = CIO.create() {
+        requestTimeout = 0
+    },
     baseName: String = "dp_innsyn"
 ) {
 
@@ -44,7 +46,7 @@ internal class HenvendelseOppslag(
         install(HttpTimeout) {
             requestTimeoutMillis = 15.seconds.inWholeMilliseconds
             connectTimeoutMillis = 5.seconds.inWholeMilliseconds
-            socketTimeoutMillis = 5.seconds.inWholeMilliseconds
+            socketTimeoutMillis = 15.seconds.inWholeMilliseconds
         }
 
         install(ContentNegotiation) {
