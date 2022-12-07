@@ -8,6 +8,7 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
@@ -19,12 +20,15 @@ import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
 import java.time.ZonedDateTime
 import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 
 internal class PåbegyntOppslag(
     private val baseUrl: String,
     private val soknadAudience: String,
     private val tokenProvider: (token: String, audience: String) -> String = exchangeToOboToken,
-    engine: HttpClientEngine = CIO.create()
+    engine: HttpClientEngine = CIO.create() {
+        requestTimeout = 0
+    }
 ) {
 
     private val httpClient = HttpClient(engine) {
@@ -35,6 +39,11 @@ internal class PåbegyntOppslag(
                 disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 registerModule(JavaTimeModule())
             }
+        }
+        install(HttpTimeout) {
+            requestTimeoutMillis = 15.seconds.inWholeMilliseconds
+            connectTimeoutMillis = 5.seconds.inWholeMilliseconds
+            socketTimeoutMillis = 15.seconds.inWholeMilliseconds
         }
     }
 
