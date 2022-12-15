@@ -33,8 +33,6 @@ import io.ktor.server.request.path
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.Configuration.appName
 import no.nav.dagpenger.innsyn.behandlingsstatus.AvgjørBehandlingsstatus
@@ -172,31 +170,26 @@ internal fun Application.innsynApi(
             }
 
             get("/paabegynte") {
-                val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
-                val requestId: String? = call.request.header("Nav-Consumer-Id") ?: call.request.header(HttpHeaders.XRequestId)
-                val fnr = jwtPrincipal!!.fnr
+                val requestId: String? =
+                    call.request.header("Nav-Consumer-Id") ?: call.request.header(HttpHeaders.XRequestId)
                 val token = call.request.jwt()
-                val påbegynte = async { henvendelseOppslag.hentPåbegynte(fnr) }
-                val påbegyntSøknadFraNySøknadsdialog = async {
-                    try {
-                        påbegyntOppslag.hentPåbegyntSøknad(token, requestId)?.let {
-                            listOf(
-                                Påbegynt(
-                                    søknadId = it.uuid.toString(),
-                                    behandlingsId = it.uuid.toString(),
-                                    sistEndret = it.sistEndret,
-                                    tittel = "Søknad om dagpenger",
-                                    erNySøknadsdialog = true
-                                )
+                val påbegyntSøknadFraNySøknadsdialog = try {
+                    påbegyntOppslag.hentPåbegyntSøknad(token, requestId)?.let {
+                        listOf(
+                            Påbegynt(
+                                søknadId = it.uuid.toString(),
+                                behandlingsId = it.uuid.toString(),
+                                sistEndret = it.sistEndret,
+                                tittel = "Søknad om dagpenger",
+                                erNySøknadsdialog = true
                             )
-                        } ?: emptyList()
-                    } catch (e: Exception) {
-                        logger.error(e) { "Klarte ikke å hente påbegynt søknad fra dp-soknad " }
-                        emptyList()
-                    }
+                        )
+                    } ?: emptyList()
+                } catch (e: Exception) {
+                    logger.error(e) { "Klarte ikke å hente påbegynt søknad fra dp-soknad " }
+                    emptyList()
                 }
-                val søknader = awaitAll(påbegynte, påbegyntSøknadFraNySøknadsdialog).flatten()
-                call.respond(søknader)
+                call.respond(påbegyntSøknadFraNySøknadsdialog)
             }
         }
     }

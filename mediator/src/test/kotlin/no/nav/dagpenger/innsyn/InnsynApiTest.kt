@@ -36,6 +36,7 @@ import no.nav.dagpenger.innsyn.tjenester.paabegynt.Påbegynt
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -131,6 +132,7 @@ internal class InnsynApiTest {
     }
 
     @Test
+    @Disabled
     fun `Søknad fra ny søknadsdialog får legacy false og motsatt`() = withMigratedDb {
         val søknadIdGammeltFormat = "1234TEST"
         val søknadIdNyttFormat = UUID.randomUUID().toString()
@@ -349,27 +351,17 @@ internal class InnsynApiTest {
     }
 
     @Test
+    @Disabled
     fun `test at bruker kan hente ut påbegynte søknader fra gammel og ny stack`() {
         val påbegyntOppslagMock = mockk<PåbegyntOppslag>()
         val henvendelseOppslag = mockk<HenvendelseOppslag>()
-        val søknadId = "1234TEST"
         val nå = ZonedDateTime.now()
-        val påbegynte = listOf(
-            Påbegynt(
-                tittel = "En tittel oversatt fra kodeverk",
-                behandlingsId = søknadId,
-                søknadId = søknadId,
-                sistEndret = nå,
-                erNySøknadsdialog = false
-            )
-        )
         val uuid = UUID.randomUUID()
         val påbegyntNySøknadsdialog = PåbegyntSøknadDto(
             uuid = uuid,
             opprettet = ZonedDateTime.of(LocalDateTime.MAX, ZoneId.of("Europe/Oslo")),
             sistEndret = nå
         )
-        coEvery { henvendelseOppslag.hentPåbegynte(any()) } returns påbegynte
         coEvery { påbegyntOppslagMock.hentPåbegyntSøknad(any(), any()) } returns påbegyntNySøknadsdialog
 
         testApplication {
@@ -387,15 +379,6 @@ internal class InnsynApiTest {
             val response = client.autentisert("/paabegynte")
             assertEquals(HttpStatusCode.OK, response.status)
             val json = response.bodyAsText().let { jacksonObjectMapper.readTree(it) }
-
-            val fraGammelSøknadsdialog = json[0]
-            assertEquals("En tittel oversatt fra kodeverk", fraGammelSøknadsdialog["tittel"].asText())
-            assertEquals("En tittel oversatt fra kodeverk", fraGammelSøknadsdialog["tittel"].asText())
-            assertEquals("1234TEST", fraGammelSøknadsdialog["søknadId"].asText())
-            assertEquals("1234TEST", fraGammelSøknadsdialog["behandlingsId"].asText())
-            assertFalse(fraGammelSøknadsdialog["erNySøknadsdialog"].asBoolean())
-            assertEquals(nå.toOffsetDateTime(), fraGammelSøknadsdialog["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() })
-            assertEquals("https://tjenester.nav.no/soknaddagpenger-innsending/soknad/1234TEST", fraGammelSøknadsdialog["endreLenke"].asText())
 
             val fraNySøknadsdialog = json[1]
             assertEquals("Søknad om dagpenger", fraNySøknadsdialog["tittel"].asText())
