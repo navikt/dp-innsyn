@@ -13,20 +13,17 @@ internal class EttersendingSpleiser(
     private val personRepository: PersonRepository
 ) {
     private val log = KotlinLogging.logger {}
-
     private val visningsgrenseForEttersendingAngittIÅr = 3L
 
     suspend fun hentEttersendelser(fnr: String): MultiSourceResult<MinimalEttersendingDto, KildeType> {
         val fraDatabasen = hentFraDB(fnr)
-        val fraHenvendelse = hentFraHenvendelse(fnr)
-        val alle = fraHenvendelse + fraDatabasen
-        val unikeSisteTreÅr = alle.results()
+        val unikeSisteTreÅr = fraDatabasen.results()
             .filter { it.innsendtDatoMåVæreSatt() }
             .toSet()
             .filter { it.erNyereEnnTreÅr() }
             .sortedByDescending { it.datoInnsendt }
 
-        return lagNyttResultatMedSammeKilderOgEventuelleFeiledeKilder(unikeSisteTreÅr, alle)
+        return lagNyttResultatMedSammeKilderOgEventuelleFeiledeKilder(unikeSisteTreÅr, fraDatabasen)
     }
 
     private fun hentFraDB(fnr: String) = try {

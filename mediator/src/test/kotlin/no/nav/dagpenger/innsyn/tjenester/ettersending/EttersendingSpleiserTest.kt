@@ -36,9 +36,8 @@ internal class EttersendingSpleiserTest {
             ettersendingSpleiser.hentEttersendelser("999")
         }
 
-        assertEquals(2, alleEttersendelser.results().size)
+        assertEquals(1, alleEttersendelser.results().size)
         assertEquals("456", alleEttersendelser.results()[0].søknadId)
-        assertEquals("123", alleEttersendelser.results()[1].søknadId)
     }
 
     @Test
@@ -82,7 +81,7 @@ internal class EttersendingSpleiserTest {
 
         assertEquals(1, alleEttersendelser.results().size)
         assertNotNull(alleEttersendelser.results().first { it.søknadId == "456" })
-        assertTrue(alleEttersendelser.failedSources().contains(KildeType.HENVENDELSE))
+        // TODO: assertTrue(alleEttersendelser.failedSources().contains(KildeType.HENVENDELSE))
     }
 
     @Test
@@ -100,8 +99,7 @@ internal class EttersendingSpleiserTest {
             ettersendingSpleiser.hentEttersendelser("999")
         }
 
-        assertEquals(1, alleEttersendelser.results().size)
-        assertNotNull(alleEttersendelser.results().first { it.søknadId == "678" })
+        assertEquals(0, alleEttersendelser.results().size)
         assertTrue(alleEttersendelser.failedSources().contains(KildeType.DB))
     }
 
@@ -120,7 +118,7 @@ internal class EttersendingSpleiserTest {
         }
 
         assertEquals(0, alleEttersendelser.results().size)
-        assertTrue(alleEttersendelser.failedSources().contains(KildeType.HENVENDELSE))
+        // TODO assertTrue(alleEttersendelser.failedSources().contains(KildeType.HENVENDELSE))
         assertTrue(alleEttersendelser.failedSources().contains(KildeType.DB))
     }
 }
