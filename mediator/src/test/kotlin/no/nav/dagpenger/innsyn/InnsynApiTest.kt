@@ -32,11 +32,9 @@ import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
 import no.nav.dagpenger.innsyn.tjenester.PåbegyntOppslag
 import no.nav.dagpenger.innsyn.tjenester.PåbegyntSøknadDto
 import no.nav.dagpenger.innsyn.tjenester.ettersending.EttersendingSpleiser
-import no.nav.dagpenger.innsyn.tjenester.paabegynt.Påbegynt
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -132,15 +130,10 @@ internal class InnsynApiTest {
     }
 
     @Test
-    @Disabled
-    fun `Søknad fra ny søknadsdialog får legacy false og motsatt`() = withMigratedDb {
-        val søknadIdGammeltFormat = "1234TEST"
+    fun `Søknad fra ny søknadsdialog får flagget erNySøknadsdialog satt til true`() = withMigratedDb {
         val søknadIdNyttFormat = UUID.randomUUID().toString()
         val personRepository = PostgresPersonRepository().also {
             it.person("test@nav.no").also { person ->
-                person.håndter(
-                    søknad(søknadIdGammeltFormat, "1", LocalDateTime.now().minusDays(90))
-                )
                 person.håndter(
                     søknad(søknadIdNyttFormat, "11", LocalDateTime.now().minusDays(90))
                 )
@@ -166,9 +159,6 @@ internal class InnsynApiTest {
                     val fraNySøknadsdialog = jsonNode[0]
                     assertTrue(fraNySøknadsdialog["erNySøknadsdialog"].asBoolean()) { "Forventet at erNySøknadsdialog: true. $jsonNode" }
                     assertEquals("https://arbeid.dev.nav.no/dagpenger/dialog/soknad/$søknadIdNyttFormat/kvittering", fraNySøknadsdialog["endreLenke"].asText())
-                    val fraGammelSøknadsdialog = jsonNode[1]
-                    assertFalse(fraGammelSøknadsdialog["erNySøknadsdialog"].asBoolean()) { "Forventet at erNySøknadsdialog: false.  $jsonNode" }
-                    assertEquals("https://tjenester.nav.no/soknaddagpenger-innsending/startettersending/1234TEST", fraGammelSøknadsdialog["endreLenke"].asText())
                 }
             }
         }
@@ -351,10 +341,8 @@ internal class InnsynApiTest {
     }
 
     @Test
-    @Disabled
-    fun `test at bruker kan hente ut påbegynte søknader fra gammel og ny stack`() {
+    fun `test at bruker kan hente ut påbegynte søknader`() {
         val påbegyntOppslagMock = mockk<PåbegyntOppslag>()
-        val henvendelseOppslag = mockk<HenvendelseOppslag>()
         val nå = ZonedDateTime.now()
         val uuid = UUID.randomUUID()
         val påbegyntNySøknadsdialog = PåbegyntSøknadDto(
@@ -380,7 +368,7 @@ internal class InnsynApiTest {
             assertEquals(HttpStatusCode.OK, response.status)
             val json = response.bodyAsText().let { jacksonObjectMapper.readTree(it) }
 
-            val fraNySøknadsdialog = json[1]
+            val fraNySøknadsdialog = json[0]
             assertEquals("Søknad om dagpenger", fraNySøknadsdialog["tittel"].asText())
             assertEquals(uuid.toString(), fraNySøknadsdialog["søknadId"].asText())
             assertEquals(uuid.toString(), fraNySøknadsdialog["behandlingsId"].asText())
