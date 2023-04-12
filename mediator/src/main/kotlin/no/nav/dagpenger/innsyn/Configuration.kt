@@ -49,7 +49,7 @@ internal object Configuration {
         }
     }
 
-    val dpProxyUrl by lazy { properties[Key("DP_PROXY_URL", stringType)] }
+    val dpProxyUrl by lazy { properties[Key("DP_PROXY_HOST", stringType)].let { "https://$it" } }
     val dpProxyScope by lazy { properties[Key("DP_PROXY_SCOPE", stringType)] }
 
     val dpSoknadUrl by lazy { properties[Key("DP_SOKNAD_URL", stringType)] }

@@ -55,6 +55,8 @@ spec:
     outbound:
       rules:
         - application: dp-soknad
+    external:
+      - host: {{ DP_PROXY_HOST }}
   tokenx:
     enabled: true
   azure:
@@ -80,8 +82,8 @@ spec:
   env:
     - name: DP_PROXY_SCOPE
       value: {{dp_proxy_scope}}
-    - name: DP_PROXY_URL
-      value: {{dp_proxy_url}}
+    - name: DP_PROXY_HOST
+      value: {{DP_PROXY_HOST}}
     - name: DP_SOKNAD_URL
       value:  {{dp_soknad.url}}
     - name: DP_SOKNAD_AUDIENCE
