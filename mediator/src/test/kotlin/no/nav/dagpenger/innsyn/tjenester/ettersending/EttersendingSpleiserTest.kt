@@ -22,7 +22,7 @@ internal class EttersendingSpleiserTest {
         val ettersendelserFraHenvendelse = listOf(
             MinimalEttersendingDtoObjectMother.giveMeEttersending("123"),
             MinimalEttersendingDtoObjectMother.giveMeForGammelEttersending(),
-            MinimalEttersendingDtoObjectMother.giveMeEttersendingUtenInnsendtDato()
+            MinimalEttersendingDtoObjectMother.giveMeEttersendingUtenInnsendtDato(),
         )
         coEvery { henvendelseOppslag.hentEttersendelser(any()) } returns ettersendelserFraHenvendelse
 

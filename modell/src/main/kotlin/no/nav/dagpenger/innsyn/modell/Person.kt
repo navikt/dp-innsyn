@@ -12,7 +12,7 @@ class Person private constructor(
     private val søknader: MutableList<Søknad>,
     private val ettersendinger: MutableList<Ettersending>,
     private val vedtak: MutableList<Vedtak>,
-    private val sakstilknytninger: MutableList<Sakstilknytning>
+    private val sakstilknytninger: MutableList<Sakstilknytning>,
 ) {
     constructor(fnr: String) : this(fnr, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf())
 

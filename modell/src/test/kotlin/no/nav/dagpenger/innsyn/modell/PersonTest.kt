@@ -41,8 +41,8 @@ internal class PersonTest {
                     Vedtak.Status.INNVILGET,
                     LocalDateTime.now(),
                     LocalDateTime.now(),
-                    LocalDateTime.now()
-                )
+                    LocalDateTime.now(),
+                ),
             )
             person.håndter(
                 Vedtak(
@@ -51,8 +51,8 @@ internal class PersonTest {
                     Vedtak.Status.AVSLÅTT,
                     LocalDateTime.now(),
                     LocalDateTime.now(),
-                    LocalDateTime.now()
-                )
+                    LocalDateTime.now(),
+                ),
             )
             assertEquals(2, PersonInspektør(person).antallVedtak)
         }
@@ -66,7 +66,7 @@ internal class PersonTest {
         Kanal.Digital,
         LocalDateTime.now(),
         emptyList(),
-        "tittel"
+        "tittel",
     )
 
     private fun ettersending(søknadId: String?, ettersendingId: String?) =
@@ -75,7 +75,7 @@ internal class PersonTest {
             ettersendingId,
             "99",
             Kanal.Digital,
-            emptyList()
+            emptyList(),
         )
 
     private class PersonInspektør(person: Person) : PersonVisitor {
@@ -94,7 +94,7 @@ internal class PersonTest {
             søknadsType: Søknad.SøknadsType,
             kanal: Kanal,
             datoInnsendt: LocalDateTime,
-            tittel: String?
+            tittel: String?,
         ) {
             antallSøknader++
         }
@@ -109,7 +109,7 @@ internal class PersonTest {
             status: Vedtak.Status,
             datoFattet: LocalDateTime,
             fraDato: LocalDateTime,
-            tilDato: LocalDateTime?
+            tilDato: LocalDateTime?,
         ) {
             antallVedtak++
         }

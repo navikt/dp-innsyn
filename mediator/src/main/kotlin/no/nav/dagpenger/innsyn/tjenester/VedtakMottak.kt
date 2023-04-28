@@ -16,7 +16,7 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall.VedtakMottak")
 
 internal class VedtakMottak(
     rapidsConnection: RapidsConnection,
-    private val personMediator: PersonMediator
+    private val personMediator: PersonMediator,
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
@@ -26,7 +26,7 @@ internal class VedtakMottak(
                     "op_ts",
                     "after.VEDTAK_ID",
                     "after.SAK_ID",
-                    "after.FRA_DATO"
+                    "after.FRA_DATO",
                 )
             }
             validate { it.requireAny("after.VEDTAKTYPEKODE", listOf("O", "G")) }
@@ -45,7 +45,7 @@ internal class VedtakMottak(
 
         withLoggingContext(
             "fagsakId" to sakId,
-            "vedtakId" to vedtakId
+            "vedtakId" to vedtakId,
         ) {
             logg.info { "Mottok nytt vedtak" }
             sikkerlogg.info { "Mottok nytt vedtak for person $fnr: ${packet.toJson()}" }

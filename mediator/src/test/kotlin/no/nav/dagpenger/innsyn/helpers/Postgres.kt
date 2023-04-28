@@ -33,7 +33,7 @@ internal object Postgres {
         System.setProperty(db.host.name, instance.host)
         System.setProperty(
             db.port.name,
-            instance.getMappedPort(POSTGRESQL_PORT).toString()
+            instance.getMappedPort(POSTGRESQL_PORT).toString(),
         )
         System.setProperty(db.database.name, instance.databaseName)
         System.setProperty(db.username.name, instance.password)

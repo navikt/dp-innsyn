@@ -8,17 +8,17 @@ object ExternalPåbegyntObjectMother {
         ExternalPåbegynt(
             "bid",
             "NAV 04-01.03",
-            ZonedDateTime.now()
+            ZonedDateTime.now(),
         )
 
     fun giveMeBILPåbegynt() = ExternalPåbegynt(
         "bid",
         "NAV 10-07.40",
-        ZonedDateTime.now()
+        ZonedDateTime.now(),
     )
 
     fun giveMePåbegynteForDAGOgBIL() = listOf(
         giveMeBILPåbegynt(),
-        giveMeDagpengePåbegynt()
+        giveMeDagpengePåbegynt(),
     )
 }

@@ -34,7 +34,7 @@ internal class HenvendelseOppslag(
     httpClientEngine: HttpClientEngine = CIO.create() {
         requestTimeout = 0
     },
-    baseName: String = "dp_innsyn"
+    baseName: String = "dp_innsyn",
 ) {
 
     private val dpProxyClient = HttpClient(httpClientEngine) {
@@ -57,8 +57,8 @@ internal class HenvendelseOppslag(
                         .addModule(JavaTimeModule())
                         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                        .build()
-                )
+                        .build(),
+                ),
             )
         }
     }
@@ -90,7 +90,7 @@ data class ExternalEttersending(
     val hovedskjemaKodeverkId: String,
     val sistEndret: ZonedDateTime,
     val innsendtDato: ZonedDateTime?,
-    val vedlegg: List<Vedlegg>
+    val vedlegg: List<Vedlegg>,
 ) {
     data class Vedlegg(val tilleggsTittel: String?, val kodeverkId: String)
 }
@@ -98,5 +98,5 @@ data class ExternalEttersending(
 data class ExternalPåbegynt(
     val behandlingsId: String,
     val hovedskjemaKodeverkId: String,
-    val sistEndret: ZonedDateTime
+    val sistEndret: ZonedDateTime,
 )

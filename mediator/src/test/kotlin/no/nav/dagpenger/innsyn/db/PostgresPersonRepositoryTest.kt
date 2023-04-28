@@ -33,9 +33,9 @@ internal class PostgresPersonRepositoryTest {
                 Kanal.Digital,
                 LocalDateTime.now(),
                 listOf(
-                    Vedlegg("123", "123", LastetOpp)
+                    Vedlegg("123", "123", LastetOpp),
                 ),
-                "tittel"
+                "tittel",
             )
 
             person.håndter(søknad)
@@ -57,7 +57,7 @@ internal class PostgresPersonRepositoryTest {
             repository.hentSøknaderFor(
                 fnr = person.fnr,
                 fom = LocalDate.now().minusDays(30),
-                tom = LocalDate.now().plusDays(0)
+                tom = LocalDate.now().plusDays(0),
             ).also {
                 assertEquals(1, it.size)
             }
@@ -81,8 +81,8 @@ internal class PostgresPersonRepositoryTest {
                     Kanal.Digital,
                     LocalDateTime.now(),
                     emptyList(),
-                    "tittel"
-                )
+                    "tittel",
+                ),
             )
             repository.lagre(person)
 
@@ -110,10 +110,10 @@ internal class PostgresPersonRepositoryTest {
             )
 
             person.håndter(
-                vedtak
+                vedtak,
             )
             person.håndter(
-                vedtak
+                vedtak,
             )
 
             repository.lagre(person)
@@ -128,28 +128,28 @@ internal class PostgresPersonRepositoryTest {
                 repository.hentVedtakFor(
                     fnr = "123",
                     fattetFom = null,
-                    fattetTom = null
+                    fattetTom = null,
                 ).also {
                     assertEquals(1, it.size)
                 }
                 repository.hentVedtakFor(
                     fnr = "123",
                     fattetFom = LocalDate.now().minusDays(2),
-                    fattetTom = null
+                    fattetTom = null,
                 ).also {
                     assertEquals(1, it.size)
                 }
                 repository.hentVedtakFor(
                     fnr = "123",
                     fattetFom = LocalDate.of(2021, 4, 30),
-                    fattetTom = LocalDate.of(2021, 5, 30)
+                    fattetTom = LocalDate.of(2021, 5, 30),
                 ).also {
                     assertEquals(0, it.size)
                 }
                 repository.hentVedtakFor(
                     fnr = "123",
                     fattetFom = null,
-                    fattetTom = LocalDate.now().plusDays(2)
+                    fattetTom = LocalDate.now().plusDays(2),
                 ).also {
                     assertEquals(1, it.size)
                 }
@@ -169,7 +169,7 @@ internal class PostgresPersonRepositoryTest {
                 Kanal.Papir,
                 LocalDateTime.now(),
                 emptyList(),
-                "tittel"
+                "tittel",
             )
             person.håndter(søknad)
             repository.lagre(person)
@@ -195,10 +195,12 @@ internal class PostgresPersonRepositoryTest {
                 LocalDateTime.now(),
                 listOf(
                     Vedlegg(
-                        "skjemanummer", "navn", LastetOpp
-                    )
+                        "skjemanummer",
+                        "navn",
+                        LastetOpp,
+                    ),
                 ),
-                "tittel"
+                "tittel",
             )
             person.håndter(søknad)
             repository.lagre(person)
@@ -211,7 +213,7 @@ internal class PostgresPersonRepositoryTest {
         val resultInspektør = SøknadInspektør(result)
         assertEquals(
             expInspektør.datoInnsendt.truncatedTo(ChronoUnit.SECONDS),
-            resultInspektør.datoInnsendt.truncatedTo(ChronoUnit.SECONDS)
+            resultInspektør.datoInnsendt.truncatedTo(ChronoUnit.SECONDS),
         )
         assertEquals(expInspektør.journalpostId, resultInspektør.journalpostId)
         assertEquals(expInspektør.kanal, resultInspektør.kanal)
@@ -238,7 +240,7 @@ internal class PostgresPersonRepositoryTest {
             søknadsType: Søknad.SøknadsType,
             kanal: Kanal,
             datoInnsendt: LocalDateTime,
-            tittel: String?
+            tittel: String?,
         ) {
             søknader++
         }
@@ -253,7 +255,7 @@ internal class PostgresPersonRepositoryTest {
             status: Vedtak.Status,
             datoFattet: LocalDateTime,
             fraDato: LocalDateTime,
-            tilDato: LocalDateTime?
+            tilDato: LocalDateTime?,
         ) {
             vedtak++
         }
@@ -281,7 +283,7 @@ internal class PostgresPersonRepositoryTest {
             søknadsType: Søknad.SøknadsType,
             kanal: Kanal,
             datoInnsendt: LocalDateTime,
-            tittel: String?
+            tittel: String?,
         ) {
             this.søknadId = søknadId
             this.skjemaKode = skjemaKode
@@ -295,7 +297,7 @@ internal class PostgresPersonRepositoryTest {
         override fun visitVedlegg(
             skjemaNummer: String,
             navn: String,
-            status: Vedlegg.Status
+            status: Vedlegg.Status,
         ) {
             antallVedlegg++
         }

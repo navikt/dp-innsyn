@@ -23,7 +23,7 @@ class Behandlingsstatus(antallSøknader: Int, antallVedtak: Int) {
     enum class Status {
         Ukjent,
         FerdigBehandlet,
-        UnderBehandling
+        UnderBehandling,
     }
 }
 

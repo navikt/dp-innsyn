@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 object SøknadObjectMother {
     fun giveMeListOfDigitalOgPapirSøknad() = listOf(
         giveDigitalSøknad(),
-        giveMePapirSøknad()
+        giveMePapirSøknad(),
     )
 
     fun giveMePapirSøknad(søknadId: String = "123") = Søknad(
@@ -18,7 +18,7 @@ object SøknadObjectMother {
         Kanal.Papir,
         LocalDateTime.now(),
         emptyList(),
-        "Papir søknad"
+        "Papir søknad",
     )
 
     fun giveDigitalSøknad(søknadId: String = "456", skjemakode: String? = "NAV456", tittel: String? = "Digital søknad") = Søknad(
@@ -29,6 +29,6 @@ object SøknadObjectMother {
         Kanal.Digital,
         LocalDateTime.now(),
         emptyList(),
-        tittel
+        tittel,
     )
 }

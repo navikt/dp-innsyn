@@ -14,7 +14,7 @@ interface SøknadRepository {
         type: List<SøknadsType> = emptyList(),
         kanal: List<Kanal> = emptyList(),
         offset: Int = 0,
-        limit: Int = 20
+        limit: Int = 20,
     ): List<Søknad>
 
     fun hentSøknaderFor(fnr: String): List<Søknad>

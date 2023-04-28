@@ -21,8 +21,8 @@ internal object Configuration {
             "KAFKA_BROKERS" to "localhost:9092",
             "NY_SOKNADSDIALOG_INGRESS" to "https://arbeid.dev.nav.no/dagpenger/dialog/soknad",
             "GAMMEL_SOKNADSDIALOG_INGRESS" to "https://tjenester.nav.no/soknaddagpenger-innsending",
-            "FLYWAY_CLEAN_DISABLED" to "false"
-        )
+            "FLYWAY_CLEAN_DISABLED" to "false",
+        ),
     )
 
     private val defaultProperties = ConfigurationMap(
@@ -32,8 +32,8 @@ internal object Configuration {
             "KAFKA_RESET_POLICY" to "latest",
             "KAFKA_EXTRA_TOPIC" to "teamdagpenger.journalforing.v1,teamdagpenger.arena.oppgave.v1,teamarenanais.gg-arena-vedtak-dagpenger-v2-q1",
             "HTTP_PORT" to "8080",
-            "FLYWAY_CLEAN_DISABLED" to "true"
-        )
+            "FLYWAY_CLEAN_DISABLED" to "true",
+        ),
     )
 
     private val prodProperties = ConfigurationMap(
@@ -70,7 +70,7 @@ internal object Configuration {
         val tokenX = OAuth2Config.TokenX(properties)
         CachedOauth2Client(
             tokenEndpointUrl = tokenX.tokenEndpointUrl,
-            authType = tokenX.privateKey()
+            authType = tokenX.privateKey(),
         )
     }
 

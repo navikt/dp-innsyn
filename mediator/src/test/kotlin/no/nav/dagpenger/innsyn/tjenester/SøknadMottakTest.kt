@@ -45,13 +45,13 @@ class SøknadMottakTest {
 
         defaultRegistry.getSampleValue(
             "dagpenger_mottak_forsinkelse_sum",
-            "type" to "soknad"
+            "type" to "soknad",
         ).also {
             assertTrue(syntheticDelaySeconds <= it)
         }
         defaultRegistry.getSampleValue(
             "dagpenger_mottak_forsinkelse_count",
-            "type" to "soknad"
+            "type" to "soknad",
         ).also {
             assertTrue(1.0 <= it)
         }
@@ -80,7 +80,8 @@ private fun CollectorRegistry.getSampleValue(name: String, vararg labels: Pair<S
     labels.unzip().let { (labelNames, labelValues) ->
         getSampleValue(
             name,
-            labelNames.toTypedArray(), labelValues.toTypedArray()
+            labelNames.toTypedArray(),
+            labelValues.toTypedArray(),
         )
     }
 

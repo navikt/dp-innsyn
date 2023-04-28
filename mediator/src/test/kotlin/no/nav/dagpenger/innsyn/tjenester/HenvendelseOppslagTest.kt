@@ -44,7 +44,7 @@ internal class HenvendelseOppslagTest {
         respond(
             content = jsonResponse,
             status = HttpStatusCode.OK,
-            headers = headersOf(HttpHeaders.ContentType, "application/json")
+            headers = headersOf(HttpHeaders.ContentType, "application/json"),
         )
     }
 
@@ -53,6 +53,6 @@ internal class HenvendelseOppslagTest {
             dpProxyUrl = "dummyUrl",
             tokenProvider = { "dummyToken" },
             httpClientEngine = mockHttpClient,
-            baseName = baseName
+            baseName = baseName,
         )
 }

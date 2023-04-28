@@ -17,7 +17,7 @@ class BehandlingsstatusTest {
     fun `Behandlingsstatus er UnderBehandling når det finnes 1 søknad og 0 vedtak`() {
         assertEquals(
             UnderBehandling,
-            Behandlingsstatus(antallSøknader = 1, antallVedtak = 0).antattStatus
+            Behandlingsstatus(antallSøknader = 1, antallVedtak = 0).antattStatus,
         )
     }
 
@@ -25,14 +25,15 @@ class BehandlingsstatusTest {
     fun `Behandlingsstatus er FerdigBehandlet når det finnes 1 søknad og 1 vedtak`() {
         assertEquals(
             FerdigBehandlet,
-            Behandlingsstatus(antallSøknader = 1, antallVedtak = 1).antattStatus
+            Behandlingsstatus(antallSøknader = 1, antallVedtak = 1).antattStatus,
         )
     }
+
     @Test
     fun `Behandlingsstatus er null når det finnes 0 søknader og 1 vedtak`() {
         assertEquals(
             null,
-            Behandlingsstatus(antallSøknader = 0, antallVedtak = 1).antattStatus
+            Behandlingsstatus(antallSøknader = 0, antallVedtak = 1).antattStatus,
         )
     }
 
@@ -40,7 +41,7 @@ class BehandlingsstatusTest {
     fun `Behandlingsstatus er FerdigBehandlet når det finnes 1 søknad og 2 vedtak`() {
         assertEquals(
             FerdigBehandlet,
-            Behandlingsstatus(antallSøknader = 1, antallVedtak = 2).antattStatus
+            Behandlingsstatus(antallSøknader = 1, antallVedtak = 2).antattStatus,
         )
     }
 
@@ -48,7 +49,7 @@ class BehandlingsstatusTest {
     fun `Behandlingsstatus er Ukjent når det finnes 2 søknader og 1 vedtak`() {
         assertEquals(
             Ukjent,
-            Behandlingsstatus(antallSøknader = 2, antallVedtak = 1).antattStatus
+            Behandlingsstatus(antallSøknader = 2, antallVedtak = 1).antattStatus,
         )
     }
 
@@ -56,7 +57,7 @@ class BehandlingsstatusTest {
     fun `Behandlingsstatus er FerdigBehandlet når det finnes 2 søknader og 2 vedtak`() {
         assertEquals(
             FerdigBehandlet, // TODO: Er dette riktig?
-            Behandlingsstatus(antallVedtak = 2, antallSøknader = 2).antattStatus
+            Behandlingsstatus(antallVedtak = 2, antallSøknader = 2).antattStatus,
         )
     }
 }

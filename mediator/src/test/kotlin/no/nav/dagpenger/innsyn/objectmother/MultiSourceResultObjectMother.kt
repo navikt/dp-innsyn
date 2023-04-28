@@ -9,9 +9,9 @@ object MultiSourceResultObjectMother {
     fun giveMeSuccessfulResult(source: KildeType = KildeType.HENVENDELSE) =
         MultiSourceResult.createSuccessfulResult(
             listOf(
-                MinimalEttersendingDtoObjectMother.giveMeEttersending()
+                MinimalEttersendingDtoObjectMother.giveMeEttersending(),
             ),
-            source
+            source,
         )
 
     fun giveMeFailedResult(source: KildeType) =

@@ -56,7 +56,7 @@ internal fun Application.innsynApi(
     personRepository: PersonRepository,
     henvendelseOppslag: HenvendelseOppslag,
     ettersendingSpleiser: EttersendingSpleiser,
-    påbegyntOppslag: PåbegyntOppslag
+    påbegyntOppslag: PåbegyntOppslag,
 ) {
     install(CallId) {
         header("Nav-Call-Id")
@@ -73,7 +73,7 @@ internal fun Application.innsynApi(
             !setOf(
                 "isalive",
                 "isready",
-                "metrics"
+                "metrics",
             ).contains(call.request.document())
         }
     }
@@ -94,7 +94,7 @@ internal fun Application.innsynApi(
                 DefaultPrettyPrinter().apply {
                     indentArraysWith(DefaultPrettyPrinter.FixedSpaceIndenter.instance)
                     indentObjectsWith(DefaultIndenter("  ", "\n"))
-                }
+                },
             )
             disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             registerModule(JavaTimeModule())
@@ -127,7 +127,7 @@ internal fun Application.innsynApi(
                 val søknader = personRepository.hentSøknaderFor(
                     fnr,
                     fom = fom,
-                    tom = tom
+                    tom = tom,
                 )
 
                 call.respond(søknader.map { SøknadJsonBuilder(it).resultat() })
@@ -140,7 +140,7 @@ internal fun Application.innsynApi(
                 val vedtak = personRepository.hentVedtakFor(
                     fnr,
                     fattetFom = fattetFom,
-                    fattetTom = fattetTom
+                    fattetTom = fattetTom,
                 )
 
                 call.respond(vedtak.map { VedtakJsonBuilder(it).resultat() })
@@ -181,8 +181,8 @@ internal fun Application.innsynApi(
                                 behandlingsId = it.uuid.toString(),
                                 sistEndret = it.sistEndret,
                                 tittel = "Søknad om dagpenger",
-                                erNySøknadsdialog = true
-                            )
+                                erNySøknadsdialog = true,
+                            ),
                         )
                     } ?: emptyList()
                 } catch (e: Exception) {

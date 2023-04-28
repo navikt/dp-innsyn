@@ -28,7 +28,7 @@ class SøknadJsonBuilder(val søknad: Søknad) : SøknadVisitor {
         søknadsType: Søknad.SøknadsType,
         kanal: Kanal,
         datoInnsendt: LocalDateTime,
-        tittel: String?
+        tittel: String?,
     ) {
         søknadId?.let { søknadIden ->
             root.put("søknadId", søknadIden)
@@ -64,6 +64,6 @@ class SøknadJsonBuilder(val søknad: Søknad) : SøknadVisitor {
         "NAV 04-16.04" to "Søknad om gjenopptak av dagpenger ved permittering",
         "NAV 04-16.03" to "Søknad om gjenopptak av dagpenger",
         "NAV 04-01.03" to "Søknad om dagpenger (ikke permittert)",
-        "NAV 04-01.04" to "Søknad om dagpenger ved permittering"
+        "NAV 04-01.04" to "Søknad om dagpenger ved permittering",
     )[skjemaNummer]
 }

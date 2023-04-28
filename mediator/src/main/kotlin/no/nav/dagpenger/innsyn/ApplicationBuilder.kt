@@ -19,7 +19,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val personRepository = PostgresPersonRepository()
     private val henvendelseOppslag = HenvendelseOppslag(
         dpProxyUrl = Configuration.dpProxyUrl,
-        tokenProvider = { Configuration.dpProxyTokenProvider.clientCredentials(Configuration.dpProxyScope).accessToken }
+        tokenProvider = { Configuration.dpProxyTokenProvider.clientCredentials(Configuration.dpProxyScope).accessToken },
     )
     private val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
     private val påbegyntOppslag = PåbegyntOppslag(
@@ -36,7 +36,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
                 personRepository,
                 henvendelseOppslag,
                 ettersendingSpleiser,
-                påbegyntOppslag
+                påbegyntOppslag,
             )
         }.build().apply {
             SøknadMottak(this, personMediator)

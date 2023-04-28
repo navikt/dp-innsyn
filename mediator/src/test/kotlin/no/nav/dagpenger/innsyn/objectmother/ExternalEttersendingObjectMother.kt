@@ -10,7 +10,7 @@ object ExternalEttersendingObjectMother {
             "NAV 04-01.03",
             ZonedDateTime.now(),
             ZonedDateTime.now(),
-            emptyList()
+            emptyList(),
         )
 
     fun giveMeBILEttersendelse() = ExternalEttersending(
@@ -18,11 +18,11 @@ object ExternalEttersendingObjectMother {
         "NAV 10-07.40",
         ZonedDateTime.now(),
         ZonedDateTime.now(),
-        emptyList()
+        emptyList(),
     )
 
     fun giveMeEttersendelserForDAGOgBIL() = listOf(
         giveMeBILEttersendelse(),
-        giveMeDagpengeEttersendelse()
+        giveMeDagpengeEttersendelse(),
     )
 }

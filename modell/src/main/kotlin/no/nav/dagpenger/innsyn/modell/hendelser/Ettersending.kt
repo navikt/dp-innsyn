@@ -7,7 +7,7 @@ class Ettersending(
     val søknadId: String?,
     val journalpostId: String,
     val kanal: Kanal,
-    vedlegg: List<Vedlegg>
+    vedlegg: List<Vedlegg>,
 ) : Innsending(vedlegg) {
     fun accept(visitor: EttersendingVisitor) {
         visitor.visitEttersending(søknadId, kanal)

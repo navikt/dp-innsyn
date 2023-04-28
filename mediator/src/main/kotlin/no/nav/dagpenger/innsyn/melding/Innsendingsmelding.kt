@@ -17,7 +17,7 @@ internal abstract class Innsendingsmelding(packet: JsonMessage) : Hendelsemeldin
         Vedlegg(
             it["skjemaNummer"].asText(),
             it["navn"].asText(),
-            Status.valueOf(it["innsendingsvalg"].asText())
+            Status.valueOf(it["innsendingsvalg"].asText()),
         )
     }
 }

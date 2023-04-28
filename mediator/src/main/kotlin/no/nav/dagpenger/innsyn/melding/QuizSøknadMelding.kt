@@ -19,6 +19,6 @@ internal class QuizSøknadMelding(packet: JsonMessage) : SøknadMelding(packet) 
             kanal = Kanal.Digital,
             datoInnsendt = datoRegistrert,
             vedlegg = vedlegg,
-            tittel = tittel
+            tittel = tittel,
         )
 }

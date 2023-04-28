@@ -41,9 +41,9 @@ class JwtStub(private val issuer: String = "test issuer") {
             return Jwk(
                 keyId, "RSA", "RS256", "sig", listOf(), null, null, null,
                 mapOf(
-                    "e" to String(Base64.getEncoder().encode(publicKey.publicExponent.toByteArray())),
-                    "n" to String(Base64.getEncoder().encode(publicKey.modulus.toByteArray()))
-                )
+                    "e" to String(Base64.getUrlEncoder().encode(publicKey.publicExponent.toByteArray())),
+                    "n" to String(Base64.getUrlEncoder().encode(publicKey.modulus.toByteArray())),
+                ),
             )
         }
     }

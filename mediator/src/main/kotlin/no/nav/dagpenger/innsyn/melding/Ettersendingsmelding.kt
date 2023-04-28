@@ -15,6 +15,6 @@ internal class Ettersendingsmelding(packet: JsonMessage) : Innsendingsmelding(pa
         behandlingskjedeId,
         journalpostId,
         kanal,
-        vedlegg
+        vedlegg,
     )
 }

@@ -20,20 +20,20 @@ interface SøknadVisitor {
         søknadsType: Søknad.SøknadsType,
         kanal: Kanal,
         datoInnsendt: LocalDateTime,
-        tittel: String?
+        tittel: String?,
     ) {}
 
     fun visitVedlegg(
         skjemaNummer: String,
         navn: String,
-        status: Innsending.Vedlegg.Status
+        status: Innsending.Vedlegg.Status,
     ) {}
 }
 
 interface EttersendingVisitor {
     fun visitEttersending(
         søknadId: String?,
-        kanal: Kanal
+        kanal: Kanal,
     ) {}
 }
 
@@ -44,7 +44,7 @@ interface VedtakVisitor {
         status: Vedtak.Status,
         datoFattet: LocalDateTime,
         fraDato: LocalDateTime,
-        tilDato: LocalDateTime?
+        tilDato: LocalDateTime?,
     ) {}
 }
 

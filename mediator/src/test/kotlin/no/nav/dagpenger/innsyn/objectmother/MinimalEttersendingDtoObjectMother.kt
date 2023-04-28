@@ -10,11 +10,11 @@ object MinimalEttersendingDtoObjectMother {
     fun giveMeEttersending(
         søknadId: String = "sId-123",
         innsendtDato: ZonedDateTime? = ZonedDateTime.now().minusDays(eldsteLovligeInnsendingsdatoAngittIDager),
-        tittel: String = "Dette er en ettersending"
+        tittel: String = "Dette er en ettersending",
     ) = MinimalEttersendingDto(
         søknadId,
         innsendtDato,
-        tittel
+        tittel,
     )
 
     fun giveMeForGammelEttersending() = giveMeEttersending(innsendtDato = ZonedDateTime.now().minusYears(4))

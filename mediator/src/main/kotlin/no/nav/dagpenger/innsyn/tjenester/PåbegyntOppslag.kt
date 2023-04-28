@@ -28,7 +28,7 @@ internal class PåbegyntOppslag(
     private val tokenProvider: (token: String, audience: String) -> String = exchangeToOboToken,
     engine: HttpClientEngine = CIO.create() {
         requestTimeout = 0
-    }
+    },
 ) {
 
     private val httpClient = HttpClient(engine) {
@@ -74,7 +74,7 @@ data class PåbegyntSøknadDto(
     @JsonProperty("opprettet")
     val opprettet: ZonedDateTime,
     @JsonProperty("sistEndret")
-    val sistEndret: ZonedDateTime
+    val sistEndret: ZonedDateTime,
 )
 
 private val exchangeToOboToken = { token: String, audience: String ->

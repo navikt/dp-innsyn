@@ -10,7 +10,7 @@ interface VedtakRepository {
         fattetTom: LocalDate? = null,
         status: List<Vedtak.Status> = emptyList(),
         offset: Int = 0,
-        limit: Int = 20
+        limit: Int = 20,
     ): List<Vedtak>
 
     fun hentVedtakFor(fnr: String): List<Vedtak>

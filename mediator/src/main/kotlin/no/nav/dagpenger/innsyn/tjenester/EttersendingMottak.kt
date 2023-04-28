@@ -17,7 +17,7 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall.EttersendingMottak")
 
 internal class EttersendingMottak(
     rapidsConnection: RapidsConnection,
-    private val personMediator: PersonMediator
+    private val personMediator: PersonMediator,
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
@@ -30,7 +30,7 @@ internal class EttersendingMottak(
                     "skjemaKode",
                     "søknadsData.brukerBehandlingId",
                     "søknadsData.behandlingskjedeId",
-                    "tittel"
+                    "tittel",
                 )
             }
             validate { it.requireAny("type", listOf("Ettersending")) }
@@ -45,7 +45,7 @@ internal class EttersendingMottak(
 
         withLoggingContext(
             "søknadId" to søknadId,
-            "journalpostId" to journalpostId
+            "journalpostId" to journalpostId,
         ) {
             logg.info { "Mottok ny ettersending." }
             sikkerlogg.info { "Mottok ny ettersending for person $fnr: ${packet.toJson()}" }

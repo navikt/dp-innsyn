@@ -22,7 +22,7 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadMottak")
 
 internal class SøknadMottak(
     rapidsConnection: RapidsConnection,
-    private val personMediator: PersonMediator
+    private val personMediator: PersonMediator,
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
@@ -41,7 +41,7 @@ internal class SøknadMottak(
                 it.interestedIn(
                     "søknadsData.vedlegg",
                     QuizSøknadMelding.søknadIdNøkkel,
-                    LegacySøknadsmelding.søknadIdNøkkel
+                    LegacySøknadsmelding.søknadIdNøkkel,
                 )
             }
         }.register(this)
@@ -55,7 +55,7 @@ internal class SøknadMottak(
 
         withLoggingContext(
             "søknadId" to søknadId,
-            "journalpostId" to journalpostId
+            "journalpostId" to journalpostId,
         ) {
             logg.info { "Mottok ny søknad av typen ${søknadMelding.javaClass.simpleName}." }
             sikkerlogg.info { "Mottok ny søknad for person $fnr: ${packet.toJson()}" }

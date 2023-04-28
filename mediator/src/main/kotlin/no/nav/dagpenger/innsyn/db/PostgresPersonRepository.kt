@@ -47,7 +47,8 @@ class PostgresPersonRepository : PersonRepository {
 
     private fun hentVedtakFor(session: Session, personId: Int) = session.run(
         queryOf( //language=PostgreSQL
-            "SELECT * FROM vedtak WHERE person_id = ?", personId
+            "SELECT * FROM vedtak WHERE person_id = ?",
+            personId,
         ).map { row ->
             Vedtak(
                 vedtakId = row.string("vedtak_id"),
@@ -55,13 +56,14 @@ class PostgresPersonRepository : PersonRepository {
                 status = Vedtak.Status.valueOf(row.string("status")),
                 datoFattet = row.localDateTime("fattet"),
                 fraDato = row.localDateTime("fra_dato"),
-                tilDato = row.localDateTimeOrNull("til_dato")
+                tilDato = row.localDateTimeOrNull("til_dato"),
             )
-        }.asList
+        }.asList,
     )
 
     private fun selectPerson(fnr: String) = queryOf( //language=PostgreSQL
-        "SELECT person_id FROM person WHERE fnr = ?", fnr
+        "SELECT person_id FROM person WHERE fnr = ?",
+        fnr,
     ).map { it.int(1) }.asSingle
 
     private class PersonLagrer(person: Person) : PersonVisitor {
@@ -78,8 +80,8 @@ class PostgresPersonRepository : PersonRepository {
             queries.add(
                 queryOf( //language=PostgreSQL
                     "INSERT INTO person (fnr) VALUES (:fnr) ON CONFLICT DO NOTHING",
-                    mapOf("fnr" to fnr)
-                )
+                    mapOf("fnr" to fnr),
+                ),
             )
         }
 
@@ -90,7 +92,7 @@ class PostgresPersonRepository : PersonRepository {
             søknadsType: SøknadsType,
             kanal: Kanal,
             datoInnsendt: LocalDateTime,
-            tittel: String?
+            tittel: String?,
         ) {
             aktivSøknadId = søknadId
             queries.add(
@@ -108,15 +110,16 @@ class PostgresPersonRepository : PersonRepository {
                         "soknadsType" to søknadsType.toString(),
                         "kanal" to kanal.toString(),
                         "datoInnsendt" to datoInnsendt,
-                        "tittel" to tittel
-                    )
-                )
+                        "tittel" to tittel,
+                    ),
+                ),
             )
             queries.add(
                 queryOf(
                     //language=PostgreSQL
-                    """DELETE FROM vedlegg WHERE søknad_id = ?""", aktivSøknadId
-                )
+                    """DELETE FROM vedlegg WHERE søknad_id = ?""",
+                    aktivSøknadId,
+                ),
             )
         }
 
@@ -133,8 +136,8 @@ class PostgresPersonRepository : PersonRepository {
                         "skjemaNummer" to skjemaNummer,
                         "navn" to navn,
                         "status" to status.toString(),
-                    )
-                )
+                    ),
+                ),
             )
         }
 
@@ -144,7 +147,7 @@ class PostgresPersonRepository : PersonRepository {
             status: Vedtak.Status,
             datoFattet: LocalDateTime,
             fraDato: LocalDateTime,
-            tilDato: LocalDateTime?
+            tilDato: LocalDateTime?,
         ) {
             queries.add(
                 queryOf(
@@ -160,9 +163,9 @@ class PostgresPersonRepository : PersonRepository {
                         "status" to status.toString(),
                         "fattet" to datoFattet,
                         "fraDato" to fraDato,
-                        "tilDato" to tilDato
-                    )
-                )
+                        "tilDato" to tilDato,
+                    ),
+                ),
             )
         }
     }
@@ -175,10 +178,10 @@ class PostgresPersonRepository : PersonRepository {
                         FROM søknad
                         WHERE person_id = (SELECT person_id FROM person WHERE fnr = ?)
                     """.trimMargin(),
-                    fnr
+                    fnr,
                 ).map { row ->
                     mapSøknadsRad(row)
-                }.asList
+                }.asList,
             )
         }
 
@@ -197,10 +200,10 @@ class PostgresPersonRepository : PersonRepository {
                         FROM vedlegg 
                         WHERE søknad_id = ? 
                     """.trimMargin(),
-                    søknadsId
+                    søknadsId,
                 ).map { row ->
                     row.toVedlegg()
-                }.asList
+                }.asList,
             )
         }
 
@@ -213,8 +216,8 @@ class PostgresPersonRepository : PersonRepository {
                         INNER JOIN person p ON p.person_id = v.person_id
                         WHERE p.fnr = ?
                     """.trimIndent(),
-                    fnr
-                ).map { row -> row.toVedtak() }.asList
+                    fnr,
+                ).map { row -> row.toVedtak() }.asList,
             )
         }
 
@@ -224,7 +227,7 @@ class PostgresPersonRepository : PersonRepository {
         fattetTom: LocalDate?,
         status: List<Vedtak.Status>,
         offset: Int,
-        limit: Int
+        limit: Int,
     ): List<Vedtak> = using(sessionOf(dataSource)) { session ->
         session.run(
             queryOf( //language=PostgreSQL
@@ -242,9 +245,9 @@ class PostgresPersonRepository : PersonRepository {
                     "fom" to fattetFom,
                     "tom" to fattetTom?.plusDays(1),
                     "limit" to limit,
-                    "offset" to offset
-                )
-            ).map { row -> row.toVedtak() }.asList
+                    "offset" to offset,
+                ),
+            ).map { row -> row.toVedtak() }.asList,
         )
     }
 
@@ -255,7 +258,7 @@ class PostgresPersonRepository : PersonRepository {
         type: List<SøknadsType>,
         kanal: List<Kanal>,
         offset: Int,
-        limit: Int
+        limit: Int,
     ) = using(sessionOf(dataSource)) { session ->
         session.run(
             queryOf( //language=PostgreSQL
@@ -273,9 +276,9 @@ class PostgresPersonRepository : PersonRepository {
                     "fom" to fom,
                     "tom" to tom?.plusDays(1),
                     "limit" to limit,
-                    "offset" to offset
-                )
-            ).map { row -> mapSøknadsRad(row) }.asList
+                    "offset" to offset,
+                ),
+            ).map { row -> mapSøknadsRad(row) }.asList,
         )
     }
 
@@ -287,13 +290,13 @@ class PostgresPersonRepository : PersonRepository {
         kanal = Kanal.valueOf(string("kanal")),
         datoInnsendt = localDateTime("dato_innsendt"),
         vedlegg = vedlegg,
-        tittel = stringOrNull("tittel")
+        tittel = stringOrNull("tittel"),
     )
 
     private fun Row.toVedlegg() = Vedlegg(
         skjemaNummer = string("skjema_nummer"),
         navn = string("navn"),
-        status = Status.valueOf(string("status"))
+        status = Status.valueOf(string("status")),
     )
 
     private fun Row.toVedtak() = Vedtak(

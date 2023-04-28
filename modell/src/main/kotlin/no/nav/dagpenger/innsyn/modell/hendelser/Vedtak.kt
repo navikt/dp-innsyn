@@ -9,7 +9,7 @@ class Vedtak constructor(
     private val status: Status,
     private val datoFattet: LocalDateTime,
     private val fraDato: LocalDateTime,
-    private val tilDato: LocalDateTime?
+    private val tilDato: LocalDateTime?,
 ) {
     fun accept(visitor: VedtakVisitor) {
         visitor.visitVedtak(vedtakId, fagsakId, status, datoFattet, fraDato, tilDato)
@@ -19,6 +19,6 @@ class Vedtak constructor(
         INNVILGET,
         AVSLÅTT,
         STANS,
-        ENDRING
+        ENDRING,
     }
 }

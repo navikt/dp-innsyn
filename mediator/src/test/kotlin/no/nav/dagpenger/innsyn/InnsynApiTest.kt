@@ -61,7 +61,7 @@ internal class InnsynApiTest {
                     PostgresPersonRepository(),
                     henvendelseOppslag,
                     ettersendingSpleiser,
-                    mockk()
+                    mockk(),
                 )
             }
             client.autentisert("/soknad").let { response ->
@@ -76,19 +76,19 @@ internal class InnsynApiTest {
         val personRepository = PostgresPersonRepository().also {
             it.person("test@nav.no").also { person ->
                 person.håndter(
-                    søknad("1", "1", LocalDateTime.now().minusDays(90), "Søknad om")
+                    søknad("1", "1", LocalDateTime.now().minusDays(90), "Søknad om"),
                 )
                 person.håndter(
-                    søknad("2", "11", LocalDateTime.now().minusDays(90))
+                    søknad("2", "11", LocalDateTime.now().minusDays(90)),
                 )
                 person.håndter(
-                    søknad("3", "12", LocalDateTime.now().minusDays(90))
+                    søknad("3", "12", LocalDateTime.now().minusDays(90)),
                 )
                 person.håndter(
-                    søknad("4", "13", LocalDateTime.now().minusDays(90))
+                    søknad("4", "13", LocalDateTime.now().minusDays(90)),
                 )
                 person.håndter(
-                    søknad("5", "14", LocalDateTime.now().minusDays(90))
+                    søknad("5", "14", LocalDateTime.now().minusDays(90)),
                 )
                 person.håndter(Sakstilknytning("11", "arenaId"))
                 person.håndter(
@@ -98,8 +98,8 @@ internal class InnsynApiTest {
                         Vedtak.Status.INNVILGET,
                         LocalDateTime.now(),
                         LocalDateTime.now(),
-                        null
-                    )
+                        null,
+                    ),
                 )
                 it.lagre(person)
             }
@@ -113,7 +113,7 @@ internal class InnsynApiTest {
                     personRepository,
                     henvendelseOppslag,
                     ettersendingSpleiser,
-                    mockk()
+                    mockk(),
                 )
             }
             val fom = LocalDate.now().minusDays(100)
@@ -135,7 +135,7 @@ internal class InnsynApiTest {
         val personRepository = PostgresPersonRepository().also {
             it.person("test@nav.no").also { person ->
                 person.håndter(
-                    søknad(søknadIdNyttFormat, "11", LocalDateTime.now().minusDays(90))
+                    søknad(søknadIdNyttFormat, "11", LocalDateTime.now().minusDays(90)),
                 )
                 it.lagre(person)
             }
@@ -149,7 +149,7 @@ internal class InnsynApiTest {
                     personRepository,
                     henvendelseOppslag,
                     ettersendingSpleiser,
-                    mockk()
+                    mockk(),
                 )
             }
             val fom = LocalDate.now().minusDays(100)
@@ -169,7 +169,7 @@ internal class InnsynApiTest {
         val personRepository = PostgresPersonRepository().also {
             it.person("test@nav.no").also { person ->
                 person.håndter(
-                    søknad("1", "1", LocalDateTime.now().minusDays(90))
+                    søknad("1", "1", LocalDateTime.now().minusDays(90)),
                 )
                 person.håndter(Sakstilknytning("11", "arenaId"))
                 person.håndter(
@@ -179,8 +179,8 @@ internal class InnsynApiTest {
                         Vedtak.Status.INNVILGET,
                         LocalDateTime.now(),
                         LocalDateTime.now(),
-                        null
-                    )
+                        null,
+                    ),
                 )
                 it.lagre(person)
             }
@@ -194,7 +194,7 @@ internal class InnsynApiTest {
                     personRepository,
                     henvendelseOppslag,
                     ettersendingSpleiser,
-                    mockk()
+                    mockk(),
                 )
             }
             val dagensDato = LocalDate.now()
@@ -210,7 +210,7 @@ internal class InnsynApiTest {
         val personRepository = PostgresPersonRepository().also {
             it.person("test@nav.no").also { person ->
                 person.håndter(
-                    søknad()
+                    søknad(),
                 )
                 person.håndter(Sakstilknytning("11", "arenaId"))
                 person.håndter(
@@ -220,8 +220,8 @@ internal class InnsynApiTest {
                         Vedtak.Status.INNVILGET,
                         LocalDateTime.now(),
                         LocalDateTime.now(),
-                        null
-                    )
+                        null,
+                    ),
                 )
                 it.lagre(person)
             }
@@ -235,7 +235,7 @@ internal class InnsynApiTest {
                     personRepository,
                     henvendelseOppslag,
                     ettersendingSpleiser,
-                    mockk()
+                    mockk(),
                 )
             }
             val dagensDato = LocalDate.now()
@@ -251,7 +251,7 @@ internal class InnsynApiTest {
         val personRepository = PostgresPersonRepository().also {
             it.person("test@nav.no").also { person ->
                 person.håndter(
-                    søknad()
+                    søknad(),
                 )
                 person.håndter(Sakstilknytning("11", "arenaId"))
                 person.håndter(
@@ -261,8 +261,8 @@ internal class InnsynApiTest {
                         Vedtak.Status.INNVILGET,
                         LocalDateTime.now().minusDays(90),
                         LocalDateTime.now(),
-                        null
-                    )
+                        null,
+                    ),
                 )
                 it.lagre(person)
             }
@@ -276,7 +276,7 @@ internal class InnsynApiTest {
                     personRepository,
                     henvendelseOppslag,
                     ettersendingSpleiser,
-                    mockk()
+                    mockk(),
                 )
             }
             val dagensDato = LocalDate.now()
@@ -300,7 +300,7 @@ internal class InnsynApiTest {
                     mockk<PostgresPersonRepository>(),
                     henvendelseOppslag,
                     ettersendingSpleiser,
-                    mockk()
+                    mockk(),
                 )
             }
             client.autentisert("/ettersendelser").let { response ->
@@ -314,7 +314,7 @@ internal class InnsynApiTest {
         val ettersendingSpleiser = mockk<EttersendingSpleiser>()
         val enFeiletOgEnVellykket =
             MultiSourceResultObjectMother.giveMeSuccessfulResult(KildeType.DB) + MultiSourceResultObjectMother.giveMeFailedResult(
-                KildeType.HENVENDELSE
+                KildeType.HENVENDELSE,
             )
         coEvery { ettersendingSpleiser.hentEttersendelser(any()) } returns enFeiletOgEnVellykket
 
@@ -348,7 +348,7 @@ internal class InnsynApiTest {
         val påbegyntNySøknadsdialog = PåbegyntSøknadDto(
             uuid = uuid,
             opprettet = ZonedDateTime.of(LocalDateTime.MAX, ZoneId.of("Europe/Oslo")),
-            sistEndret = nå
+            sistEndret = nå,
         )
         coEvery { påbegyntOppslagMock.hentPåbegyntSøknad(any(), any()) } returns påbegyntNySøknadsdialog
 
@@ -361,7 +361,7 @@ internal class InnsynApiTest {
                     mockk<PostgresPersonRepository>(),
                     henvendelseOppslag,
                     ettersendingSpleiser,
-                    påbegyntOppslagMock
+                    påbegyntOppslagMock,
                 )
             }
             val response = client.autentisert("/paabegynte")
@@ -383,7 +383,7 @@ internal class InnsynApiTest {
         val personRepository = PostgresPersonRepository().also {
             it.person("test@nav.no").also { person ->
                 person.håndter(
-                    søknad()
+                    søknad(),
                 )
                 person.håndter(Sakstilknytning("11", "arenaId"))
                 person.håndter(
@@ -393,8 +393,8 @@ internal class InnsynApiTest {
                         Vedtak.Status.INNVILGET,
                         LocalDateTime.now(),
                         LocalDateTime.now(),
-                        null
-                    )
+                        null,
+                    ),
                 )
                 it.lagre(person)
             }
@@ -408,7 +408,7 @@ internal class InnsynApiTest {
                     personRepository,
                     henvendelseOppslag,
                     ettersendingSpleiser,
-                    mockk()
+                    mockk(),
                 )
             }
             val dagensDato = LocalDate.now()
@@ -430,16 +430,16 @@ internal class InnsynApiTest {
                     PostgresPersonRepository(),
                     henvendelseOppslag,
                     ettersendingSpleiser,
-                    mockk()
+                    mockk(),
                 )
             }
             assertEquals(
                 HttpStatusCode.InternalServerError,
-                client.autentisert("/behandlingsstatus?fom=ugyldig_fom").status
+                client.autentisert("/behandlingsstatus?fom=ugyldig_fom").status,
             )
             assertEquals(
                 HttpStatusCode.InternalServerError,
-                client.autentisert("/behandlingsstatus").status
+                client.autentisert("/behandlingsstatus").status,
             )
         }
     }
@@ -448,7 +448,7 @@ internal class InnsynApiTest {
         endepunkt: String,
         token: String = jwtStub.createTokenFor("test@nav.no", "id"),
         httpMethod: HttpMethod = HttpMethod.Get,
-        body: String? = null
+        body: String? = null,
     ): HttpResponse {
         return this.request {
             this.url(endepunkt)
@@ -468,7 +468,7 @@ internal class InnsynApiTest {
         søknadId: String = "1",
         journalpostId: String = "1",
         datoInnsendt: LocalDateTime = LocalDateTime.now(),
-        tittel: String? = null
+        tittel: String? = null,
     ) = Søknad(
         søknadId = søknadId,
         journalpostId = journalpostId,
@@ -477,6 +477,6 @@ internal class InnsynApiTest {
         kanal = Kanal.Digital,
         datoInnsendt = datoInnsendt,
         vedlegg = listOf(Innsending.Vedlegg("123", "navn", Innsending.Vedlegg.Status.LastetOpp)),
-        tittel = tittel
+        tittel = tittel,
     )
 }

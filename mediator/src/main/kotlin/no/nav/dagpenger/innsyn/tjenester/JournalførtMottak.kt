@@ -15,7 +15,7 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall.JournalførtMottak")
 
 internal class JournalførtMottak(
     rapidsConnection: RapidsConnection,
-    private val personMediator: PersonMediator
+    private val personMediator: PersonMediator,
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
@@ -33,7 +33,7 @@ internal class JournalførtMottak(
 
         withLoggingContext(
             "journalpostId" to journalpostId,
-            "fagsakId" to fagsakId
+            "fagsakId" to fagsakId,
         ) {
             logg.info { "Mottok ferdig journalføring." }
             sikkerlogg.info { "Mottok ferdig journalføring ($fnr): ${packet.toJson()}" }

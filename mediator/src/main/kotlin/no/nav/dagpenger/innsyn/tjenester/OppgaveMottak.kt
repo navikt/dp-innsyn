@@ -17,7 +17,7 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall.OppgaveMottak")
 
 internal class OppgaveMottak(
     rapidsConnection: RapidsConnection,
-    private val personMediator: PersonMediator
+    private val personMediator: PersonMediator,
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {

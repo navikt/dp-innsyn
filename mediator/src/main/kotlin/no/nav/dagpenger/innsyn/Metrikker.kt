@@ -21,23 +21,23 @@ internal object Metrikker {
             20.0,
             30.0,
             60.0,
-            120.0
+            120.0,
         )
         .help("Tid fra innsendingen ble journalført til vi tar i mot")
         .register()
 
     fun søknadForsinkelse(forsinkelse: LocalDateTime) =
         mottakForsinkelse.labels("soknad").observe(
-            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble()
+            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble(),
         )
 
     fun ettersendingForsinkelse(forsinkelse: LocalDateTime) =
         mottakForsinkelse.labels("ettersending").observe(
-            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble()
+            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble(),
         )
 
     fun mottakForsinkelse(forsinkelse: LocalDateTime) =
         mottakForsinkelse.labels("mottak").observe(
-            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble()
+            Duration.between(forsinkelse, LocalDateTime.now()).seconds.toDouble(),
         )
 }

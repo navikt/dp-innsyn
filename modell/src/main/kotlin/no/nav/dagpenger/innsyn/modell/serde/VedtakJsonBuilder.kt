@@ -20,7 +20,7 @@ class VedtakJsonBuilder(val vedtak: Vedtak) : VedtakVisitor {
         status: Vedtak.Status,
         datoFattet: LocalDateTime,
         fraDato: LocalDateTime,
-        tilDato: LocalDateTime?
+        tilDato: LocalDateTime?,
     ) {
         root.put("vedtakId", vedtakId)
         root.put("fagsakId", fagsakId)

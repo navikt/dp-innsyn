@@ -18,5 +18,5 @@ internal fun ExternalPåbegynt.toInternal() = Påbegynt(
     behandlingsId = this.behandlingsId,
     søknadId = this.behandlingsId,
     sistEndret = this.sistEndret,
-    erNySøknadsdialog = false
+    erNySøknadsdialog = false,
 )

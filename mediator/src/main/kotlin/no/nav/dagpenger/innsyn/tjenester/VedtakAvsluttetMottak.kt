@@ -38,7 +38,7 @@ internal class VedtakAvsluttetMottak(
 
         withLoggingContext(
             "fagsakId" to sakId,
-            "vedtakId" to vedtakId
+            "vedtakId" to vedtakId,
         ) {
             logg.info { "Mottok vedtak som gikk fra IVERK til AVLSU" }
             sikkerlogg.info { "Mottok nytt vedtak for person $fnr: ${packet.toJson()}" }

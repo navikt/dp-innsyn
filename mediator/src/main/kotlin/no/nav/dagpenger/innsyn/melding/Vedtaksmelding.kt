@@ -32,7 +32,7 @@ internal class Vedtaksmelding(private val packet: JsonMessage) : Hendelsemelding
             status = status,
             datoFattet = fattet,
             fraDato = fraDato,
-            tilDato = tilDato
+            tilDato = tilDato,
         )
     override val fødselsnummer: String = packet.fødselsnummer()
     private val status

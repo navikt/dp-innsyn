@@ -5,25 +5,25 @@ import io.ktor.http.HttpStatusCode
 data class MultiSourceResult<R, S>(
     val results: List<R>,
     val successFullSources: List<S>,
-    val failedSources: List<S> = emptyList()
+    val failedSources: List<S> = emptyList(),
 ) {
 
     companion object {
         fun <R, S> createSuccessfulResult(results: List<R>, successfulSource: S) = MultiSourceResult(
             results,
-            listOf(successfulSource)
+            listOf(successfulSource),
         )
 
         fun <R, S> createErrorResult(failedSource: S) = MultiSourceResult(
             emptyList<R>(),
             emptyList<S>(),
-            listOf(failedSource)
+            listOf(failedSource),
         )
 
         fun <R> createEmptyResult(): MultiSourceResult<R, KildeType> = MultiSourceResult(
             emptyList(),
             emptyList(),
-            emptyList()
+            emptyList(),
         )
     }
 
@@ -31,7 +31,7 @@ data class MultiSourceResult<R, S>(
         MultiSourceResult(
             this.results + other.results,
             this.successFullSources + other.successFullSources,
-            this.failedSources + other.failedSources
+            this.failedSources + other.failedSources,
         )
 
     fun results() = mutableListOf<R>().apply { addAll(results) }
@@ -53,5 +53,5 @@ data class MultiSourceResult<R, S>(
 
 enum class KildeType {
     HENVENDELSE,
-    DB
+    DB,
 }

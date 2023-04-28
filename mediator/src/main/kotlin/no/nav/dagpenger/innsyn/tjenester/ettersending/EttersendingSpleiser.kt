@@ -10,7 +10,7 @@ import java.time.ZonedDateTime
 
 internal class EttersendingSpleiser(
     private val henvendelseOppslag: HenvendelseOppslag,
-    private val personRepository: PersonRepository
+    private val personRepository: PersonRepository,
 ) {
     private val log = KotlinLogging.logger {}
     private val visningsgrenseForEttersendingAngittIÅr = 3L
@@ -30,7 +30,7 @@ internal class EttersendingSpleiser(
         val søknader = personRepository.hentSøknaderFor(
             fnr,
             fom = null,
-            tom = null
+            tom = null,
         )
         val ettersendelser = søknader.toMinimalEttersending()
         MultiSourceResult.createSuccessfulResult(ettersendelser, KildeType.DB)
@@ -64,10 +64,10 @@ internal class EttersendingSpleiser(
 
     private fun lagNyttResultatMedSammeKilderOgEventuelleFeiledeKilder(
         unikeEttersendelser: List<MinimalEttersendingDto>,
-        alleEttersendelser: MultiSourceResult<MinimalEttersendingDto, KildeType>
+        alleEttersendelser: MultiSourceResult<MinimalEttersendingDto, KildeType>,
     ) = MultiSourceResult(
         unikeEttersendelser,
         alleEttersendelser.successFullSources(),
-        alleEttersendelser.failedSources()
+        alleEttersendelser.failedSources(),
     )
 }

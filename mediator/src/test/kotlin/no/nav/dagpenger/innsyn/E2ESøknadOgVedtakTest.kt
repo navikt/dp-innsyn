@@ -96,7 +96,7 @@ internal class E2ESøknadOgVedtakTest {
             søknadsType: Søknad.SøknadsType,
             kanal: Kanal,
             datoInnsendt: LocalDateTime,
-            tittel: String?
+            tittel: String?,
         ) {
             søknader++
         }
@@ -115,7 +115,7 @@ internal class E2ESøknadOgVedtakTest {
             status: Vedtak.Status,
             datoFattet: LocalDateTime,
             fraDato: LocalDateTime,
-            tilDato: LocalDateTime?
+            tilDato: LocalDateTime?,
         ) {
             vedtak++
         }

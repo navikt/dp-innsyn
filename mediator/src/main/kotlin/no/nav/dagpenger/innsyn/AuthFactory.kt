@@ -35,7 +35,7 @@ object AuthFactory {
             .rateLimited(
                 10,
                 1,
-                TimeUnit.MINUTES
+                TimeUnit.MINUTES,
             ) // if not cached, only allow max 10 different keys per minute to be fetched from external provider
             .build()
 }
@@ -48,7 +48,7 @@ private data class OpenIdConfiguration(
     @JsonProperty("token_endpoint")
     val tokenEndpoint: String,
     @JsonProperty("authorization_endpoint")
-    val authorizationEndpoint: String
+    val authorizationEndpoint: String,
 )
 
 private val httpClient = HttpClient(CIO) {

@@ -20,6 +20,6 @@ internal class LegacySøknadsmelding(packet: JsonMessage) : SøknadMelding(packe
             kanal = Digital,
             datoInnsendt = datoRegistrert,
             vedlegg = vedlegg,
-            tittel = tittel
+            tittel = tittel,
         )
 }

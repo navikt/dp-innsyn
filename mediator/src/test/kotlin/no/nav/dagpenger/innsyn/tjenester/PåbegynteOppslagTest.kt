@@ -38,20 +38,20 @@ class PåbegynteOppslagTest {
                     assertEquals(HttpMethod.Get, request.method)
                     assertEquals(
                         "Bearer ${testTokenProvider.invoke(subjectToken, soknadAudience)}",
-                        request.headers[HttpHeaders.Authorization]
+                        request.headers[HttpHeaders.Authorization],
                     )
                     val jsonResponse = objectMapper.writeValueAsString(
                         PåbegyntSøknadDto(
                             uuid = søknadUuid,
                             opprettet = opprettet,
-                            sistEndret = sistEndret
-                        )
+                            sistEndret = sistEndret,
+                        ),
                     )
                     respond(
                         content = jsonResponse,
-                        headers = headersOf(HttpHeaders.ContentType, "application/json")
+                        headers = headersOf(HttpHeaders.ContentType, "application/json"),
                     )
-                }
+                },
             )
 
             val påbegyntResponse = påbegyntOppslag.hentPåbegyntSøknad(subjectToken = "testToken")

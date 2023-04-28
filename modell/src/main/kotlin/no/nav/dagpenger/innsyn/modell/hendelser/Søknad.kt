@@ -33,7 +33,7 @@ class Søknad(
 
     enum class SøknadsType {
         NySøknad,
-        Gjenopptak
+        Gjenopptak,
     }
 
     private val papirKanIkkeHaVedlegg get() = !(søknadId == null && vedlegg.isNotEmpty())
