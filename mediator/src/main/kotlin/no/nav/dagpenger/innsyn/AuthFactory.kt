@@ -19,6 +19,7 @@ import java.net.URL
 import java.util.concurrent.TimeUnit
 
 object AuthFactory {
+    @Suppress("ktlint:standard:class-naming")
     private object token_x : PropertyGroup() {
         val well_known_url by stringType
         val client_id by stringType

@@ -1,8 +1,8 @@
 plugins {
-    id("dagpenger.common")
+    id("common")
 }
 
 dependencies {
-    implementation(Jackson.core)
-    implementation(Jackson.kotlin)
+    implementation(libs.jackson.core)
+    implementation(libs.jackson.kotlin)
 }
