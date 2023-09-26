@@ -16,6 +16,7 @@ import org.flywaydb.core.api.configuration.FluentConfiguration
 private val config = ConfigurationProperties.systemProperties() overriding EnvironmentVariables()
 
 internal object PostgresDataSourceBuilder {
+    @Suppress("ktlint:standard:class-naming")
     internal object db : PropertyGroup() {
         val host by stringType
         val port by stringType
