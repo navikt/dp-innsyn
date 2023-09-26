@@ -2,7 +2,7 @@ rootProject.name = "dp-innsyn"
 
 include(
     "modell",
-    "mediator"
+    "mediator",
 )
 
 dependencyResolutionManagement {
