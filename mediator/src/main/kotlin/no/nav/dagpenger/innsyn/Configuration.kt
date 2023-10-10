@@ -19,7 +19,7 @@ internal object Configuration {
             "KAFKA_RESET_POLICY" to "earliest",
             "HTTP_PORT" to "8080",
             "KAFKA_BROKERS" to "localhost:9092",
-            "NY_SOKNADSDIALOG_INGRESS" to "https://arbeid.dev.nav.no/dagpenger/dialog/soknad",
+            "NY_SOKNADSDIALOG_INGRESS" to "https://arbeid.intern.dev.nav.no/dagpenger/dialog/soknad",
             "GAMMEL_SOKNADSDIALOG_INGRESS" to "https://tjenester.nav.no/soknaddagpenger-innsending",
             "FLYWAY_CLEAN_DISABLED" to "false",
         ),
