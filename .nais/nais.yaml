@@ -45,7 +45,6 @@ spec:
     inbound:
       rules:
         - application: dp-dagpenger
-        - application: dp-soknad-veileder
         - application: dp-soknad
         - application: paw-auth-proxy
           namespace: paw
