@@ -29,11 +29,10 @@ spec:
     enabled: true
   resources:
     limits:
-      cpu: "2000m"
-      memory: "2048Mi"
+      memory: 512Mi
     requests:
-      cpu: "1000m"
-      memory: "2048Mi"
+      cpu: 100m
+      memory: 256Mi
   secureLogs:
     enabled: true
   kafka:
