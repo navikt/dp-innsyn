@@ -23,7 +23,7 @@ spec:
   replicas:
     min: 2
     max: 3
-    cpuThresholdPercentage: 50
+    cpuThresholdPercentage: 80
   terminationGracePeriodSeconds: 180
   prometheus:
     enabled: true
@@ -31,7 +31,7 @@ spec:
     limits:
       memory: 512Mi
     requests:
-      cpu: 100m
+      cpu: 60m
       memory: 256Mi
   secureLogs:
     enabled: true
