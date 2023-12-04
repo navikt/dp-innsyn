@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class MultiSourceResultTest {
-
     @Test
     fun `Skal summere to vellykkede resultater til et nytt resultatobjekt`() {
         val expectedSuccessfulSource1 = KildeType.HENVENDELSE

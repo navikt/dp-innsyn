@@ -13,11 +13,12 @@ internal abstract class Innsendingsmelding(packet: JsonMessage) : Hendelsemeldin
     internal val datoRegistrert: LocalDateTime = packet["datoRegistrert"].asLocalDateTime()
     internal val tittel = packet["tittel"].asText()
 
-    internal val vedlegg = packet["søknadsData.vedlegg"].map {
-        Vedlegg(
-            it["skjemaNummer"].asText(),
-            it["navn"].asText(),
-            Status.valueOf(it["innsendingsvalg"].asText()),
-        )
-    }
+    internal val vedlegg =
+        packet["søknadsData.vedlegg"].map {
+            Vedlegg(
+                it["skjemaNummer"].asText(),
+                it["navn"].asText(),
+                Status.valueOf(it["innsendingsvalg"].asText()),
+            )
+        }
 }

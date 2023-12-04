@@ -31,7 +31,10 @@ internal class VedtakAvsluttetMottak(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val fnr = packet.fødselsnummer()
         val vedtakId = packet["after"]["VEDTAK_ID"].asText()
         val sakId = packet["after"]["SAK_ID"].asText()
@@ -45,7 +48,10 @@ internal class VedtakAvsluttetMottak(
         }
     }
 
-    override fun onError(problems: MessageProblems, context: MessageContext) {
+    override fun onError(
+        problems: MessageProblems,
+        context: MessageContext,
+    ) {
         logg.debug { problems }
         sikkerlogg.debug { problems.toExtendedReport() }
     }

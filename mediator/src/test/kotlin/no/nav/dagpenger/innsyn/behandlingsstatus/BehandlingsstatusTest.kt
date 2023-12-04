@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class BehandlingsstatusTest {
-
     @Test
     fun `Behandlingsstatus er null når det er 0 søknader og 0 vedtak`() {
         assertEquals(null, Behandlingsstatus(antallSøknader = 0, antallVedtak = 0).antattStatus)
@@ -56,7 +55,8 @@ class BehandlingsstatusTest {
     @Test
     fun `Behandlingsstatus er FerdigBehandlet når det finnes 2 søknader og 2 vedtak`() {
         assertEquals(
-            FerdigBehandlet, // TODO: Er dette riktig?
+            // TODO: Er dette riktig?
+            FerdigBehandlet,
             Behandlingsstatus(antallVedtak = 2, antallSøknader = 2).antattStatus,
         )
     }

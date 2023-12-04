@@ -17,37 +17,41 @@ internal class EttersendingSpleiser(
 
     suspend fun hentEttersendelser(fnr: String): MultiSourceResult<MinimalEttersendingDto, KildeType> {
         val fraDatabasen = hentFraDB(fnr)
-        val unikeSisteTreÅr = fraDatabasen.results()
-            .filter { it.innsendtDatoMåVæreSatt() }
-            .toSet()
-            .filter { it.erNyereEnnTreÅr() }
-            .sortedByDescending { it.datoInnsendt }
+        val unikeSisteTreÅr =
+            fraDatabasen.results()
+                .filter { it.innsendtDatoMåVæreSatt() }
+                .toSet()
+                .filter { it.erNyereEnnTreÅr() }
+                .sortedByDescending { it.datoInnsendt }
 
         return lagNyttResultatMedSammeKilderOgEventuelleFeiledeKilder(unikeSisteTreÅr, fraDatabasen)
     }
 
-    private fun hentFraDB(fnr: String) = try {
-        val søknader = personRepository.hentSøknaderFor(
-            fnr,
-            fom = null,
-            tom = null,
-        )
-        val ettersendelser = søknader.toMinimalEttersending()
-        MultiSourceResult.createSuccessfulResult(ettersendelser, KildeType.DB)
-    } catch (e: Exception) {
-        log.warn("Klarte ikke å hente data fra databasen: $e", e)
-        MultiSourceResult.createErrorResult(KildeType.DB)
-    }
+    private fun hentFraDB(fnr: String) =
+        try {
+            val søknader =
+                personRepository.hentSøknaderFor(
+                    fnr,
+                    fom = null,
+                    tom = null,
+                )
+            val ettersendelser = søknader.toMinimalEttersending()
+            MultiSourceResult.createSuccessfulResult(ettersendelser, KildeType.DB)
+        } catch (e: Exception) {
+            log.warn("Klarte ikke å hente data fra databasen: $e", e)
+            MultiSourceResult.createErrorResult(KildeType.DB)
+        }
 
     private fun List<Søknad>.toMinimalEttersending() = OversettSøknadTilEttersending(this).resultat()
 
-    private suspend fun hentFraHenvendelse(fnr: String) = try {
-        val ettersendelser = henvendelseOppslag.hentEttersendelser(fnr)
-        MultiSourceResult.createSuccessfulResult(ettersendelser, KildeType.HENVENDELSE)
-    } catch (e: Exception) {
-        log.warn("Klarte ikke å hente data fra henvendelse: $e", e)
-        MultiSourceResult.createErrorResult(KildeType.HENVENDELSE)
-    }
+    private suspend fun hentFraHenvendelse(fnr: String) =
+        try {
+            val ettersendelser = henvendelseOppslag.hentEttersendelser(fnr)
+            MultiSourceResult.createSuccessfulResult(ettersendelser, KildeType.HENVENDELSE)
+        } catch (e: Exception) {
+            log.warn("Klarte ikke å hente data fra henvendelse: $e", e)
+            MultiSourceResult.createErrorResult(KildeType.HENVENDELSE)
+        }
 
     private fun MinimalEttersendingDto.innsendtDatoMåVæreSatt(): Boolean =
         if (datoInnsendt == null) {

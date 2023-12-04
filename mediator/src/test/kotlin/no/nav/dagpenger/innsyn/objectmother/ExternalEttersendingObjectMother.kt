@@ -13,16 +13,18 @@ object ExternalEttersendingObjectMother {
             emptyList(),
         )
 
-    fun giveMeBILEttersendelse() = ExternalEttersending(
-        "bid",
-        "NAV 10-07.40",
-        ZonedDateTime.now(),
-        ZonedDateTime.now(),
-        emptyList(),
-    )
+    fun giveMeBILEttersendelse() =
+        ExternalEttersending(
+            "bid",
+            "NAV 10-07.40",
+            ZonedDateTime.now(),
+            ZonedDateTime.now(),
+            emptyList(),
+        )
 
-    fun giveMeEttersendelserForDAGOgBIL() = listOf(
-        giveMeBILEttersendelse(),
-        giveMeDagpengeEttersendelse(),
-    )
+    fun giveMeEttersendelserForDAGOgBIL() =
+        listOf(
+            giveMeBILEttersendelse(),
+            giveMeDagpengeEttersendelse(),
+        )
 }

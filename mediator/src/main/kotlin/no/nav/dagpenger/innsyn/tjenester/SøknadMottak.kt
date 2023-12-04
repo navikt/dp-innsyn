@@ -40,14 +40,17 @@ internal class SøknadMottak(
             validate {
                 it.interestedIn(
                     "søknadsData.vedlegg",
-                    QuizSøknadMelding.søknadIdNøkkel,
-                    LegacySøknadsmelding.søknadIdNøkkel,
+                    QuizSøknadMelding.SØKNAD_ID_NØKKEL,
+                    LegacySøknadsmelding.SØKNAD_ID_NØKKEL,
                 )
             }
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val søknadMelding: SøknadMelding = packet.tilSøknadMelding()
         val fnr = packet["fødselsnummer"].asText()
         val søknadId = søknadMelding.søknadId
@@ -62,16 +65,20 @@ internal class SøknadMottak(
             personMediator.håndter(søknadMelding.søknad, søknadMelding)
         }.also {
             logg.info {
-                val datoRegistrert = packet["datoRegistrert"].asLocalDateTime().also {
-                    Metrikker.søknadForsinkelse(it)
-                }
+                val datoRegistrert =
+                    packet["datoRegistrert"].asLocalDateTime().also {
+                        Metrikker.søknadForsinkelse(it)
+                    }
                 val forsinkelse = Duration.between(datoRegistrert, LocalDateTime.now()).toMillis()
                 "Har lagret en søknad med $forsinkelse millisekunder forsinkelse"
             }
         }
     }
 
-    override fun onError(problems: MessageProblems, context: MessageContext) {
+    override fun onError(
+        problems: MessageProblems,
+        context: MessageContext,
+    ) {
         logg.debug { problems }
     }
 }
@@ -86,5 +93,6 @@ private fun JsonMessage.tilSøknadMelding(): SøknadMelding {
     }
 }
 
-private fun JsonMessage.harSøknadIdFraQuiz() = !this[QuizSøknadMelding.søknadIdNøkkel].isMissingNode
-private fun JsonMessage.harSøknadIdFraLegacy() = !this[LegacySøknadsmelding.søknadIdNøkkel].isMissingNode
+private fun JsonMessage.harSøknadIdFraQuiz() = !this[QuizSøknadMelding.SØKNAD_ID_NØKKEL].isMissingNode
+
+private fun JsonMessage.harSøknadIdFraLegacy() = !this[LegacySøknadsmelding.SØKNAD_ID_NØKKEL].isMissingNode

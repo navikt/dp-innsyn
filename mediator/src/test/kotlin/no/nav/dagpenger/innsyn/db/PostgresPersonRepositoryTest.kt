@@ -25,18 +25,19 @@ internal class PostgresPersonRepositoryTest {
     fun `skal lagre og finne person`() {
         withMigratedDb {
             val person = repository.person("123")
-            val søknad = Søknad(
-                "id",
-                "journalpostId",
-                "NAV01",
-                Søknad.SøknadsType.NySøknad,
-                Kanal.Digital,
-                LocalDateTime.now(),
-                listOf(
-                    Vedlegg("123", "123", LastetOpp),
-                ),
-                "tittel",
-            )
+            val søknad =
+                Søknad(
+                    "id",
+                    "journalpostId",
+                    "NAV01",
+                    Søknad.SøknadsType.NySøknad,
+                    Kanal.Digital,
+                    LocalDateTime.now(),
+                    listOf(
+                        Vedlegg("123", "123", LastetOpp),
+                    ),
+                    "tittel",
+                )
 
             person.håndter(søknad)
             repository.lagre(person)
@@ -99,15 +100,15 @@ internal class PostgresPersonRepositoryTest {
     fun `Lagring av vedtak er idempotent`() {
         withMigratedDb {
             val person = repository.person("123")
-            val vedtak = Vedtak(
-                "123",
-                "fagsakid",
-                Vedtak.Status.INNVILGET,
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-
-            )
+            val vedtak =
+                Vedtak(
+                    "123",
+                    "fagsakid",
+                    Vedtak.Status.INNVILGET,
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                )
 
             person.håndter(
                 vedtak,
@@ -161,16 +162,17 @@ internal class PostgresPersonRepositoryTest {
     fun `skal finne papirsøknad for person`() {
         withMigratedDb {
             val person = repository.person("123")
-            val søknad = Søknad(
-                null,
-                "journalpostId",
-                "NAV01",
-                Søknad.SøknadsType.NySøknad,
-                Kanal.Papir,
-                LocalDateTime.now(),
-                emptyList(),
-                "tittel",
-            )
+            val søknad =
+                Søknad(
+                    null,
+                    "journalpostId",
+                    "NAV01",
+                    Søknad.SøknadsType.NySøknad,
+                    Kanal.Papir,
+                    LocalDateTime.now(),
+                    emptyList(),
+                    "tittel",
+                )
             person.håndter(søknad)
             repository.lagre(person)
             repository.hentSøknaderFor(person.fnr, LocalDate.now().minusDays(5), LocalDate.now().plusDays(5)).also {
@@ -186,29 +188,33 @@ internal class PostgresPersonRepositoryTest {
             val fnr = "1234567891"
             val person = repository.person(fnr)
             val søknadId = UUID.randomUUID().toString()
-            val søknad = Søknad(
-                søknadId,
-                "journalpostId",
-                "NAV01",
-                Søknad.SøknadsType.NySøknad,
-                Kanal.Papir,
-                LocalDateTime.now(),
-                listOf(
-                    Vedlegg(
-                        "skjemanummer",
-                        "navn",
-                        LastetOpp,
+            val søknad =
+                Søknad(
+                    søknadId,
+                    "journalpostId",
+                    "NAV01",
+                    Søknad.SøknadsType.NySøknad,
+                    Kanal.Papir,
+                    LocalDateTime.now(),
+                    listOf(
+                        Vedlegg(
+                            "skjemanummer",
+                            "navn",
+                            LastetOpp,
+                        ),
                     ),
-                ),
-                "tittel",
-            )
+                    "tittel",
+                )
             person.håndter(søknad)
             repository.lagre(person)
             assertEquals(1, repository.hentSøknaderFor(fnr).size)
         }
     }
 
-    private fun assertSøknadEquals(expected: Søknad, result: Søknad) {
+    private fun assertSøknadEquals(
+        expected: Søknad,
+        result: Søknad,
+    ) {
         val expInspektør = SøknadInspektør(expected)
         val resultInspektør = SøknadInspektør(result)
         assertEquals(
@@ -245,7 +251,11 @@ internal class PostgresPersonRepositoryTest {
             søknader++
         }
 
-        override fun visitVedlegg(skjemaNummer: String, navn: String, status: Vedlegg.Status) {
+        override fun visitVedlegg(
+            skjemaNummer: String,
+            navn: String,
+            status: Vedlegg.Status,
+        ) {
             vedlegg++
         }
 

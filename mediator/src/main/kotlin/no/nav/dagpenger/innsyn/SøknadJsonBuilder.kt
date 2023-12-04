@@ -33,7 +33,16 @@ class SøknadJsonBuilder(val søknad: Søknad) : SøknadVisitor {
         søknadId?.let { søknadIden ->
             root.put("søknadId", søknadIden)
             root.put("erNySøknadsdialog", søknadIden.erFraNySøknadsdialog())
-            root.put("endreLenke", if (søknadIden.erFraNySøknadsdialog()) Lenker.ettersendelseNySøknadsdialog(søknadIden) else Lenker.ettersendelseGammelSøknadsdialog(søknadIden))
+            root.put(
+                "endreLenke",
+                if (søknadIden.erFraNySøknadsdialog()) {
+                    Lenker.ettersendelseNySøknadsdialog(
+                        søknadIden,
+                    )
+                } else {
+                    Lenker.ettersendelseGammelSøknadsdialog(søknadIden)
+                },
+            )
         }
         skjemaKode?.let {
             root.put("skjemaKode", it)
@@ -48,11 +57,16 @@ class SøknadJsonBuilder(val søknad: Søknad) : SøknadVisitor {
     }
 
     // TODO: Dette kan fjernes så fort vi er fullstendig over på ny søknadsdialog
-    private fun String.erFraNySøknadsdialog(): Boolean = this.runCatching {
-        UUID.fromString(this)
-    }.isSuccess
+    private fun String.erFraNySøknadsdialog(): Boolean =
+        this.runCatching {
+            UUID.fromString(this)
+        }.isSuccess
 
-    override fun visitVedlegg(skjemaNummer: String, navn: String, status: Innsending.Vedlegg.Status) {
+    override fun visitVedlegg(
+        skjemaNummer: String,
+        navn: String,
+        status: Innsending.Vedlegg.Status,
+    ) {
         vedlegg.addObject().also {
             it.put("skjemaNummer", skjemaNummer)
             it.put("navn", navn)
@@ -60,10 +74,11 @@ class SøknadJsonBuilder(val søknad: Søknad) : SøknadVisitor {
         }
     }
 
-    private fun finnTittel(skjemaNummer: String) = mapOf(
-        "NAV 04-16.04" to "Søknad om gjenopptak av dagpenger ved permittering",
-        "NAV 04-16.03" to "Søknad om gjenopptak av dagpenger",
-        "NAV 04-01.03" to "Søknad om dagpenger (ikke permittert)",
-        "NAV 04-01.04" to "Søknad om dagpenger ved permittering",
-    )[skjemaNummer]
+    private fun finnTittel(skjemaNummer: String) =
+        mapOf(
+            "NAV 04-16.04" to "Søknad om gjenopptak av dagpenger ved permittering",
+            "NAV 04-16.03" to "Søknad om gjenopptak av dagpenger",
+            "NAV 04-01.03" to "Søknad om dagpenger (ikke permittert)",
+            "NAV 04-01.04" to "Søknad om dagpenger ved permittering",
+        )[skjemaNummer]
 }

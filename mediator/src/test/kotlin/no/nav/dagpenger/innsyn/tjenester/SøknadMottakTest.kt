@@ -47,7 +47,7 @@ class SøknadMottakTest {
             "dagpenger_mottak_forsinkelse_sum",
             "type" to "soknad",
         ).also {
-            assertTrue(syntheticDelaySeconds <= it)
+            assertTrue(SYNTHETIC_DELAY_SECONDS <= it)
         }
         defaultRegistry.getSampleValue(
             "dagpenger_mottak_forsinkelse_count",
@@ -76,64 +76,72 @@ class SøknadMottakTest {
     }
 }
 
-private fun CollectorRegistry.getSampleValue(name: String, vararg labels: Pair<String, String>) =
-    labels.unzip().let { (labelNames, labelValues) ->
-        getSampleValue(
-            name,
-            labelNames.toTypedArray(),
-            labelValues.toTypedArray(),
-        )
+private fun CollectorRegistry.getSampleValue(
+    name: String,
+    vararg labels: Pair<String, String>,
+) = labels.unzip().let { (labelNames, labelValues) ->
+    getSampleValue(
+        name,
+        labelNames.toTypedArray(),
+        labelValues.toTypedArray(),
+    )
+}
+
+private const val SYNTHETIC_DELAY_SECONDS: Long = 5
+
+@Language("JSON")
+private val søknadJson =
+    """
+    {
+      "@event_name": "innsending_mottatt",
+      "@opprettet": "${LocalDateTime.now()}",
+      "fødselsnummer": "123",
+      "journalpostId": "123",
+      "skjemaKode": "NAV 03-102.23",
+      "tittel": "Tittel",
+      "type": "NySøknad",
+      "datoRegistrert": "${LocalDateTime.now().minusSeconds(SYNTHETIC_DELAY_SECONDS)}",
+      "søknadsData": {
+        "brukerBehandlingId": "123",
+        "vedlegg": [],
+        "skjemaNummer": "NAV12"
+      }
     }
-
-private const val syntheticDelaySeconds: Long = 5
-
-@Language("JSON")
-private val søknadJson = """{
-  "@event_name": "innsending_mottatt",
-  "@opprettet": "${LocalDateTime.now()}",
-  "fødselsnummer": "123",
-  "journalpostId": "123",
-  "skjemaKode": "NAV 03-102.23",
-  "tittel": "Tittel",
-  "type": "NySøknad",
-  "datoRegistrert": "${LocalDateTime.now().minusSeconds(syntheticDelaySeconds)}",
-  "søknadsData": {
-    "brukerBehandlingId": "123",
-    "vedlegg": [],
-    "skjemaNummer": "NAV12"
-  }
-}
-""".trimIndent()
+    """.trimIndent()
 
 @Language("JSON")
-private val papirsøknadJson = """{
-  "@id": "123",
-  "@opprettet": "2021-01-01T01:01:01.000001",
-  "journalpostId": "12455",
-  "datoRegistrert": "2021-01-01T01:01:01.000001",
-  "skjemaKode": "NAV 03-102.23",
-  "tittel": "Tittel",
-  "type": "NySøknad",
-  "fødselsnummer": "11111111111",
-  "aktørId": "1234455",
-  "søknadsData": {},
-  "@event_name": "innsending_mottatt",
-  "system_read_count": 0
-}
-""".trimIndent()
+private val papirsøknadJson =
+    """
+    {
+      "@id": "123",
+      "@opprettet": "2021-01-01T01:01:01.000001",
+      "journalpostId": "12455",
+      "datoRegistrert": "2021-01-01T01:01:01.000001",
+      "skjemaKode": "NAV 03-102.23",
+      "tittel": "Tittel",
+      "type": "NySøknad",
+      "fødselsnummer": "11111111111",
+      "aktørId": "1234455",
+      "søknadsData": {},
+      "@event_name": "innsending_mottatt",
+      "system_read_count": 0
+    }
+    """.trimIndent()
 
 @Language("JSON")
-private val søknadJsonFraNyQuiz = """{
-  "@event_name": "innsending_mottatt",
-  "@opprettet": "${LocalDateTime.now()}",
-  "fødselsnummer": "123",
-  "journalpostId": "123",
-  "skjemaKode": "NAV 03-102.23",
-  "tittel": "Tittel",
-  "type": "NySøknad",
-  "datoRegistrert": "${LocalDateTime.now().minusSeconds(syntheticDelaySeconds)}",
-  "søknadsData": {
-    "søknad_uuid": "${UUID.randomUUID()}"
-  }
-}
-""".trimIndent()
+private val søknadJsonFraNyQuiz =
+    """
+    {
+      "@event_name": "innsending_mottatt",
+      "@opprettet": "${LocalDateTime.now()}",
+      "fødselsnummer": "123",
+      "journalpostId": "123",
+      "skjemaKode": "NAV 03-102.23",
+      "tittel": "Tittel",
+      "type": "NySøknad",
+      "datoRegistrert": "${LocalDateTime.now().minusSeconds(SYNTHETIC_DELAY_SECONDS)}",
+      "søknadsData": {
+        "søknad_uuid": "${UUID.randomUUID()}"
+      }
+    }
+    """.trimIndent()

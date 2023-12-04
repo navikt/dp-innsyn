@@ -8,8 +8,15 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import java.time.LocalDateTime
 
 interface PersonVisitor : SøknadVisitor, EttersendingVisitor, VedtakVisitor, SakstilknytningVisitor {
-    fun preVisit(person: Person, fnr: String) {}
-    fun postVisit(person: Person, fnr: String) {}
+    fun preVisit(
+        person: Person,
+        fnr: String,
+    ) {}
+
+    fun postVisit(
+        person: Person,
+        fnr: String,
+    ) {}
 }
 
 interface SøknadVisitor {

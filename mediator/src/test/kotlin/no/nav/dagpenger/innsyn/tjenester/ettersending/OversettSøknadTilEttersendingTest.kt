@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class OversettSøknadTilEttersendingTest {
-
     @Test
     fun `skal konvertere fra Søknad til MinimalEttersendelseDto`() {
         val søknader = giveMeListOfDigitalOgPapirSøknad()

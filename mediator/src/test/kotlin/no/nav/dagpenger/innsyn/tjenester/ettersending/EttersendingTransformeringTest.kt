@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 internal class EttersendingTransformeringTest {
-
     @Test
     fun `skal kunne hente kun ettersendelser for dagpenger og ha oversatt kodeverk`() {
         val externalEttersendelser = ExternalEttersendingObjectMother.giveMeEttersendelserForDAGOgBIL()

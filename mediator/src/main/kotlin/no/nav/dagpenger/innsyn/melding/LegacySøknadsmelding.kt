@@ -5,21 +5,21 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.helse.rapids_rivers.JsonMessage
 
 internal class LegacySøknadsmelding(packet: JsonMessage) : SøknadMelding(packet) {
-
     companion object {
-        const val søknadIdNøkkel = "søknadsData.brukerBehandlingId"
+        const val SØKNAD_ID_NØKKEL = "søknadsData.brukerBehandlingId"
     }
 
-    override val søknadId = packet[søknadIdNøkkel].asText()
+    override val søknadId = packet[SØKNAD_ID_NØKKEL].asText()
     override val søknad
-        get() = Søknad(
-            søknadId = søknadId,
-            journalpostId = journalpostId,
-            skjemaKode = skjemaKode,
-            søknadsType = søknadsType,
-            kanal = Digital,
-            datoInnsendt = datoRegistrert,
-            vedlegg = vedlegg,
-            tittel = tittel,
-        )
+        get() =
+            Søknad(
+                søknadId = søknadId,
+                journalpostId = journalpostId,
+                skjemaKode = skjemaKode,
+                søknadsType = søknadsType,
+                kanal = Digital,
+                datoInnsendt = datoRegistrert,
+                vedlegg = vedlegg,
+                tittel = tittel,
+            )
 }

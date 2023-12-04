@@ -34,7 +34,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
-import no.nav.dagpenger.innsyn.Configuration.appName
+import no.nav.dagpenger.innsyn.Configuration.APP_NAME
 import no.nav.dagpenger.innsyn.behandlingsstatus.AvgjørBehandlingsstatus
 import no.nav.dagpenger.innsyn.behandlingsstatus.BehandlingsstatusDTO
 import no.nav.dagpenger.innsyn.db.PersonRepository
@@ -106,7 +106,7 @@ internal fun Application.innsynApi(
             verifier(jwkProvider, issuer) {
                 withAudience(clientId)
             }
-            realm = appName
+            realm = APP_NAME
             validate { credentials ->
                 requireNotNull(credentials.payload.claims.pid()) {
                     "Token må inneholde fødselsnummer for personen i enten pid claim"
@@ -124,11 +124,12 @@ internal fun Application.innsynApi(
                 val fnr = jwtPrincipal!!.fnr
                 val fom = call.request.queryParameters["soktFom"]?.asOptionalLocalDate()
                 val tom = call.request.queryParameters["soktTom"]?.asOptionalLocalDate()
-                val søknader = personRepository.hentSøknaderFor(
-                    fnr,
-                    fom = fom,
-                    tom = tom,
-                )
+                val søknader =
+                    personRepository.hentSøknaderFor(
+                        fnr,
+                        fom = fom,
+                        tom = tom,
+                    )
 
                 call.respond(søknader.map { SøknadJsonBuilder(it).resultat() })
             }
@@ -137,11 +138,12 @@ internal fun Application.innsynApi(
                 val fnr = jwtPrincipal!!.fnr
                 val fattetFom = call.request.queryParameters["fattetFom"]?.asOptionalLocalDate()
                 val fattetTom = call.request.queryParameters["fattetTom"]?.asOptionalLocalDate()
-                val vedtak = personRepository.hentVedtakFor(
-                    fnr,
-                    fattetFom = fattetFom,
-                    fattetTom = fattetTom,
-                )
+                val vedtak =
+                    personRepository.hentVedtakFor(
+                        fnr,
+                        fattetFom = fattetFom,
+                        fattetTom = fattetTom,
+                    )
 
                 call.respond(vedtak.map { VedtakJsonBuilder(it).resultat() })
             }
@@ -149,8 +151,9 @@ internal fun Application.innsynApi(
             get("/behandlingsstatus") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
-                val fom = call.request.queryParameters["fom"]
-                    ?: throw IllegalArgumentException("Mangler fom queryparameter i url")
+                val fom =
+                    call.request.queryParameters["fom"]
+                        ?: throw IllegalArgumentException("Mangler fom queryparameter i url")
                 val behandlingsstatus = avgjørBehandlingsstatus.hentStatus(fnr, LocalDate.parse(fom))
 
                 call.respond(HttpStatusCode.OK, BehandlingsstatusDTO(behandlingsstatus))
@@ -173,36 +176,37 @@ internal fun Application.innsynApi(
                 val requestId: String? =
                     call.request.header("Nav-Consumer-Id") ?: call.request.header(HttpHeaders.XRequestId)
                 val token = call.request.jwt()
-                val påbegyntSøknadFraNySøknadsdialog = try {
-                    påbegyntOppslag.hentPåbegyntSøknad(token, requestId)?.let {
-                        listOf(
-                            Påbegynt(
-                                søknadId = it.uuid.toString(),
-                                behandlingsId = it.uuid.toString(),
-                                sistEndret = it.sistEndret,
-                                tittel = "Søknad om dagpenger",
-                                erNySøknadsdialog = true,
-                            ),
-                        )
-                    } ?: emptyList()
-                } catch (e: Exception) {
-                    logger.error(e) { "Klarte ikke å hente påbegynt søknad fra dp-soknad " }
-                    emptyList()
-                }
+                val påbegyntSøknadFraNySøknadsdialog =
+                    try {
+                        påbegyntOppslag.hentPåbegyntSøknad(token, requestId)?.let {
+                            listOf(
+                                Påbegynt(
+                                    søknadId = it.uuid.toString(),
+                                    behandlingsId = it.uuid.toString(),
+                                    sistEndret = it.sistEndret,
+                                    tittel = "Søknad om dagpenger",
+                                    erNySøknadsdialog = true,
+                                ),
+                            )
+                        } ?: emptyList()
+                    } catch (e: Exception) {
+                        logger.error(e) { "Klarte ikke å hente påbegynt søknad fra dp-soknad " }
+                        emptyList()
+                    }
                 call.respond(påbegyntSøknadFraNySøknadsdialog)
             }
         }
     }
 }
 
-private fun String.asOptionalLocalDate(): LocalDate? =
-    takeIf(String::isNotEmpty)?.let { LocalDate.parse(it) }
+private fun String.asOptionalLocalDate(): LocalDate? = takeIf(String::isNotEmpty)?.let { LocalDate.parse(it) }
 
 private val JWTPrincipal.fnr: String
     get() = this.payload.claims.pid().asString()
 
-internal fun ApplicationRequest.jwt(): String = this.parseAuthorizationHeader().let { authHeader ->
-    (authHeader as? HttpAuthHeader.Single)?.blob ?: throw IllegalArgumentException("JWT not found")
-}
+internal fun ApplicationRequest.jwt(): String =
+    this.parseAuthorizationHeader().let { authHeader ->
+        (authHeader as? HttpAuthHeader.Single)?.blob ?: throw IllegalArgumentException("JWT not found")
+    }
 
 private fun <V : Claim> Map<String, V>.pid() = firstNotNullOf { it.takeIf { it.key == "pid" } }.value

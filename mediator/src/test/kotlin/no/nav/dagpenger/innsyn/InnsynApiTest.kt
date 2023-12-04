@@ -51,241 +51,255 @@ internal class InnsynApiTest {
     private val jacksonObjectMapper = jacksonObjectMapper()
 
     @Test
-    fun `test at bruker ikke har søknad`() = withMigratedDb {
-        testApplication {
-            application {
-                innsynApi(
-                    jwtStub.stubbedJwkProvider(),
-                    testIssuer,
-                    clientId,
-                    PostgresPersonRepository(),
-                    henvendelseOppslag,
-                    ettersendingSpleiser,
-                    mockk(),
-                )
-            }
-            client.autentisert("/soknad").let { response ->
-                assertEquals(HttpStatusCode.OK, response.status)
-                assertEquals("[ ]", response.bodyAsText())
-            }
-        }
-    }
-
-    @Test
-    fun `test at bruker har søknad`() = withMigratedDb {
-        val personRepository = PostgresPersonRepository().also {
-            it.person("test@nav.no").also { person ->
-                person.håndter(
-                    søknad("1", "1", LocalDateTime.now().minusDays(90), "Søknad om"),
-                )
-                person.håndter(
-                    søknad("2", "11", LocalDateTime.now().minusDays(90)),
-                )
-                person.håndter(
-                    søknad("3", "12", LocalDateTime.now().minusDays(90)),
-                )
-                person.håndter(
-                    søknad("4", "13", LocalDateTime.now().minusDays(90)),
-                )
-                person.håndter(
-                    søknad("5", "14", LocalDateTime.now().minusDays(90)),
-                )
-                person.håndter(Sakstilknytning("11", "arenaId"))
-                person.håndter(
-                    Vedtak(
-                        "2",
-                        "arenaId",
-                        Vedtak.Status.INNVILGET,
-                        LocalDateTime.now(),
-                        LocalDateTime.now(),
-                        null,
-                    ),
-                )
-                it.lagre(person)
-            }
-        }
-        testApplication {
-            application {
-                innsynApi(
-                    jwtStub.stubbedJwkProvider(),
-                    testIssuer,
-                    clientId,
-                    personRepository,
-                    henvendelseOppslag,
-                    ettersendingSpleiser,
-                    mockk(),
-                )
-            }
-            val fom = LocalDate.now().minusDays(100)
-            val dagensDato = LocalDate.now()
-            client.autentisert("/soknad?soktFom=$fom&soktTom=$dagensDato").let { response ->
-                assertEquals(HttpStatusCode.OK, response.status)
-                response.bodyAsText().let { content ->
-                    assertTrue(content.contains(NySøknad.toString()))
-                    assertTrue(content.contains(Innsending.Vedlegg.Status.LastetOpp.toString()))
-                    assertTrue(content.contains("Søknad om"))
+    fun `test at bruker ikke har søknad`() =
+        withMigratedDb {
+            testApplication {
+                application {
+                    innsynApi(
+                        jwtStub.stubbedJwkProvider(),
+                        testIssuer,
+                        clientId,
+                        PostgresPersonRepository(),
+                        henvendelseOppslag,
+                        ettersendingSpleiser,
+                        mockk(),
+                    )
+                }
+                client.autentisert("/soknad").let { response ->
+                    assertEquals(HttpStatusCode.OK, response.status)
+                    assertEquals("[ ]", response.bodyAsText())
                 }
             }
         }
-    }
 
     @Test
-    fun `Søknad fra ny søknadsdialog får flagget erNySøknadsdialog satt til true`() = withMigratedDb {
-        val søknadIdNyttFormat = UUID.randomUUID().toString()
-        val personRepository = PostgresPersonRepository().also {
-            it.person("test@nav.no").also { person ->
-                person.håndter(
-                    søknad(søknadIdNyttFormat, "11", LocalDateTime.now().minusDays(90)),
-                )
-                it.lagre(person)
-            }
-        }
-        testApplication {
-            application {
-                innsynApi(
-                    jwtStub.stubbedJwkProvider(),
-                    testIssuer,
-                    clientId,
-                    personRepository,
-                    henvendelseOppslag,
-                    ettersendingSpleiser,
-                    mockk(),
-                )
-            }
-            val fom = LocalDate.now().minusDays(100)
-            val dagensDato = LocalDate.now()
-            client.autentisert("/soknad?soktFom=$fom&soktTom=$dagensDato").let { response ->
-                ObjectMapper().readTree(response.bodyAsText()).let { jsonNode ->
-                    val fraNySøknadsdialog = jsonNode[0]
-                    assertTrue(fraNySøknadsdialog["erNySøknadsdialog"].asBoolean()) { "Forventet at erNySøknadsdialog: true. $jsonNode" }
-                    assertEquals("https://arbeid.intern.dev.nav.no/dagpenger/dialog/soknad/$søknadIdNyttFormat/kvittering", fraNySøknadsdialog["endreLenke"].asText())
+    fun `test at bruker har søknad`() =
+        withMigratedDb {
+            val personRepository =
+                PostgresPersonRepository().also {
+                    it.person("test@nav.no").also { person ->
+                        person.håndter(
+                            søknad("1", "1", LocalDateTime.now().minusDays(90), "Søknad om"),
+                        )
+                        person.håndter(
+                            søknad("2", "11", LocalDateTime.now().minusDays(90)),
+                        )
+                        person.håndter(
+                            søknad("3", "12", LocalDateTime.now().minusDays(90)),
+                        )
+                        person.håndter(
+                            søknad("4", "13", LocalDateTime.now().minusDays(90)),
+                        )
+                        person.håndter(
+                            søknad("5", "14", LocalDateTime.now().minusDays(90)),
+                        )
+                        person.håndter(Sakstilknytning("11", "arenaId"))
+                        person.håndter(
+                            Vedtak(
+                                "2",
+                                "arenaId",
+                                Vedtak.Status.INNVILGET,
+                                LocalDateTime.now(),
+                                LocalDateTime.now(),
+                                null,
+                            ),
+                        )
+                        it.lagre(person)
+                    }
+                }
+            testApplication {
+                application {
+                    innsynApi(
+                        jwtStub.stubbedJwkProvider(),
+                        testIssuer,
+                        clientId,
+                        personRepository,
+                        henvendelseOppslag,
+                        ettersendingSpleiser,
+                        mockk(),
+                    )
+                }
+                val fom = LocalDate.now().minusDays(100)
+                val dagensDato = LocalDate.now()
+                client.autentisert("/soknad?soktFom=$fom&soktTom=$dagensDato").let { response ->
+                    assertEquals(HttpStatusCode.OK, response.status)
+                    response.bodyAsText().let { content ->
+                        assertTrue(content.contains(NySøknad.toString()))
+                        assertTrue(content.contains(Innsending.Vedlegg.Status.LastetOpp.toString()))
+                        assertTrue(content.contains("Søknad om"))
+                    }
                 }
             }
         }
-    }
 
     @Test
-    fun `test at bruker har søknad som ikke kommer med`() = withMigratedDb {
-        val personRepository = PostgresPersonRepository().also {
-            it.person("test@nav.no").also { person ->
-                person.håndter(
-                    søknad("1", "1", LocalDateTime.now().minusDays(90)),
-                )
-                person.håndter(Sakstilknytning("11", "arenaId"))
-                person.håndter(
-                    Vedtak(
-                        "2",
-                        "arenaId",
-                        Vedtak.Status.INNVILGET,
-                        LocalDateTime.now(),
-                        LocalDateTime.now(),
-                        null,
-                    ),
-                )
-                it.lagre(person)
+    fun `Søknad fra ny søknadsdialog får flagget erNySøknadsdialog satt til true`() =
+        withMigratedDb {
+            val søknadIdNyttFormat = UUID.randomUUID().toString()
+            val personRepository =
+                PostgresPersonRepository().also {
+                    it.person("test@nav.no").also { person ->
+                        person.håndter(
+                            søknad(søknadIdNyttFormat, "11", LocalDateTime.now().minusDays(90)),
+                        )
+                        it.lagre(person)
+                    }
+                }
+            testApplication {
+                application {
+                    innsynApi(
+                        jwtStub.stubbedJwkProvider(),
+                        testIssuer,
+                        clientId,
+                        personRepository,
+                        henvendelseOppslag,
+                        ettersendingSpleiser,
+                        mockk(),
+                    )
+                }
+                val fom = LocalDate.now().minusDays(100)
+                val dagensDato = LocalDate.now()
+                client.autentisert("/soknad?soktFom=$fom&soktTom=$dagensDato").let { response ->
+                    ObjectMapper().readTree(response.bodyAsText()).let { jsonNode ->
+                        val fraNySøknadsdialog = jsonNode[0]
+                        val erNySøknadsdialog = fraNySøknadsdialog["erNySøknadsdialog"].asBoolean()
+                        assertTrue(erNySøknadsdialog) { "Forventet at erNySøknadsdialog: true. $jsonNode" }
+
+                        val url = "https://arbeid.intern.dev.nav.no/dagpenger/dialog/soknad/"
+                        assertEquals("$url$søknadIdNyttFormat/kvittering", fraNySøknadsdialog["endreLenke"].asText())
+                    }
+                }
             }
         }
-        testApplication {
-            application {
-                innsynApi(
-                    jwtStub.stubbedJwkProvider(),
-                    testIssuer,
-                    clientId,
-                    personRepository,
-                    henvendelseOppslag,
-                    ettersendingSpleiser,
-                    mockk(),
-                )
-            }
-            val dagensDato = LocalDate.now()
-            client.autentisert("/soknad?soktFom=${dagensDato.minusDays(30)}&soktTom=$dagensDato").let { response ->
-                assertEquals(HttpStatusCode.OK, response.status)
-                assertFalse(response.bodyAsText().contains(NySøknad.toString()))
-            }
-        }
-    }
 
     @Test
-    fun `test at bruker har vedtak`() = withMigratedDb {
-        val personRepository = PostgresPersonRepository().also {
-            it.person("test@nav.no").also { person ->
-                person.håndter(
-                    søknad(),
-                )
-                person.håndter(Sakstilknytning("11", "arenaId"))
-                person.håndter(
-                    Vedtak(
-                        "2",
-                        "arenaId",
-                        Vedtak.Status.INNVILGET,
-                        LocalDateTime.now(),
-                        LocalDateTime.now(),
-                        null,
-                    ),
-                )
-                it.lagre(person)
+    fun `test at bruker har søknad som ikke kommer med`() =
+        withMigratedDb {
+            val personRepository =
+                PostgresPersonRepository().also {
+                    it.person("test@nav.no").also { person ->
+                        person.håndter(
+                            søknad("1", "1", LocalDateTime.now().minusDays(90)),
+                        )
+                        person.håndter(Sakstilknytning("11", "arenaId"))
+                        person.håndter(
+                            Vedtak(
+                                "2",
+                                "arenaId",
+                                Vedtak.Status.INNVILGET,
+                                LocalDateTime.now(),
+                                LocalDateTime.now(),
+                                null,
+                            ),
+                        )
+                        it.lagre(person)
+                    }
+                }
+            testApplication {
+                application {
+                    innsynApi(
+                        jwtStub.stubbedJwkProvider(),
+                        testIssuer,
+                        clientId,
+                        personRepository,
+                        henvendelseOppslag,
+                        ettersendingSpleiser,
+                        mockk(),
+                    )
+                }
+                val dagensDato = LocalDate.now()
+                client.autentisert("/soknad?soktFom=${dagensDato.minusDays(30)}&soktTom=$dagensDato").let { response ->
+                    assertEquals(HttpStatusCode.OK, response.status)
+                    assertFalse(response.bodyAsText().contains(NySøknad.toString()))
+                }
             }
         }
-        testApplication {
-            application {
-                innsynApi(
-                    jwtStub.stubbedJwkProvider(),
-                    testIssuer,
-                    clientId,
-                    personRepository,
-                    henvendelseOppslag,
-                    ettersendingSpleiser,
-                    mockk(),
-                )
-            }
-            val dagensDato = LocalDate.now()
-            client.autentisert("/vedtak?fattetFom=$dagensDato&fattetTom=$dagensDato").let { response ->
-                assertEquals(HttpStatusCode.OK, response.status)
-                assertTrue(response.bodyAsText().contains(Vedtak.Status.INNVILGET.toString()))
-            }
-        }
-    }
 
     @Test
-    fun `test at bruker har vedtak som ikke er innefor tiden`() = withMigratedDb {
-        val personRepository = PostgresPersonRepository().also {
-            it.person("test@nav.no").also { person ->
-                person.håndter(
-                    søknad(),
-                )
-                person.håndter(Sakstilknytning("11", "arenaId"))
-                person.håndter(
-                    Vedtak(
-                        "2",
-                        "arenaId",
-                        Vedtak.Status.INNVILGET,
-                        LocalDateTime.now().minusDays(90),
-                        LocalDateTime.now(),
-                        null,
-                    ),
-                )
-                it.lagre(person)
+    fun `test at bruker har vedtak`() =
+        withMigratedDb {
+            val personRepository =
+                PostgresPersonRepository().also {
+                    it.person("test@nav.no").also { person ->
+                        person.håndter(
+                            søknad(),
+                        )
+                        person.håndter(Sakstilknytning("11", "arenaId"))
+                        person.håndter(
+                            Vedtak(
+                                "2",
+                                "arenaId",
+                                Vedtak.Status.INNVILGET,
+                                LocalDateTime.now(),
+                                LocalDateTime.now(),
+                                null,
+                            ),
+                        )
+                        it.lagre(person)
+                    }
+                }
+            testApplication {
+                application {
+                    innsynApi(
+                        jwtStub.stubbedJwkProvider(),
+                        testIssuer,
+                        clientId,
+                        personRepository,
+                        henvendelseOppslag,
+                        ettersendingSpleiser,
+                        mockk(),
+                    )
+                }
+                val dagensDato = LocalDate.now()
+                client.autentisert("/vedtak?fattetFom=$dagensDato&fattetTom=$dagensDato").let { response ->
+                    assertEquals(HttpStatusCode.OK, response.status)
+                    assertTrue(response.bodyAsText().contains(Vedtak.Status.INNVILGET.toString()))
+                }
             }
         }
-        testApplication {
-            application {
-                innsynApi(
-                    jwtStub.stubbedJwkProvider(),
-                    testIssuer,
-                    clientId,
-                    personRepository,
-                    henvendelseOppslag,
-                    ettersendingSpleiser,
-                    mockk(),
-                )
-            }
-            val dagensDato = LocalDate.now()
-            client.autentisert("/vedtak?fattetFom=${dagensDato.minusDays(30)}&fattetTom=$dagensDato").let { response ->
-                assertEquals(HttpStatusCode.OK, response.status)
-                assertFalse(response.bodyAsText().contains(Vedtak.Status.INNVILGET.toString()))
+
+    @Test
+    fun `test at bruker har vedtak som ikke er innefor tiden`() =
+        withMigratedDb {
+            val personRepository =
+                PostgresPersonRepository().also {
+                    it.person("test@nav.no").also { person ->
+                        person.håndter(
+                            søknad(),
+                        )
+                        person.håndter(Sakstilknytning("11", "arenaId"))
+                        person.håndter(
+                            Vedtak(
+                                "2",
+                                "arenaId",
+                                Vedtak.Status.INNVILGET,
+                                LocalDateTime.now().minusDays(90),
+                                LocalDateTime.now(),
+                                null,
+                            ),
+                        )
+                        it.lagre(person)
+                    }
+                }
+            testApplication {
+                application {
+                    innsynApi(
+                        jwtStub.stubbedJwkProvider(),
+                        testIssuer,
+                        clientId,
+                        personRepository,
+                        henvendelseOppslag,
+                        ettersendingSpleiser,
+                        mockk(),
+                    )
+                }
+                val dagensDato = LocalDate.now()
+                client.autentisert("/vedtak?fattetFom=${dagensDato.minusDays(30)}&fattetTom=$dagensDato").let { response ->
+                    assertEquals(HttpStatusCode.OK, response.status)
+                    assertFalse(response.bodyAsText().contains(Vedtak.Status.INNVILGET.toString()))
+                }
             }
         }
-    }
 
     @Test
     fun `test at bruker kan hente ut ettersendelser`() {
@@ -313,9 +327,10 @@ internal class InnsynApiTest {
     fun `test at bruker kan hente ut ettersendelser når én kilde feiler`() {
         val ettersendingSpleiser = mockk<EttersendingSpleiser>()
         val enFeiletOgEnVellykket =
-            MultiSourceResultObjectMother.giveMeSuccessfulResult(KildeType.DB) + MultiSourceResultObjectMother.giveMeFailedResult(
-                KildeType.HENVENDELSE,
-            )
+            MultiSourceResultObjectMother.giveMeSuccessfulResult(KildeType.DB) +
+                MultiSourceResultObjectMother.giveMeFailedResult(
+                    KildeType.HENVENDELSE,
+                )
         coEvery { ettersendingSpleiser.hentEttersendelser(any()) } returns enFeiletOgEnVellykket
 
         testApplication {
@@ -345,11 +360,12 @@ internal class InnsynApiTest {
         val påbegyntOppslagMock = mockk<PåbegyntOppslag>()
         val nå = ZonedDateTime.now()
         val uuid = UUID.randomUUID()
-        val påbegyntNySøknadsdialog = PåbegyntSøknadDto(
-            uuid = uuid,
-            opprettet = ZonedDateTime.of(LocalDateTime.MAX, ZoneId.of("Europe/Oslo")),
-            sistEndret = nå,
-        )
+        val påbegyntNySøknadsdialog =
+            PåbegyntSøknadDto(
+                uuid = uuid,
+                opprettet = ZonedDateTime.of(LocalDateTime.MAX, ZoneId.of("Europe/Oslo")),
+                sistEndret = nå,
+            )
         coEvery { påbegyntOppslagMock.hentPåbegyntSøknad(any(), any()) } returns påbegyntNySøknadsdialog
 
         testApplication {
@@ -373,76 +389,82 @@ internal class InnsynApiTest {
             assertEquals(uuid.toString(), fraNySøknadsdialog["søknadId"].asText())
             assertEquals(uuid.toString(), fraNySøknadsdialog["behandlingsId"].asText())
             assertTrue(fraNySøknadsdialog["erNySøknadsdialog"].asBoolean())
-            assertEquals(nå.toOffsetDateTime(), fraNySøknadsdialog["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() })
+            assertEquals(
+                nå.toOffsetDateTime(),
+                fraNySøknadsdialog["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() },
+            )
             assertEquals("https://arbeid.intern.dev.nav.no/dagpenger/dialog/soknad/$uuid", fraNySøknadsdialog["endreLenke"].asText())
         }
     }
 
     @Test
-    fun `får behandlingsstatus FerdigBehandlet når det er 1 søknad og 1 vedtak`() = withMigratedDb {
-        val personRepository = PostgresPersonRepository().also {
-            it.person("test@nav.no").also { person ->
-                person.håndter(
-                    søknad(),
-                )
-                person.håndter(Sakstilknytning("11", "arenaId"))
-                person.håndter(
-                    Vedtak(
-                        "2",
-                        "arenaId",
-                        Vedtak.Status.INNVILGET,
-                        LocalDateTime.now(),
-                        LocalDateTime.now(),
-                        null,
-                    ),
-                )
-                it.lagre(person)
+    fun `får behandlingsstatus FerdigBehandlet når det er 1 søknad og 1 vedtak`() =
+        withMigratedDb {
+            val personRepository =
+                PostgresPersonRepository().also {
+                    it.person("test@nav.no").also { person ->
+                        person.håndter(
+                            søknad(),
+                        )
+                        person.håndter(Sakstilknytning("11", "arenaId"))
+                        person.håndter(
+                            Vedtak(
+                                "2",
+                                "arenaId",
+                                Vedtak.Status.INNVILGET,
+                                LocalDateTime.now(),
+                                LocalDateTime.now(),
+                                null,
+                            ),
+                        )
+                        it.lagre(person)
+                    }
+                }
+            testApplication {
+                application {
+                    innsynApi(
+                        jwtStub.stubbedJwkProvider(),
+                        testIssuer,
+                        clientId,
+                        personRepository,
+                        henvendelseOppslag,
+                        ettersendingSpleiser,
+                        mockk(),
+                    )
+                }
+                val dagensDato = LocalDate.now()
+                client.autentisert("/behandlingsstatus?fom=$dagensDato").let { response ->
+                    assertEquals(HttpStatusCode.OK, response.status)
+                    assertTrue(response.bodyAsText().contains(FerdigBehandlet.toString()))
+                }
             }
         }
-        testApplication {
-            application {
-                innsynApi(
-                    jwtStub.stubbedJwkProvider(),
-                    testIssuer,
-                    clientId,
-                    personRepository,
-                    henvendelseOppslag,
-                    ettersendingSpleiser,
-                    mockk(),
-                )
-            }
-            val dagensDato = LocalDate.now()
-            client.autentisert("/behandlingsstatus?fom=$dagensDato").let { response ->
-                assertEquals(HttpStatusCode.OK, response.status)
-                assertTrue(response.bodyAsText().contains(FerdigBehandlet.toString()))
-            }
-        }
-    }
 
     @Test
-    fun `InternalServerError når man ikke kan parse fom dato`() = withMigratedDb {
-        testApplication {
-            application {
-                innsynApi(
-                    jwtStub.stubbedJwkProvider(),
-                    testIssuer,
-                    clientId,
-                    PostgresPersonRepository(),
-                    henvendelseOppslag,
-                    ettersendingSpleiser,
-                    mockk(),
+    fun `InternalServerError når man ikke kan parse fom dato`() =
+        withMigratedDb {
+            testApplication {
+                application {
+                    innsynApi(
+                        jwtStub.stubbedJwkProvider(),
+                        testIssuer,
+                        clientId,
+                        PostgresPersonRepository(),
+                        henvendelseOppslag,
+                        ettersendingSpleiser,
+                        mockk(),
+                    )
+                }
+                assertEquals(
+                    HttpStatusCode.InternalServerError,
+                    client.autentisert("/behandlingsstatus?fom=ugyldig_fom").status,
+                )
+                assertEquals(
+                    HttpStatusCode.InternalServerError,
+                    client.autentisert("/behandlingsstatus").status,
                 )
             }
-            assertEquals(
-                HttpStatusCode.InternalServerError,
-                client.autentisert("/behandlingsstatus?fom=ugyldig_fom").status,
-            )
-            assertEquals(
-                HttpStatusCode.InternalServerError,
-                client.autentisert("/behandlingsstatus").status,
-            )
         }
-    }
 
     private suspend fun HttpClient.autentisert(
         endepunkt: String,

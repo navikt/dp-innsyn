@@ -10,11 +10,12 @@ internal class Ettersendingsmelding(packet: JsonMessage) : Innsendingsmelding(pa
     private val ettersendingId = packet["søknadsData.brukerBehandlingId"].asText()
     private val kanal = ettersendingId?.let { Digital } ?: Papir
 
-    internal val ettersending get() = Ettersending(
-        ettersendingId,
-        behandlingskjedeId,
-        journalpostId,
-        kanal,
-        vedlegg,
-    )
+    internal val ettersending get() =
+        Ettersending(
+            ettersendingId,
+            behandlingskjedeId,
+            journalpostId,
+            kanal,
+            vedlegg,
+        )
 }

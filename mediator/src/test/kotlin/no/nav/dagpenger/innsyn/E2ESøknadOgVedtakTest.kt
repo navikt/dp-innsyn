@@ -101,7 +101,11 @@ internal class E2ESøknadOgVedtakTest {
             søknader++
         }
 
-        override fun visitVedlegg(skjemaNummer: String, navn: String, status: Innsending.Vedlegg.Status) {
+        override fun visitVedlegg(
+            skjemaNummer: String,
+            navn: String,
+            status: Innsending.Vedlegg.Status,
+        ) {
             if (status == Innsending.Vedlegg.Status.LastetOpp) {
                 ferdigeVedlegg++
             } else {
@@ -123,7 +127,10 @@ internal class E2ESøknadOgVedtakTest {
 }
 
 @Language("JSON")
-private fun søknadsJson(journalpostId: String, søknadsId: String) = """{
+private fun søknadsJson(
+    journalpostId: String,
+    søknadsId: String,
+) = """{
   "@id": "98638d1d-9b75-4802-abb2-8b7f1a08948f",
   "@opprettet": "2021-05-06T09:39:03.638555",
   "journalpostId": $journalpostId,

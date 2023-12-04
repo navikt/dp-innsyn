@@ -11,14 +11,16 @@ class Behandlingsstatus(antallSøknader: Int, antallVedtak: Int) {
         antattStatus = status(antallSøknader, antallVedtak)
     }
 
-    private fun status(antallSøknader: Int, antallVedtak: Int) =
-        when {
-            antallSøknader == 0 -> null
-            antallSøknader > 0 && antallVedtak == 0 -> UnderBehandling
-            antallSøknader > antallVedtak && antallVedtak > 0 -> Ukjent
-            antallVedtak > 0 && antallSøknader > 0 -> FerdigBehandlet
-            else -> null
-        }
+    private fun status(
+        antallSøknader: Int,
+        antallVedtak: Int,
+    ) = when {
+        antallSøknader == 0 -> null
+        antallSøknader > 0 && antallVedtak == 0 -> UnderBehandling
+        antallSøknader > antallVedtak && antallVedtak > 0 -> Ukjent
+        antallVedtak > 0 && antallSøknader > 0 -> FerdigBehandlet
+        else -> null
+    }
 
     enum class Status {
         Ukjent,

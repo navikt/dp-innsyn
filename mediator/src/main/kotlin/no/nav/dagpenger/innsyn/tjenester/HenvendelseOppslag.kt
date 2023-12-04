@@ -31,37 +31,38 @@ private val logg = KotlinLogging.logger {}
 internal class HenvendelseOppslag(
     private val dpProxyUrl: String,
     private val tokenProvider: () -> String,
-    httpClientEngine: HttpClientEngine = CIO.create() {
-        requestTimeout = 0
-    },
+    httpClientEngine: HttpClientEngine =
+        CIO.create {
+            requestTimeout = 0
+        },
     baseName: String = "dp_innsyn",
 ) {
+    private val dpProxyClient =
+        HttpClient(httpClientEngine) {
+            expectSuccess = true
+            install(PrometheusMetricsPlugin) {
+                this.baseName = baseName
+            }
 
-    private val dpProxyClient = HttpClient(httpClientEngine) {
-        expectSuccess = true
-        install(PrometheusMetricsPlugin) {
-            this.baseName = baseName
-        }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 15.seconds.inWholeMilliseconds
+                connectTimeoutMillis = 5.seconds.inWholeMilliseconds
+                socketTimeoutMillis = 15.seconds.inWholeMilliseconds
+            }
 
-        install(HttpTimeout) {
-            requestTimeoutMillis = 15.seconds.inWholeMilliseconds
-            connectTimeoutMillis = 5.seconds.inWholeMilliseconds
-            socketTimeoutMillis = 15.seconds.inWholeMilliseconds
+            install(ContentNegotiation) {
+                register(
+                    ContentType.Application.Json,
+                    JacksonConverter(
+                        jacksonMapperBuilder()
+                            .addModule(JavaTimeModule())
+                            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                            .build(),
+                    ),
+                )
+            }
         }
-
-        install(ContentNegotiation) {
-            register(
-                ContentType.Application.Json,
-                JacksonConverter(
-                    jacksonMapperBuilder()
-                        .addModule(JavaTimeModule())
-                        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                        .build(),
-                ),
-            )
-        }
-    }
 
     suspend fun hentEttersendelser(fnr: String): List<MinimalEttersendingDto> {
         return hentRequestMedFnrIBody<ExternalEttersending>(fnr, "$dpProxyUrl/proxy/v1/ettersendelser").toInternal()
@@ -71,7 +72,10 @@ internal class HenvendelseOppslag(
         return hentRequestMedFnrIBody<ExternalPåbegynt>(fnr, "$dpProxyUrl/proxy/v1/paabegynte").toInternal()
     }
 
-    private suspend inline fun <reified T> hentRequestMedFnrIBody(fnr: String, requestUrl: String): List<T> =
+    private suspend inline fun <reified T> hentRequestMedFnrIBody(
+        fnr: String,
+        requestUrl: String,
+    ): List<T> =
         kotlin.runCatching {
             dpProxyClient.request(requestUrl) {
                 method = HttpMethod.Post

@@ -26,28 +26,32 @@ internal class PåbegyntOppslag(
     private val baseUrl: String,
     private val soknadAudience: String,
     private val tokenProvider: (token: String, audience: String) -> String = exchangeToOboToken,
-    engine: HttpClientEngine = CIO.create() {
-        requestTimeout = 0
-    },
+    engine: HttpClientEngine =
+        CIO.create {
+            requestTimeout = 0
+        },
 ) {
-
-    private val httpClient = HttpClient(engine) {
-        expectSuccess = true
-        install(ContentNegotiation) {
-            jackson {
-                configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
-                registerModule(JavaTimeModule())
+    private val httpClient =
+        HttpClient(engine) {
+            expectSuccess = true
+            install(ContentNegotiation) {
+                jackson {
+                    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                    registerModule(JavaTimeModule())
+                }
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 15.seconds.inWholeMilliseconds
+                connectTimeoutMillis = 5.seconds.inWholeMilliseconds
+                socketTimeoutMillis = 15.seconds.inWholeMilliseconds
             }
         }
-        install(HttpTimeout) {
-            requestTimeoutMillis = 15.seconds.inWholeMilliseconds
-            connectTimeoutMillis = 5.seconds.inWholeMilliseconds
-            socketTimeoutMillis = 15.seconds.inWholeMilliseconds
-        }
-    }
 
-    internal suspend fun hentPåbegyntSøknad(subjectToken: String, XRequestId: String? = UUID.randomUUID().toString()): PåbegyntSøknadDto? {
+    internal suspend fun hentPåbegyntSøknad(
+        subjectToken: String,
+        XRequestId: String? = UUID.randomUUID().toString(),
+    ): PåbegyntSøknadDto? {
         val url = "$baseUrl/arbeid/dagpenger/soknadapi/soknad/paabegynt"
         return try {
             httpClient.get(url) {

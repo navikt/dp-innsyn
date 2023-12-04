@@ -13,31 +13,46 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 
 internal class PersonMediator(private val personRepository: PersonRepository) {
-    fun håndter(søknad: Søknad, melding: SøknadMelding) {
+    fun håndter(
+        søknad: Søknad,
+        melding: SøknadMelding,
+    ) {
         håndter(melding) { person ->
             person.håndter(søknad)
         }
     }
 
-    fun håndter(sakstilknytning: Sakstilknytning, melding: Journalførtmelding) {
+    fun håndter(
+        sakstilknytning: Sakstilknytning,
+        melding: Journalførtmelding,
+    ) {
         håndter(melding) { person ->
             person.håndter(sakstilknytning)
         }
     }
 
-    fun håndter(vedtak: Vedtak, melding: Vedtaksmelding) {
+    fun håndter(
+        vedtak: Vedtak,
+        melding: Vedtaksmelding,
+    ) {
         håndter(melding) { person ->
             person.håndter(vedtak)
         }
     }
 
-    fun håndter(ettersending: Ettersending, melding: Ettersendingsmelding) {
+    fun håndter(
+        ettersending: Ettersending,
+        melding: Ettersendingsmelding,
+    ) {
         håndter(melding) { person ->
             person.håndter(ettersending)
         }
     }
 
-    private fun håndter(melding: Hendelsemelding, handler: (Person) -> Unit) {
+    private fun håndter(
+        melding: Hendelsemelding,
+        handler: (Person) -> Unit,
+    ) {
         personRepository.person(melding.fødselsnummer).also { person ->
             handler(person)
             personRepository.lagre(person)

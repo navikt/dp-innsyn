@@ -25,20 +25,22 @@ object AuthFactory {
         val client_id by stringType
     }
 
-    private val openIdConfiguration = runBlocking {
-        httpClient.get(properties[token_x.well_known_url]).body<OpenIdConfiguration>()
-    }
+    private val openIdConfiguration =
+        runBlocking {
+            httpClient.get(properties[token_x.well_known_url]).body<OpenIdConfiguration>()
+        }
     val clientId = properties[token_x.client_id]
     val issuer = openIdConfiguration.issuer
     val jwkProvider: JwkProvider
-        get() = JwkProviderBuilder(URL(openIdConfiguration.jwksUri))
-            .cached(10, 24, TimeUnit.HOURS) // cache up to 10 JWKs for 24 hours
-            .rateLimited(
-                10,
-                1,
-                TimeUnit.MINUTES,
-            ) // if not cached, only allow max 10 different keys per minute to be fetched from external provider
-            .build()
+        get() =
+            JwkProviderBuilder(URL(openIdConfiguration.jwksUri))
+                .cached(10, 24, TimeUnit.HOURS) // cache up to 10 JWKs for 24 hours
+                .rateLimited(
+                    10,
+                    1,
+                    TimeUnit.MINUTES,
+                ) // if not cached, only allow max 10 different keys per minute to be fetched from external provider
+                .build()
 }
 
 private data class OpenIdConfiguration(
@@ -52,10 +54,11 @@ private data class OpenIdConfiguration(
     val authorizationEndpoint: String,
 )
 
-private val httpClient = HttpClient(CIO) {
-    install(ContentNegotiation) {
-        jackson {
-            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+private val httpClient =
+    HttpClient(CIO) {
+        install(ContentNegotiation) {
+            jackson {
+                configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            }
         }
     }
-}

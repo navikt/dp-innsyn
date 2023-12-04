@@ -9,14 +9,15 @@ internal class PapirSøknadsMelding(packet: JsonMessage) : SøknadMelding(packet
         get() = null
 
     override val søknad
-        get() = Søknad(
-            søknadId = søknadId,
-            journalpostId = journalpostId,
-            skjemaKode = skjemaKode,
-            søknadsType = søknadsType,
-            kanal = Papir,
-            datoInnsendt = datoRegistrert,
-            vedlegg = emptyList(),
-            tittel = tittel,
-        )
+        get() =
+            Søknad(
+                søknadId = søknadId,
+                journalpostId = journalpostId,
+                skjemaKode = skjemaKode,
+                søknadsType = søknadsType,
+                kanal = Papir,
+                datoInnsendt = datoRegistrert,
+                vedlegg = emptyList(),
+                tittel = tittel,
+            )
 }

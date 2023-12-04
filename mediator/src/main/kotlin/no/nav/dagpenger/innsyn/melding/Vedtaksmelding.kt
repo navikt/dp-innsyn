@@ -11,8 +11,9 @@ import java.time.format.DateTimeFormatter
 internal class Vedtaksmelding(private val packet: JsonMessage) : Hendelsemelding(packet) {
     companion object {
         private var formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss[.SSSSSS]")
-        private fun JsonNode.asArenaDato() =
-            asText().let { LocalDateTime.parse(it, formatter) }
+
+        private fun JsonNode.asArenaDato() = asText().let { LocalDateTime.parse(it, formatter) }
+
         private fun JsonNode.asOptionalArenaDato() =
             takeIf(JsonNode::isTextual)?.asText()?.takeIf(String::isNotEmpty)
                 ?.let { LocalDateTime.parse(it, formatter) }
@@ -26,14 +27,15 @@ internal class Vedtaksmelding(private val packet: JsonMessage) : Hendelsemelding
     private val tilDato = packet["after"]["TIL_DATO"].asOptionalArenaDato()
 
     internal val vedtak
-        get() = Vedtak(
-            vedtakId = vedtakId,
-            fagsakId = sakId,
-            status = status,
-            datoFattet = fattet,
-            fraDato = fraDato,
-            tilDato = tilDato,
-        )
+        get() =
+            Vedtak(
+                vedtakId = vedtakId,
+                fagsakId = sakId,
+                status = status,
+                datoFattet = fattet,
+                fraDato = fraDato,
+                tilDato = tilDato,
+            )
     override val fødselsnummer: String = packet.fødselsnummer()
     private val status
         get() =

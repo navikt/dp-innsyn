@@ -8,8 +8,9 @@ internal class Journalførtmelding(packet: JsonMessage) : Hendelsemelding(packet
     private val journalpostId = packet["journalpostId"].asText()
     private val fagsakId = packet["fagsakId"].asText()
     internal val journalføring
-        get() = Sakstilknytning(
-            journalpostId,
-            fagsakId,
-        )
+        get() =
+            Sakstilknytning(
+                journalpostId,
+                fagsakId,
+            )
 }

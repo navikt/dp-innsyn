@@ -42,7 +42,10 @@ internal class OppgaveMottak(
         private var formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val sakId = packet["after"]["SAK_ID"].asText()
         val transaksjonId = packet["after"]["TRANS_ID"].asText()
         val benk = packet["after"]["KONTOR"].asText()
@@ -57,12 +60,18 @@ internal class OppgaveMottak(
             val frist = packet["after"]["DUEDATE"].asText().let { LocalDateTime.parse(it, formatter) }
             val dagerTil = Duration.between(LocalDateTime.now(), frist).toDays()
 
-            logg.info { "Mottok operasjon $operasjon på oppgave $navn. Ligger på benk $benk, med frist til ${frist.toLocalDate()} (om $dagerTil dager)." }
+            logg.info {
+                "Mottok operasjon $operasjon på oppgave $navn. " +
+                    "Ligger på benk $benk, med frist til ${frist.toLocalDate()} (om $dagerTil dager)."
+            }
             // sikkerlogg.info { "Mottok oppgave: ${packet.toJson()}" }
         }
     }
 
-    override fun onError(problems: MessageProblems, context: MessageContext) {
+    override fun onError(
+        problems: MessageProblems,
+        context: MessageContext,
+    ) {
         logg.debug { problems }
     }
 }

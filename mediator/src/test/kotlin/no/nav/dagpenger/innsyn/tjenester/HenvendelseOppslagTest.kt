@@ -16,11 +16,11 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.ZonedDateTime
 
 internal class HenvendelseOppslagTest {
-
-    private val objectMapper = jacksonObjectMapper()
-        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-        .registerModule(JavaTimeModule())
-        .writer(DefaultPrettyPrinter())
+    private val objectMapper =
+        jacksonObjectMapper()
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            .registerModule(JavaTimeModule())
+            .writer(DefaultPrettyPrinter())
 
     @Test
     fun `Skal klare å utlede riktig returtype ut i fra generics definisjonen for ettersendelser`() {
@@ -39,20 +39,23 @@ internal class HenvendelseOppslagTest {
         assertDoesNotThrow { runBlocking { henvendelseOppslag.hentPåbegynte("123") } }
     }
 
-    private fun mockHttpClientWithReturnValue(returnObject: Any) = MockEngine {
-        val jsonResponse = objectMapper.writeValueAsString(returnObject)
-        respond(
-            content = jsonResponse,
-            status = HttpStatusCode.OK,
-            headers = headersOf(HttpHeaders.ContentType, "application/json"),
-        )
-    }
+    private fun mockHttpClientWithReturnValue(returnObject: Any) =
+        MockEngine {
+            val jsonResponse = objectMapper.writeValueAsString(returnObject)
+            respond(
+                content = jsonResponse,
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
+            )
+        }
 
-    private fun henvendelseOppslagWithMockClient(mockHttpClient: MockEngine, baseName: String) =
-        HenvendelseOppslag(
-            dpProxyUrl = "dummyUrl",
-            tokenProvider = { "dummyToken" },
-            httpClientEngine = mockHttpClient,
-            baseName = baseName,
-        )
+    private fun henvendelseOppslagWithMockClient(
+        mockHttpClient: MockEngine,
+        baseName: String,
+    ) = HenvendelseOppslag(
+        dpProxyUrl = "dummyUrl",
+        tokenProvider = { "dummyToken" },
+        httpClientEngine = mockHttpClient,
+        baseName = baseName,
+    )
 }

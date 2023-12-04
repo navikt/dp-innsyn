@@ -10,5 +10,12 @@ data class Påbegynt(
     val søknadId: String,
     val sistEndret: ZonedDateTime,
     val erNySøknadsdialog: Boolean,
-    val endreLenke: String = if (erNySøknadsdialog) Lenker.påbegyntNySøknadsdialogIngress(søknadId) else Lenker.påbegyntGammelSøknadsdialogIngress(søknadId),
+    val endreLenke: String =
+        if (erNySøknadsdialog) {
+            Lenker.påbegyntNySøknadsdialogIngress(
+                søknadId,
+            )
+        } else {
+            Lenker.påbegyntGammelSøknadsdialogIngress(søknadId)
+        },
 )

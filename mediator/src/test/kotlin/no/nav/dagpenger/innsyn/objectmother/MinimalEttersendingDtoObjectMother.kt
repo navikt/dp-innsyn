@@ -4,7 +4,6 @@ import no.nav.dagpenger.innsyn.tjenester.ettersending.MinimalEttersendingDto
 import java.time.ZonedDateTime
 
 object MinimalEttersendingDtoObjectMother {
-
     private val eldsteLovligeInnsendingsdatoAngittIDager: Long = (365 * 3) - 1
 
     fun giveMeEttersending(

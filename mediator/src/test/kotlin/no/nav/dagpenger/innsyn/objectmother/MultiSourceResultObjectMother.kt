@@ -5,7 +5,6 @@ import no.nav.dagpenger.innsyn.common.MultiSourceResult
 import no.nav.dagpenger.innsyn.tjenester.ettersending.MinimalEttersendingDto
 
 object MultiSourceResultObjectMother {
-
     fun giveMeSuccessfulResult(source: KildeType = KildeType.HENVENDELSE) =
         MultiSourceResult.createSuccessfulResult(
             listOf(
@@ -14,6 +13,5 @@ object MultiSourceResultObjectMother {
             source,
         )
 
-    fun giveMeFailedResult(source: KildeType) =
-        MultiSourceResult.createErrorResult<MinimalEttersendingDto, KildeType>(source)
+    fun giveMeFailedResult(source: KildeType) = MultiSourceResult.createErrorResult<MinimalEttersendingDto, KildeType>(source)
 }

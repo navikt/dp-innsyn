@@ -37,16 +37,21 @@ class PostgresPersonRepository : PersonRepository {
 
     private fun lagPerson(fnr: String): Person = Person(fnr).also { lagre(it) }
 
-    private fun getPerson(fnr: String) = using(sessionOf(dataSource)) { session ->
-        session.run(selectPerson(fnr))?.let {
-            val søknader = hentSøknaderFor(fnr)
-            val vedtak = hentVedtakFor(session, it)
-            PersonData(fnr, søknader, vedtak).person
+    private fun getPerson(fnr: String) =
+        using(sessionOf(dataSource)) { session ->
+            session.run(selectPerson(fnr))?.let {
+                val søknader = hentSøknaderFor(fnr)
+                val vedtak = hentVedtakFor(session, it)
+                PersonData(fnr, søknader, vedtak).person
+            }
         }
-    }
 
-    private fun hentVedtakFor(session: Session, personId: Int) = session.run(
-        queryOf( //language=PostgreSQL
+    private fun hentVedtakFor(
+        session: Session,
+        personId: Int,
+    ) = session.run(
+        queryOf(
+            //language=PostgreSQL
             "SELECT * FROM vedtak WHERE person_id = ?",
             personId,
         ).map { row ->
@@ -61,10 +66,12 @@ class PostgresPersonRepository : PersonRepository {
         }.asList,
     )
 
-    private fun selectPerson(fnr: String) = queryOf( //language=PostgreSQL
-        "SELECT person_id FROM person WHERE fnr = ?",
-        fnr,
-    ).map { it.int(1) }.asSingle
+    private fun selectPerson(fnr: String) =
+        queryOf(
+            //language=PostgreSQL
+            "SELECT person_id FROM person WHERE fnr = ?",
+            fnr,
+        ).map { it.int(1) }.asSingle
 
     private class PersonLagrer(person: Person) : PersonVisitor {
         private var aktivSøknadId: String? = null
@@ -75,10 +82,14 @@ class PostgresPersonRepository : PersonRepository {
             person.accept(this)
         }
 
-        override fun preVisit(person: Person, fnr: String) {
+        override fun preVisit(
+            person: Person,
+            fnr: String,
+        ) {
             this.fnr = fnr
             queries.add(
-                queryOf( //language=PostgreSQL
+                queryOf(
+                    //language=PostgreSQL
                     "INSERT INTO person (fnr) VALUES (:fnr) ON CONFLICT DO NOTHING",
                     mapOf("fnr" to fnr),
                 ),
@@ -123,7 +134,11 @@ class PostgresPersonRepository : PersonRepository {
             )
         }
 
-        override fun visitVedlegg(skjemaNummer: String, navn: String, status: Status) {
+        override fun visitVedlegg(
+            skjemaNummer: String,
+            navn: String,
+            status: Status,
+        ) {
             queries.add(
                 queryOf(
                     //language=PostgreSQL
@@ -173,7 +188,8 @@ class PostgresPersonRepository : PersonRepository {
     override fun hentSøknaderFor(fnr: String) =
         using(sessionOf(dataSource)) { session ->
             session.run(
-                queryOf( //language=PostgreSQL
+                queryOf(
+                    //language=PostgreSQL
                     """SELECT *
                         FROM søknad
                         WHERE person_id = (SELECT person_id FROM person WHERE fnr = ?)
@@ -186,16 +202,18 @@ class PostgresPersonRepository : PersonRepository {
         }
 
     private fun mapSøknadsRad(row: Row): Søknad {
-        val vedlegg = row.stringOrNull("søknad_id")?.let {
-            hentVedleggFor(row.string("søknad_id"))
-        }.orEmpty()
+        val vedlegg =
+            row.stringOrNull("søknad_id")?.let {
+                hentVedleggFor(row.string("søknad_id"))
+            }.orEmpty()
         return row.toSøknad(vedlegg)
     }
 
     override fun hentVedleggFor(søknadsId: String) =
         using(sessionOf(dataSource)) { session ->
             session.run(
-                queryOf( //language=PostgreSQL
+                queryOf(
+                    //language=PostgreSQL
                     """SELECT *
                         FROM vedlegg 
                         WHERE søknad_id = ? 
@@ -210,11 +228,12 @@ class PostgresPersonRepository : PersonRepository {
     override fun hentVedtakFor(fnr: String) =
         using(sessionOf(dataSource)) { session ->
             session.run(
-                queryOf( //language=PostgreSQL
+                queryOf(
+                    //language=PostgreSQL
                     """
-                        SELECT * FROM vedtak v
-                        INNER JOIN person p ON p.person_id = v.person_id
-                        WHERE p.fnr = ?
+                    SELECT * FROM vedtak v
+                    INNER JOIN person p ON p.person_id = v.person_id
+                    WHERE p.fnr = ?
                     """.trimIndent(),
                     fnr,
                 ).map { row -> row.toVedtak() }.asList,
@@ -228,28 +247,31 @@ class PostgresPersonRepository : PersonRepository {
         status: List<Vedtak.Status>,
         offset: Int,
         limit: Int,
-    ): List<Vedtak> = using(sessionOf(dataSource)) { session ->
-        session.run(
-            queryOf( //language=PostgreSQL
-                """SELECT *
-                FROM vedtak v,
-                     person p
-                WHERE p.person_id = v.person_id
-                  AND p.fnr = :fnr
-                  AND v.fattet <@ TSRANGE(:fom, :tom) 
-                ORDER BY v.fattet DESC
-                LIMIT :limit OFFSET :offset
-                """.trimIndent(),
-                mapOf(
-                    "fnr" to fnr,
-                    "fom" to fattetFom,
-                    "tom" to fattetTom?.plusDays(1),
-                    "limit" to limit,
-                    "offset" to offset,
-                ),
-            ).map { row -> row.toVedtak() }.asList,
-        )
-    }
+    ): List<Vedtak> =
+        using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf(
+                    //language=PostgreSQL
+                    """
+                    SELECT *
+                    FROM vedtak v,
+                         person p
+                    WHERE p.person_id = v.person_id
+                      AND p.fnr = :fnr
+                      AND v.fattet <@ TSRANGE(:fom, :tom) 
+                    ORDER BY v.fattet DESC
+                    LIMIT :limit OFFSET :offset
+                    """.trimIndent(),
+                    mapOf(
+                        "fnr" to fnr,
+                        "fom" to fattetFom,
+                        "tom" to fattetTom?.plusDays(1),
+                        "limit" to limit,
+                        "offset" to offset,
+                    ),
+                ).map { row -> row.toVedtak() }.asList,
+            )
+        }
 
     override fun hentSøknaderFor(
         fnr: String,
@@ -261,8 +283,10 @@ class PostgresPersonRepository : PersonRepository {
         limit: Int,
     ) = using(sessionOf(dataSource)) { session ->
         session.run(
-            queryOf( //language=PostgreSQL
-                """SELECT *
+            queryOf(
+                //language=PostgreSQL
+                """
+                SELECT *
                 FROM søknad s,
                      person p
                 WHERE p.person_id = s.person_id
@@ -282,29 +306,32 @@ class PostgresPersonRepository : PersonRepository {
         )
     }
 
-    private fun Row.toSøknad(vedlegg: List<Vedlegg>) = Søknad(
-        søknadId = stringOrNull("søknad_id"),
-        journalpostId = string("journalpost_id"),
-        skjemaKode = string("skjema_kode"),
-        søknadsType = SøknadsType.valueOf(string("søknads_type")),
-        kanal = Kanal.valueOf(string("kanal")),
-        datoInnsendt = localDateTime("dato_innsendt"),
-        vedlegg = vedlegg,
-        tittel = stringOrNull("tittel"),
-    )
+    private fun Row.toSøknad(vedlegg: List<Vedlegg>) =
+        Søknad(
+            søknadId = stringOrNull("søknad_id"),
+            journalpostId = string("journalpost_id"),
+            skjemaKode = string("skjema_kode"),
+            søknadsType = SøknadsType.valueOf(string("søknads_type")),
+            kanal = Kanal.valueOf(string("kanal")),
+            datoInnsendt = localDateTime("dato_innsendt"),
+            vedlegg = vedlegg,
+            tittel = stringOrNull("tittel"),
+        )
 
-    private fun Row.toVedlegg() = Vedlegg(
-        skjemaNummer = string("skjema_nummer"),
-        navn = string("navn"),
-        status = Status.valueOf(string("status")),
-    )
+    private fun Row.toVedlegg() =
+        Vedlegg(
+            skjemaNummer = string("skjema_nummer"),
+            navn = string("navn"),
+            status = Status.valueOf(string("status")),
+        )
 
-    private fun Row.toVedtak() = Vedtak(
-        vedtakId = string("vedtak_id"),
-        fagsakId = string("fagsak_id"),
-        status = Vedtak.Status.valueOf(string("status")),
-        datoFattet = localDateTime("fattet"),
-        fraDato = localDateTime("fra_dato"),
-        tilDato = localDateTimeOrNull("til_dato"),
-    )
+    private fun Row.toVedtak() =
+        Vedtak(
+            vedtakId = string("vedtak_id"),
+            fagsakId = string("fagsak_id"),
+            status = Vedtak.Status.valueOf(string("status")),
+            datoFattet = localDateTime("fattet"),
+            fraDato = localDateTime("fra_dato"),
+            tilDato = localDateTimeOrNull("til_dato"),
+        )
 }

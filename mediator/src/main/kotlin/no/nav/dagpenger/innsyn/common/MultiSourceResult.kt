@@ -7,24 +7,28 @@ data class MultiSourceResult<R, S>(
     val successFullSources: List<S>,
     val failedSources: List<S> = emptyList(),
 ) {
-
     companion object {
-        fun <R, S> createSuccessfulResult(results: List<R>, successfulSource: S) = MultiSourceResult(
+        fun <R, S> createSuccessfulResult(
+            results: List<R>,
+            successfulSource: S,
+        ) = MultiSourceResult(
             results,
             listOf(successfulSource),
         )
 
-        fun <R, S> createErrorResult(failedSource: S) = MultiSourceResult(
-            emptyList<R>(),
-            emptyList<S>(),
-            listOf(failedSource),
-        )
+        fun <R, S> createErrorResult(failedSource: S) =
+            MultiSourceResult(
+                emptyList<R>(),
+                emptyList<S>(),
+                listOf(failedSource),
+            )
 
-        fun <R> createEmptyResult(): MultiSourceResult<R, KildeType> = MultiSourceResult(
-            emptyList(),
-            emptyList(),
-            emptyList(),
-        )
+        fun <R> createEmptyResult(): MultiSourceResult<R, KildeType> =
+            MultiSourceResult(
+                emptyList(),
+                emptyList(),
+                emptyList(),
+            )
     }
 
     operator fun plus(other: MultiSourceResult<R, S>): MultiSourceResult<R, S> =
@@ -35,9 +39,11 @@ data class MultiSourceResult<R, S>(
         )
 
     fun results() = mutableListOf<R>().apply { addAll(results) }
+
     fun successFullSources() = mutableListOf<S>().apply { addAll(successFullSources) }
 
     fun hasErrors() = failedSources.isNotEmpty()
+
     fun failedSources() = mutableListOf<S>().apply { addAll(failedSources) }
 
     fun determineHttpCode(): HttpStatusCode {
@@ -48,6 +54,7 @@ data class MultiSourceResult<R, S>(
     }
 
     private fun hasPartialResult(): Boolean = successFullSources.isNotEmpty() && failedSources.isNotEmpty()
+
     private fun allSourcesFailed(): Boolean = successFullSources.isEmpty() && failedSources.isNotEmpty()
 }
 

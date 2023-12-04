@@ -11,14 +11,16 @@ object ExternalPåbegyntObjectMother {
             ZonedDateTime.now(),
         )
 
-    fun giveMeBILPåbegynt() = ExternalPåbegynt(
-        "bid",
-        "NAV 10-07.40",
-        ZonedDateTime.now(),
-    )
+    fun giveMeBILPåbegynt() =
+        ExternalPåbegynt(
+            "bid",
+            "NAV 10-07.40",
+            ZonedDateTime.now(),
+        )
 
-    fun giveMePåbegynteForDAGOgBIL() = listOf(
-        giveMeBILPåbegynt(),
-        giveMeDagpengePåbegynt(),
-    )
+    fun giveMePåbegynteForDAGOgBIL() =
+        listOf(
+            giveMeBILPåbegynt(),
+            giveMeDagpengePåbegynt(),
+        )
 }

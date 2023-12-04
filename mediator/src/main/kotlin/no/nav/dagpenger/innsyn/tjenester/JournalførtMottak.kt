@@ -26,7 +26,10 @@ internal class JournalførtMottak(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val fnr = packet["fødselsnummer"].asText()
         val journalpostId = packet["journalpostId"].asText()
         val fagsakId = packet["fagsakId"].asText()
@@ -44,7 +47,10 @@ internal class JournalførtMottak(
         }
     }
 
-    override fun onError(problems: MessageProblems, context: MessageContext) {
+    override fun onError(
+        problems: MessageProblems,
+        context: MessageContext,
+    ) {
         logg.debug { problems }
     }
 }

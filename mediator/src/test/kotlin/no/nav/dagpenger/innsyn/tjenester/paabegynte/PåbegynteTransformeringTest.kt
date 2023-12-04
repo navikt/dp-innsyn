@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 internal class PåbegynteTransformeringTest {
-
     @Test
     fun `skal kun hente påbegynte for dagpenger og oversatte kodeverk`() {
         val externalEttersendelser = ExternalPåbegyntObjectMother.giveMePåbegynteForDAGOgBIL()

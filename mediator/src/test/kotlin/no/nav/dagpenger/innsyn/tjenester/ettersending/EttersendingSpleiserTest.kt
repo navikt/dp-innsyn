@@ -15,15 +15,15 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class EttersendingSpleiserTest {
-
     @Test
     fun `Skal slå sammen ettersendelser, fjerne de uten dato, de som er for gamle og duplikater, samt sortere resultatet`() {
         val henvendelseOppslag = mockk<HenvendelseOppslag>()
-        val ettersendelserFraHenvendelse = listOf(
-            MinimalEttersendingDtoObjectMother.giveMeEttersending("123"),
-            MinimalEttersendingDtoObjectMother.giveMeForGammelEttersending(),
-            MinimalEttersendingDtoObjectMother.giveMeEttersendingUtenInnsendtDato(),
-        )
+        val ettersendelserFraHenvendelse =
+            listOf(
+                MinimalEttersendingDtoObjectMother.giveMeEttersending("123"),
+                MinimalEttersendingDtoObjectMother.giveMeForGammelEttersending(),
+                MinimalEttersendingDtoObjectMother.giveMeEttersendingUtenInnsendtDato(),
+            )
         coEvery { henvendelseOppslag.hentEttersendelser(any()) } returns ettersendelserFraHenvendelse
 
         val personRepository = mockk<PersonRepository>()
@@ -32,9 +32,10 @@ internal class EttersendingSpleiserTest {
 
         val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
 
-        val alleEttersendelser = runBlocking {
-            ettersendingSpleiser.hentEttersendelser("999")
-        }
+        val alleEttersendelser =
+            runBlocking {
+                ettersendingSpleiser.hentEttersendelser("999")
+            }
 
         assertEquals(1, alleEttersendelser.results().size)
         assertEquals("456", alleEttersendelser.results()[0].søknadId)
@@ -44,9 +45,10 @@ internal class EttersendingSpleiserTest {
     fun `Hvis begge kilder gir ettersending med samme id, så skal den som har dato satt velges`() {
         val forventetKolliderendeSøknadId = "456"
         val henvendelseOppslag = mockk<HenvendelseOppslag>()
-        val ettersendelserFraHenvendelse = listOf(
-            MinimalEttersendingDtoObjectMother.giveMeEttersendingUtenInnsendtDato(forventetKolliderendeSøknadId),
-        )
+        val ettersendelserFraHenvendelse =
+            listOf(
+                MinimalEttersendingDtoObjectMother.giveMeEttersendingUtenInnsendtDato(forventetKolliderendeSøknadId),
+            )
         coEvery { henvendelseOppslag.hentEttersendelser(any()) } returns ettersendelserFraHenvendelse
 
         val personRepository = mockk<PersonRepository>()
@@ -55,9 +57,10 @@ internal class EttersendingSpleiserTest {
 
         val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
 
-        val alleEttersendelser = runBlocking {
-            ettersendingSpleiser.hentEttersendelser("999")
-        }
+        val alleEttersendelser =
+            runBlocking {
+                ettersendingSpleiser.hentEttersendelser("999")
+            }
 
         assertEquals(1, alleEttersendelser.results().size)
         assertEquals(forventetKolliderendeSøknadId, alleEttersendelser.results()[0].søknadId)
@@ -75,9 +78,10 @@ internal class EttersendingSpleiserTest {
 
         val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
 
-        val alleEttersendelser = runBlocking {
-            ettersendingSpleiser.hentEttersendelser("999")
-        }
+        val alleEttersendelser =
+            runBlocking {
+                ettersendingSpleiser.hentEttersendelser("999")
+            }
 
         assertEquals(1, alleEttersendelser.results().size)
         assertNotNull(alleEttersendelser.results().first { it.søknadId == "456" })
@@ -95,9 +99,10 @@ internal class EttersendingSpleiserTest {
 
         val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
 
-        val alleEttersendelser = runBlocking {
-            ettersendingSpleiser.hentEttersendelser("999")
-        }
+        val alleEttersendelser =
+            runBlocking {
+                ettersendingSpleiser.hentEttersendelser("999")
+            }
 
         assertEquals(0, alleEttersendelser.results().size)
         assertTrue(alleEttersendelser.failedSources().contains(KildeType.DB))
@@ -113,9 +118,10 @@ internal class EttersendingSpleiserTest {
 
         val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
 
-        val alleEttersendelser = runBlocking {
-            ettersendingSpleiser.hentEttersendelser("999")
-        }
+        val alleEttersendelser =
+            runBlocking {
+                ettersendingSpleiser.hentEttersendelser("999")
+            }
 
         assertEquals(0, alleEttersendelser.results().size)
         // TODO assertTrue(alleEttersendelser.failedSources().contains(KildeType.HENVENDELSE))

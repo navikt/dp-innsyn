@@ -17,35 +17,38 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 
 internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.StatusListener {
     private val personRepository = PostgresPersonRepository()
-    private val henvendelseOppslag = HenvendelseOppslag(
-        dpProxyUrl = Configuration.dpProxyUrl,
-        tokenProvider = { Configuration.dpProxyTokenProvider.clientCredentials(Configuration.dpProxyScope).accessToken },
-    )
+    private val henvendelseOppslag =
+        HenvendelseOppslag(
+            dpProxyUrl = Configuration.dpProxyUrl,
+            tokenProvider = { Configuration.dpProxyTokenProvider.clientCredentials(Configuration.dpProxyScope).accessToken },
+        )
     private val ettersendingSpleiser = EttersendingSpleiser(henvendelseOppslag, personRepository)
-    private val påbegyntOppslag = PåbegyntOppslag(
-        Configuration.dpSoknadUrl,
-        Configuration.dpSoknadAudience,
-    )
+    private val påbegyntOppslag =
+        PåbegyntOppslag(
+            Configuration.dpSoknadUrl,
+            Configuration.dpSoknadAudience,
+        )
     private val personMediator = PersonMediator(personRepository)
-    private val rapidsConnection = RapidApplication.Builder(fromEnv(env))
-        .withKtorModule {
-            innsynApi(
-                AuthFactory.jwkProvider,
-                AuthFactory.issuer,
-                AuthFactory.clientId,
-                personRepository,
-                henvendelseOppslag,
-                ettersendingSpleiser,
-                påbegyntOppslag,
-            )
-        }.build().apply {
-            SøknadMottak(this, personMediator)
-            JournalførtMottak(this, personMediator)
-            EttersendingMottak(this, personMediator)
-            VedtakMottak(this, personMediator)
-            OppgaveMottak(this, personMediator)
-            VedtakAvsluttetMottak(this)
-        }
+    private val rapidsConnection =
+        RapidApplication.Builder(fromEnv(env))
+            .withKtorModule {
+                innsynApi(
+                    AuthFactory.jwkProvider,
+                    AuthFactory.issuer,
+                    AuthFactory.clientId,
+                    personRepository,
+                    henvendelseOppslag,
+                    ettersendingSpleiser,
+                    påbegyntOppslag,
+                )
+            }.build().apply {
+                SøknadMottak(this, personMediator)
+                JournalførtMottak(this, personMediator)
+                EttersendingMottak(this, personMediator)
+                VedtakMottak(this, personMediator)
+                OppgaveMottak(this, personMediator)
+                VedtakAvsluttetMottak(this)
+            }
 
     init {
         rapidsConnection.register(this)

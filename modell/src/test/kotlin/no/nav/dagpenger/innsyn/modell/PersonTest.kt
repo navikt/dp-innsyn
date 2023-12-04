@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 internal class PersonTest {
-
     @Test
     fun `Flere søknader gir flere søknader`() {
         Person("ident").also { person ->
@@ -58,25 +57,28 @@ internal class PersonTest {
         }
     }
 
-    private fun søknad(id: String) = Søknad(
-        id,
-        "journalpostId-$id",
-        "NAV123",
-        Søknad.SøknadsType.NySøknad,
-        Kanal.Digital,
-        LocalDateTime.now(),
-        emptyList(),
-        "tittel",
-    )
-
-    private fun ettersending(søknadId: String?, ettersendingId: String?) =
-        Ettersending(
-            søknadId,
-            ettersendingId,
-            "99",
+    private fun søknad(id: String) =
+        Søknad(
+            id,
+            "journalpostId-$id",
+            "NAV123",
+            Søknad.SøknadsType.NySøknad,
             Kanal.Digital,
+            LocalDateTime.now(),
             emptyList(),
+            "tittel",
         )
+
+    private fun ettersending(
+        søknadId: String?,
+        ettersendingId: String?,
+    ) = Ettersending(
+        søknadId,
+        ettersendingId,
+        "99",
+        Kanal.Digital,
+        emptyList(),
+    )
 
     private class PersonInspektør(person: Person) : PersonVisitor {
         var antallVedtak = 0
@@ -99,7 +101,10 @@ internal class PersonTest {
             antallSøknader++
         }
 
-        override fun visitEttersending(søknadId: String?, kanal: Kanal) {
+        override fun visitEttersending(
+            søknadId: String?,
+            kanal: Kanal,
+        ) {
             antallEttersendinger++
         }
 

@@ -21,7 +21,10 @@ class JwtStub(private val issuer: String = "test issuer") {
         publicKey = keyPair.public as RSAPublicKey
     }
 
-    fun createTokenFor(subject: String, clientId: String = ""): String {
+    fun createTokenFor(
+        subject: String,
+        clientId: String = "",
+    ): String {
         val algorithm = Algorithm.RSA256(publicKey, privateKey)
 
         return JWT.create()

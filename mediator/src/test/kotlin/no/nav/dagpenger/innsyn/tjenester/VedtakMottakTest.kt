@@ -37,38 +37,18 @@ class VedtakMottakTest {
 }
 
 //language=JSON
-private val vedtakJsonV1 = """{
-  "table": "SIAMO.VEDTAK",
-  "op_type": "I",
-  "op_ts": "2020-04-07 14:31:08.840468",
-  "current_ts": "2020-04-07T14:53:03.656001",
-  "pos": "00000000000000013022",
-  "tokens": {
-    "FODSELSNR": "***********"
-  },
-  "after": {
-    "VEDTAK_ID": 29501880,
-    "SAK_ID": 123,
-    "VEDTAKSTATUSKODE": "IVERK",
-    "VEDTAKTYPEKODE": "O",
-    "UTFALLKODE": "JA",
-    "RETTIGHETKODE": "DAGO",
-    "PERSON_ID": 4124685,
-    "FRA_DATO": "2018-03-05 00:00:00",
-    "TIL_DATO": null
-  }
-}
-""".trimIndent()
-
-//language=JSON
-private val vedtakJsonV2 = """{
-    "table": "SIAMO.VEDTAK",
-    "op_type": "I",
-    "op_ts": "2021-11-12 08:31:33.092337",
-    "current_ts": "2021-11-12 08:57:55.082000",
-    "pos": "00000000000000010892",
-    "FODSELSNR": "***********",
-    "after": {
+private val vedtakJsonV1 =
+    """
+    {
+      "table": "SIAMO.VEDTAK",
+      "op_type": "I",
+      "op_ts": "2020-04-07 14:31:08.840468",
+      "current_ts": "2020-04-07T14:53:03.656001",
+      "pos": "00000000000000013022",
+      "tokens": {
+        "FODSELSNR": "***********"
+      },
+      "after": {
         "VEDTAK_ID": 29501880,
         "SAK_ID": 123,
         "VEDTAKSTATUSKODE": "IVERK",
@@ -78,6 +58,30 @@ private val vedtakJsonV2 = """{
         "PERSON_ID": 4124685,
         "FRA_DATO": "2018-03-05 00:00:00",
         "TIL_DATO": null
+      }
     }
-}
-""".trimIndent()
+    """.trimIndent()
+
+//language=JSON
+private val vedtakJsonV2 =
+    """
+    {
+        "table": "SIAMO.VEDTAK",
+        "op_type": "I",
+        "op_ts": "2021-11-12 08:31:33.092337",
+        "current_ts": "2021-11-12 08:57:55.082000",
+        "pos": "00000000000000010892",
+        "FODSELSNR": "***********",
+        "after": {
+            "VEDTAK_ID": 29501880,
+            "SAK_ID": 123,
+            "VEDTAKSTATUSKODE": "IVERK",
+            "VEDTAKTYPEKODE": "O",
+            "UTFALLKODE": "JA",
+            "RETTIGHETKODE": "DAGO",
+            "PERSON_ID": 4124685,
+            "FRA_DATO": "2018-03-05 00:00:00",
+            "TIL_DATO": null
+        }
+    }
+    """.trimIndent()

@@ -18,5 +18,6 @@ interface SøknadRepository {
     ): List<Søknad>
 
     fun hentSøknaderFor(fnr: String): List<Søknad>
+
     fun hentVedleggFor(søknadsId: String): List<Innsending.Vedlegg>
 }
