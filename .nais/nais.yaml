@@ -46,8 +46,6 @@ spec:
       rules:
         - application: dp-dagpenger
         - application: dp-soknad
-        - application: paw-auth-proxy
-          namespace: paw
         - application: aia-backend
           namespace: paw
     outbound:
