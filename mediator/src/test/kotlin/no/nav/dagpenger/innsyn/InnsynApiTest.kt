@@ -17,7 +17,6 @@ import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.FerdigBehandlet
-import no.nav.dagpenger.innsyn.common.KildeType
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.JwtStub
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
@@ -27,11 +26,8 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Sakstilknytning
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType.NySøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
-import no.nav.dagpenger.innsyn.objectmother.MultiSourceResultObjectMother
-import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
 import no.nav.dagpenger.innsyn.tjenester.PåbegyntOppslag
 import no.nav.dagpenger.innsyn.tjenester.PåbegyntSøknadDto
-import no.nav.dagpenger.innsyn.tjenester.ettersending.EttersendingSpleiser
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -46,8 +42,6 @@ internal class InnsynApiTest {
     private val testIssuer = "test-issuer"
     private val jwtStub = JwtStub(testIssuer)
     private val clientId = "id"
-    private val henvendelseOppslag = mockk<HenvendelseOppslag>()
-    private val ettersendingSpleiser = mockk<EttersendingSpleiser>()
     private val jacksonObjectMapper = jacksonObjectMapper()
 
     @Test
@@ -60,8 +54,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         PostgresPersonRepository(),
-                        henvendelseOppslag,
-                        ettersendingSpleiser,
                         mockk(),
                     )
                 }
@@ -114,8 +106,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         personRepository,
-                        henvendelseOppslag,
-                        ettersendingSpleiser,
                         mockk(),
                     )
                 }
@@ -152,8 +142,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         personRepository,
-                        henvendelseOppslag,
-                        ettersendingSpleiser,
                         mockk(),
                     )
                 }
@@ -202,8 +190,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         personRepository,
-                        henvendelseOppslag,
-                        ettersendingSpleiser,
                         mockk(),
                     )
                 }
@@ -245,8 +231,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         personRepository,
-                        henvendelseOppslag,
-                        ettersendingSpleiser,
                         mockk(),
                     )
                 }
@@ -288,8 +272,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         personRepository,
-                        henvendelseOppslag,
-                        ettersendingSpleiser,
                         mockk(),
                     )
                 }
@@ -300,60 +282,6 @@ internal class InnsynApiTest {
                 }
             }
         }
-
-    @Test
-    fun `test at bruker kan hente ut ettersendelser`() {
-        val ettersendingSpleiser = mockk<EttersendingSpleiser>()
-        coEvery { ettersendingSpleiser.hentEttersendelser(any()) } returns MultiSourceResultObjectMother.giveMeSuccessfulResult()
-        testApplication {
-            application {
-                innsynApi(
-                    jwtStub.stubbedJwkProvider(),
-                    testIssuer,
-                    clientId,
-                    mockk<PostgresPersonRepository>(),
-                    henvendelseOppslag,
-                    ettersendingSpleiser,
-                    mockk(),
-                )
-            }
-            client.autentisert("/ettersendelser").let { response ->
-                assertEquals(HttpStatusCode.OK, response.status)
-            }
-        }
-    }
-
-    @Test
-    fun `test at bruker kan hente ut ettersendelser når én kilde feiler`() {
-        val ettersendingSpleiser = mockk<EttersendingSpleiser>()
-        val enFeiletOgEnVellykket =
-            MultiSourceResultObjectMother.giveMeSuccessfulResult(KildeType.DB) +
-                MultiSourceResultObjectMother.giveMeFailedResult(
-                    KildeType.HENVENDELSE,
-                )
-        coEvery { ettersendingSpleiser.hentEttersendelser(any()) } returns enFeiletOgEnVellykket
-
-        testApplication {
-            application {
-                innsynApi(
-                    jwtStub.stubbedJwkProvider(),
-                    testIssuer,
-                    clientId,
-                    mockk<PostgresPersonRepository>(),
-                    henvendelseOppslag,
-                    ettersendingSpleiser,
-                    mockk(),
-                )
-            }
-            client.autentisert("/ettersendelser").let { response ->
-                assertEquals(HttpStatusCode.OK, response.status)
-                jacksonObjectMapper.readTree(response.bodyAsText()).let {
-                    assertTrue(it.has("failedSources"))
-                    assertTrue(it.has("results"))
-                }
-            }
-        }
-    }
 
     @Test
     fun `test at bruker kan hente ut påbegynte søknader`() {
@@ -375,8 +303,6 @@ internal class InnsynApiTest {
                     testIssuer,
                     clientId,
                     mockk<PostgresPersonRepository>(),
-                    henvendelseOppslag,
-                    ettersendingSpleiser,
                     påbegyntOppslagMock,
                 )
             }
@@ -427,8 +353,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         personRepository,
-                        henvendelseOppslag,
-                        ettersendingSpleiser,
                         mockk(),
                     )
                 }
@@ -450,8 +374,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         PostgresPersonRepository(),
-                        henvendelseOppslag,
-                        ettersendingSpleiser,
                         mockk(),
                     )
                 }

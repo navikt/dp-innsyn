@@ -39,9 +39,7 @@ import no.nav.dagpenger.innsyn.behandlingsstatus.AvgjørBehandlingsstatus
 import no.nav.dagpenger.innsyn.behandlingsstatus.BehandlingsstatusDTO
 import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.modell.serde.VedtakJsonBuilder
-import no.nav.dagpenger.innsyn.tjenester.HenvendelseOppslag
 import no.nav.dagpenger.innsyn.tjenester.PåbegyntOppslag
-import no.nav.dagpenger.innsyn.tjenester.ettersending.EttersendingSpleiser
 import no.nav.dagpenger.innsyn.tjenester.paabegynt.Påbegynt
 import org.slf4j.event.Level
 import java.time.LocalDate
@@ -54,8 +52,6 @@ internal fun Application.innsynApi(
     issuer: String,
     clientId: String,
     personRepository: PersonRepository,
-    henvendelseOppslag: HenvendelseOppslag,
-    ettersendingSpleiser: EttersendingSpleiser,
     påbegyntOppslag: PåbegyntOppslag,
 ) {
     install(CallId) {
@@ -157,19 +153,6 @@ internal fun Application.innsynApi(
                 val behandlingsstatus = avgjørBehandlingsstatus.hentStatus(fnr, LocalDate.parse(fom))
 
                 call.respond(HttpStatusCode.OK, BehandlingsstatusDTO(behandlingsstatus))
-            }
-
-            get("/ettersendelser") {
-                val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
-                val fnr = jwtPrincipal!!.fnr
-                val ettersendelser = ettersendingSpleiser.hentEttersendelser(fnr)
-                val httpKode = ettersendelser.determineHttpCode()
-                if (ettersendelser.hasErrors()) {
-                    val feilende = ettersendelser.failedSources()
-                    val vellykkede = ettersendelser.successFullSources()
-                    logger.warn("Følgende kilder feilet: $feilende. Returnerer resultater fra $vellykkede sammen med HTTP-koden $httpKode.")
-                }
-                call.respond(httpKode, ettersendelser)
             }
 
             get("/paabegynte") {
