@@ -1,0 +1,129 @@
+openapi: 3.0.0
+info:
+  title: Innsyn API
+  version: 1.0.0
+  description: API for å forenkle prosessen med å hente informasjon relatert til søknader og vedtak.
+  contact:
+    name: '#team-dagpenger'
+servers:
+  - url: https://dp-innsyn.intern.dev.nav.no
+    description: dev
+  - url: https://dp-innsyn.intern.nav.no
+    description: prod
+paths:
+  /soknad:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Soknad'
+          description: OK
+      summary: Hent alle søknader
+      description: Viser en liste over alle innsendt søknader som er tilknyttet til en spesifikk bruker.
+      operationId: get-soknad
+      security:
+        - tokenX: [ ]
+
+
+  /vedtak:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vedtak'
+          description: OK
+      summary: Hent alle vedtak
+      description: Viser en liste over alle vedtak som er tilknyttet til en spesifikk bruker.
+      operationId: get-vedtak
+      security:
+        - tokenX: [ ]
+
+  /paabegynte:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaabegyntSoknad'
+          description: OK
+      summary: Hent alle påbegynte søknader
+      description: Viser en oversikt over alle søknader som er startet av en bruker.
+      operationId: get-paabegynte
+      security:
+        - tokenX: [ ]
+
+  /behandlingsstatus:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Behandlingsstatus'
+          description: OK
+      summary: Henter behandlingsstatusen til en søknad.
+      description: Viser behandlingsstatusen til en søknad.
+      operationId: get-behandlingsstatus
+      security:
+        - tokenX: [ ]
+
+
+components:
+  schemas:
+    Soknad:
+      type: object
+      properties:
+        id:
+          type: string
+
+    Vedtak:
+      type: object
+      properties:
+        id:
+          type: string
+
+    PaabegyntSoknad:
+        type: object
+        properties:
+            id:
+              type: string
+    Behandlingsstatus:
+      type: object
+      properties:
+        behandlingsstatus:
+          type: string
+          enum:
+            - Ukjent
+            - FerdigBehandlet
+            - UnderBehandling
+      required:
+        - behandlingsstatus
+
+  securitySchemes:
+    tokenX:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Bruker [TokenX](https://docs.nais.io/security/auth/tokenx/) til autentisering. Du må utveksle IDporten-token
+        til et TokenX-token hvor `audience` er satt til `[cluster]:teamdagpenger:dp-innsyn`.
+        
+        For å teste APIet kan du lage et gyldig OBO-token ved å bruke wonderwalled:
+        - [dev-gcp](https://wonderwalled-idporten.intern.dev.nav.no/api/obo?aud=dev-gcp:teamdagpenger:dp-innsyn)
+  headers: { }
+  responses: { }
+
+

@@ -9,6 +9,7 @@ application {
 
 dependencies {
     implementation(project(":modell"))
+    implementation(project(path = ":openapi"))
 
     implementation(libs.bundles.ktor.server)
 
@@ -25,6 +26,7 @@ dependencies {
 
     testImplementation("io.ktor:ktor-client-mock:${libs.versions.ktor.get()}")
     testImplementation("io.ktor:ktor-server-test-host:${libs.versions.ktor.get()}")
+    implementation("io.ktor:ktor-server-swagger:${libs.versions.ktor.get()}")
     testImplementation(libs.bundles.postgres.test)
     testImplementation(libs.mockk)
 }

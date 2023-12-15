@@ -26,6 +26,7 @@ import io.ktor.server.plugins.compression.Compression
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.defaultheaders.DefaultHeaders
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.request.ApplicationRequest
 import io.ktor.server.request.document
 import io.ktor.server.request.header
@@ -114,6 +115,8 @@ internal fun Application.innsynApi(
     }
     val avgjørBehandlingsstatus = AvgjørBehandlingsstatus(personRepository)
     routing {
+        swaggerUI(path = "openapi", swaggerFile = "innsyn-api.yaml")
+
         authenticate {
             get("/soknad") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
