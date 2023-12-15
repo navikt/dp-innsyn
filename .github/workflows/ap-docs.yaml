@@ -3,7 +3,7 @@ name: Publiser API docs
 on:
   push:
     branches:
-      - openapi
+      - main
     paths:
       - openapi/src/main/resources/*
   workflow_dispatch:
