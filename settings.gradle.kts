@@ -4,7 +4,7 @@ include(
     "modell",
     "mediator",
     "openapi",
-    )
+)
 
 dependencyResolutionManagement {
     repositories {
