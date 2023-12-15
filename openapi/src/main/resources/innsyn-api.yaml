@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Innsyn API
   version: 1.0.0
-  description: API for å forenkle prosessen med å hente informasjon relatert til søknader og vedtak.
+  description: API for å forenkle prosessen med å hente informasjon relatert til søknader og vedtak
   contact:
     name: '#team-dagpenger'
 servers:
