@@ -79,14 +79,59 @@ paths:
       operationId: get-behandlingsstatus
       security:
         - tokenX: [ ]
-
-
 components:
   schemas:
     Soknad:
       type: object
+      required:
+        - journalpostId
+        - søknadsType
+        - kanal
+        - datoInnsendt
+        - tittel
       properties:
-        id:
+        søknadId:
+          type: string
+        erNySøknadsdialog:
+          type: boolean
+        endreLenke:
+            type: string
+        skjemaKode:
+            type: string
+        tittel:
+            type: string
+        journalpostId:
+            type: string
+        søknadsType:
+            type: string
+            enum:
+              - NySøknad
+              - Gjenopptak
+        kanal:
+            type: string
+            enum:
+              - Papir
+              - Digital
+        datoInnsendt:
+            type: string
+            format: date-time
+        vedlegg:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vedlegg'
+
+    Vedlegg:
+      type: object
+      required:
+        - skjemanummer
+        - navn
+        - status
+      properties:
+        skjemanummer:
+          type: string
+        navn:
+          type: string
+        status:
           type: string
 
     Vedtak:
