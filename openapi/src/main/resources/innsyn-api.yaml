@@ -143,8 +143,26 @@ components:
     Vedtak:
       type: object
       properties:
-        id:
+        vedtakId:
           type: string
+        fagsakId:
+          type: string
+        status:
+          type: string
+          enum:
+            - INNVILGET
+            - AVSLÅTT
+            - STANS
+            - ENDRING
+        datoFattet:
+          type: string
+          format: date-time
+        fraDato:
+          type: string
+          format: date-time
+        tilDato:
+            type: string
+            format: date-time
 
     PaabegyntSoknad:
         type: object
