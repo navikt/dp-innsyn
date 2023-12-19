@@ -1,4 +1,5 @@
-import no.nav.dagpenger.innsyn.SøknadMapper
+package no.nav.dagpenger.innsyn.mapper
+
 import no.nav.dagpenger.innsyn.api.models.SoknadResponse
 import no.nav.dagpenger.innsyn.api.models.VedleggResponse
 import no.nav.dagpenger.innsyn.modell.hendelser.Innsending
