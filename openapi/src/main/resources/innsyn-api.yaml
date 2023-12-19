@@ -88,7 +88,6 @@ components:
         - søknadsType
         - kanal
         - datoInnsendt
-        - tittel
       properties:
         søknadId:
           type: string
@@ -123,16 +122,23 @@ components:
     Vedlegg:
       type: object
       required:
-        - skjemanummer
+        - skjemaNummer
         - navn
         - status
       properties:
-        skjemanummer:
+        skjemaNummer:
           type: string
         navn:
           type: string
         status:
           type: string
+          enum:
+            - LastetOpp
+            - VedleggSendesAvAndre
+            - VedleggSendesIkke
+            - SendesSenere
+            - SendesIkke
+            - VedleggAlleredeSendt
 
     Vedtak:
       type: object
