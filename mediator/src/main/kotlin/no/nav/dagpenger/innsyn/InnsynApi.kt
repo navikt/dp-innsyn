@@ -39,9 +39,9 @@ import no.nav.dagpenger.innsyn.Configuration.APP_NAME
 import no.nav.dagpenger.innsyn.behandlingsstatus.AvgjørBehandlingsstatus
 import no.nav.dagpenger.innsyn.behandlingsstatus.BehandlingsstatusDTO
 import no.nav.dagpenger.innsyn.db.PersonRepository
+import no.nav.dagpenger.innsyn.mapper.PåbegyntSøknadMapper
 import no.nav.dagpenger.innsyn.modell.serde.VedtakJsonBuilder
 import no.nav.dagpenger.innsyn.tjenester.PåbegyntOppslag
-import no.nav.dagpenger.innsyn.tjenester.paabegynt.Påbegynt
 import org.slf4j.event.Level
 import java.time.LocalDate
 import java.util.UUID
@@ -166,13 +166,7 @@ internal fun Application.innsynApi(
                     try {
                         påbegyntOppslag.hentPåbegyntSøknad(token, requestId)?.let {
                             listOf(
-                                Påbegynt(
-                                    søknadId = it.uuid.toString(),
-                                    behandlingsId = it.uuid.toString(),
-                                    sistEndret = it.sistEndret,
-                                    tittel = "Søknad om dagpenger",
-                                    erNySøknadsdialog = true,
-                                ),
+                                PåbegyntSøknadMapper(dto = it, erNySøknadsdialog = true).response,
                             )
                         } ?: emptyList()
                     } catch (e: Exception) {

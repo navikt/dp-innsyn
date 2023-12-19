@@ -316,8 +316,8 @@ internal class InnsynApiTest {
             assertEquals(uuid.toString(), fraNySøknadsdialog["behandlingsId"].asText())
             assertTrue(fraNySøknadsdialog["erNySøknadsdialog"].asBoolean())
             assertEquals(
-                nå.toOffsetDateTime(),
-                fraNySøknadsdialog["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() },
+                nå.toLocalDateTime(),
+                fraNySøknadsdialog["sistEndret"].asText().let { LocalDateTime.parse(it) },
             )
             assertEquals("https://arbeid.intern.dev.nav.no/dagpenger/dialog/soknad/$uuid", fraNySøknadsdialog["endreLenke"].asText())
         }

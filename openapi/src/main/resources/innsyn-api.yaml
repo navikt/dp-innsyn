@@ -167,8 +167,20 @@ components:
     PaabegyntSoknad:
         type: object
         properties:
-            id:
-              type: string
+          søknadId:
+            type: string
+          behandlingsId:
+            type: string
+          tittel:
+            type: string
+          sistEndret:
+                type: string
+                format: date-time
+          erNySøknadsdialog:
+            type: boolean
+          endreLenke:
+            type: string
+
     Behandlingsstatus:
       type: object
       properties:
