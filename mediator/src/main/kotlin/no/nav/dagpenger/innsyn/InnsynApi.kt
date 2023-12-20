@@ -36,12 +36,13 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.Configuration.APP_NAME
+import no.nav.dagpenger.innsyn.api.models.BehandlingsstatusResponse
 import no.nav.dagpenger.innsyn.behandlingsstatus.AvgjørBehandlingsstatus
-import no.nav.dagpenger.innsyn.behandlingsstatus.BehandlingsstatusDTO
 import no.nav.dagpenger.innsyn.db.PersonRepository
-import no.nav.dagpenger.innsyn.modell.serde.VedtakJsonBuilder
+import no.nav.dagpenger.innsyn.mapper.PåbegyntSøknadMapper
+import no.nav.dagpenger.innsyn.mapper.SøknadMapper
+import no.nav.dagpenger.innsyn.mapper.VedtakMapper
 import no.nav.dagpenger.innsyn.tjenester.PåbegyntOppslag
-import no.nav.dagpenger.innsyn.tjenester.paabegynt.Påbegynt
 import org.slf4j.event.Level
 import java.time.LocalDate
 import java.util.UUID
@@ -130,7 +131,7 @@ internal fun Application.innsynApi(
                         tom = tom,
                     )
 
-                call.respond(søknader.map { SøknadJsonBuilder(it).resultat() })
+                call.respond(søknader.map { SøknadMapper(it).response })
             }
             get("/vedtak") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
@@ -144,7 +145,7 @@ internal fun Application.innsynApi(
                         fattetTom = fattetTom,
                     )
 
-                call.respond(vedtak.map { VedtakJsonBuilder(it).resultat() })
+                call.respond(vedtak.map { VedtakMapper(it).response })
             }
 
             get("/behandlingsstatus") {
@@ -154,8 +155,11 @@ internal fun Application.innsynApi(
                     call.request.queryParameters["fom"]
                         ?: throw IllegalArgumentException("Mangler fom queryparameter i url")
                 val behandlingsstatus = avgjørBehandlingsstatus.hentStatus(fnr, LocalDate.parse(fom))
-
-                call.respond(HttpStatusCode.OK, BehandlingsstatusDTO(behandlingsstatus))
+                val status =
+                    behandlingsstatus?.let {
+                        BehandlingsstatusResponse.Behandlingsstatus.valueOf(it.name)
+                    } ?: BehandlingsstatusResponse.Behandlingsstatus.Ukjent
+                call.respond(HttpStatusCode.OK, BehandlingsstatusResponse(status))
             }
 
             get("/paabegynte") {
@@ -166,13 +170,7 @@ internal fun Application.innsynApi(
                     try {
                         påbegyntOppslag.hentPåbegyntSøknad(token, requestId)?.let {
                             listOf(
-                                Påbegynt(
-                                    søknadId = it.uuid.toString(),
-                                    behandlingsId = it.uuid.toString(),
-                                    sistEndret = it.sistEndret,
-                                    tittel = "Søknad om dagpenger",
-                                    erNySøknadsdialog = true,
-                                ),
+                                PåbegyntSøknadMapper(dto = it, erNySøknadsdialog = true).response,
                             )
                         } ?: emptyList()
                     } catch (e: Exception) {

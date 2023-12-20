@@ -88,7 +88,6 @@ components:
         - søknadsType
         - kanal
         - datoInnsendt
-        - tittel
       properties:
         søknadId:
           type: string
@@ -123,28 +122,69 @@ components:
     Vedlegg:
       type: object
       required:
-        - skjemanummer
+        - skjemaNummer
         - navn
         - status
       properties:
-        skjemanummer:
+        skjemaNummer:
           type: string
         navn:
           type: string
         status:
           type: string
+          enum:
+            - LastetOpp
+            - VedleggSendesAvAndre
+            - VedleggSendesIkke
+            - SendesSenere
+            - SendesIkke
+            - VedleggAlleredeSendt
 
     Vedtak:
       type: object
       properties:
-        id:
+        vedtakId:
           type: string
+        fagsakId:
+          type: string
+        status:
+          type: string
+          enum:
+            - INNVILGET
+            - AVSLÅTT
+            - STANS
+            - ENDRING
+        datoFattet:
+          type: string
+          format: date-time
+        fraDato:
+          type: string
+          format: date-time
+        tilDato:
+            type: string
+            format: date-time
 
     PaabegyntSoknad:
         type: object
+        required:
+          - søknadId
+          - tittel
+          - sistEndret
+          - erNySøknadsdialog
+          - endreLenke
         properties:
-            id:
-              type: string
+          søknadId:
+            type: string
+          tittel:
+            type: string
+          sistEndret:
+                type: string
+                format: date-time
+          erNySøknadsdialog:
+            type: boolean
+          endreLenke:
+            type: string
+
     Behandlingsstatus:
       type: object
       properties:

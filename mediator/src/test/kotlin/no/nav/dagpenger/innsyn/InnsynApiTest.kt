@@ -313,11 +313,10 @@ internal class InnsynApiTest {
             val fraNySøknadsdialog = json[0]
             assertEquals("Søknad om dagpenger", fraNySøknadsdialog["tittel"].asText())
             assertEquals(uuid.toString(), fraNySøknadsdialog["søknadId"].asText())
-            assertEquals(uuid.toString(), fraNySøknadsdialog["behandlingsId"].asText())
             assertTrue(fraNySøknadsdialog["erNySøknadsdialog"].asBoolean())
             assertEquals(
-                nå.toOffsetDateTime(),
-                fraNySøknadsdialog["sistEndret"].asText().let { ZonedDateTime.parse(it).toOffsetDateTime() },
+                nå.toLocalDateTime(),
+                fraNySøknadsdialog["sistEndret"].asText().let { LocalDateTime.parse(it) },
             )
             assertEquals("https://arbeid.intern.dev.nav.no/dagpenger/dialog/soknad/$uuid", fraNySøknadsdialog["endreLenke"].asText())
         }
