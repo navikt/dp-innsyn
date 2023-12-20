@@ -142,6 +142,12 @@ components:
 
     Vedtak:
       type: object
+      required:
+          - vedtakId
+          - fagsakId
+          - status
+          - datoFattet
+          - fraDato
       properties:
         vedtakId:
           type: string
