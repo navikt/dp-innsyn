@@ -8,7 +8,6 @@ class PåbegyntSøknadMapper(val dto: PåbegyntSøknadDto, val erNySøknadsdialo
     val response: PaabegyntSoknadResponse get() =
         PaabegyntSoknadResponse(
             søknadId = dto.uuid.toString(),
-            behandlingsId = dto.uuid.toString(),
             tittel = "Søknad om dagpenger",
             sistEndret = dto.sistEndret.toLocalDateTime(),
             erNySøknadsdialog = erNySøknadsdialog,

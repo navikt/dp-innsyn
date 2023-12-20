@@ -313,7 +313,6 @@ internal class InnsynApiTest {
             val fraNySøknadsdialog = json[0]
             assertEquals("Søknad om dagpenger", fraNySøknadsdialog["tittel"].asText())
             assertEquals(uuid.toString(), fraNySøknadsdialog["søknadId"].asText())
-            assertEquals(uuid.toString(), fraNySøknadsdialog["behandlingsId"].asText())
             assertTrue(fraNySøknadsdialog["erNySøknadsdialog"].asBoolean())
             assertEquals(
                 nå.toLocalDateTime(),

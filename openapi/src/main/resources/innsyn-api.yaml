@@ -168,15 +168,12 @@ components:
         type: object
         required:
           - søknadId
-          - behandlingsId
           - tittel
           - sistEndret
           - erNySøknadsdialog
           - endreLenke
         properties:
           søknadId:
-            type: string
-          behandlingsId:
             type: string
           tittel:
             type: string

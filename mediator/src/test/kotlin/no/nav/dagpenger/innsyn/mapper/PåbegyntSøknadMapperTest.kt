@@ -28,7 +28,6 @@ class PåbegyntSøknadMapperTest {
         with(response) {
             assertEquals("Søknad om dagpenger", tittel)
             assertEquals(uuid.toString(), søknadId)
-            assertEquals(uuid.toString(), behandlingsId)
             assertNotNull(sistEndret)
             assertNotNull(erNySøknadsdialog)
             assertTrue(erNySøknadsdialog!!)
@@ -55,7 +54,6 @@ class PåbegyntSøknadMapperTest {
         with(response) {
             assertEquals("Søknad om dagpenger", tittel)
             assertEquals(uuid.toString(), søknadId)
-            assertEquals(uuid.toString(), behandlingsId)
             assertNotNull(sistEndret)
             assertNotNull(erNySøknadsdialog)
             assertTrue(!erNySøknadsdialog!!)
