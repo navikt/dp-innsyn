@@ -51,8 +51,8 @@ spec:
     outbound:
       rules:
         - application: dp-soknad
-    external:
-      - host: {{ DP_PROXY_HOST }}
+      external:
+        - host: {{ DP_PROXY_HOST }}
   tokenx:
     enabled: true
   azure:
