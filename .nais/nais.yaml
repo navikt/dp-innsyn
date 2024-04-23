@@ -45,6 +45,7 @@ spec:
     inbound:
       rules:
         - application: dp-dagpenger
+        - application: dp-mine-dagpenger-frontend
         - application: dp-soknad
         - application: aia-backend
           namespace: paw
