@@ -49,6 +49,10 @@ spec:
         - application: dp-soknad
         - application: aia-backend
           namespace: paw
+        {{#if wonderwalled}}
+        - application: tokenx-token-generator
+          namespace: aura
+        {{/if}}
     outbound:
       rules:
         - application: dp-soknad

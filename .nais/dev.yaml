@@ -13,3 +13,4 @@ ny_soknadsdialog:
   ingress: "https://arbeid.intern.dev.nav.no/dagpenger/dialog/soknad"
 gammel_soknadsdialog:
   ingress: "https://arbeid.intern.dev.nav.no/soknaddagpenger-innsending"
+wonderwalled: true
