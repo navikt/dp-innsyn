@@ -4,8 +4,6 @@ kafka_pool: nav-prod
 db_tier: db-custom-2-7680
 db_size: 20
 db_ha: true
-dp_proxy_scope: api://prod-fss.teamdagpenger.dp-proxy/.default
-DP_PROXY_HOST: dp-proxy.prod-fss-pub.nais.io
 dp_soknad:
   url: "http://dp-soknad"
   audience: "prod-gcp:teamdagpenger:dp-soknad"
