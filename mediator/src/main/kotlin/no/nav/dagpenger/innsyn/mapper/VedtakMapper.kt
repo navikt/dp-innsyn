@@ -5,7 +5,9 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.VedtakVisitor
 import java.time.LocalDateTime
 
-class VedtakMapper(val vedtak: Vedtak) : VedtakVisitor {
+class VedtakMapper(
+    val vedtak: Vedtak,
+) : VedtakVisitor {
     private lateinit var vedtakId: String
     private lateinit var fagsakId: String
     private lateinit var status: Vedtak.Status

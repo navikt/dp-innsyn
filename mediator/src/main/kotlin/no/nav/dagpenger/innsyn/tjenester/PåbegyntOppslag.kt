@@ -54,11 +54,12 @@ internal class PåbegyntOppslag(
     ): PåbegyntSøknadDto? {
         val url = "$baseUrl/arbeid/dagpenger/soknadapi/soknad/paabegynt"
         return try {
-            httpClient.get(url) {
-                addBearerToken(subjectToken)
-                header(HttpHeaders.XRequestId, XRequestId)
-                contentType(ContentType.Application.Json)
-            }.body()
+            httpClient
+                .get(url) {
+                    addBearerToken(subjectToken)
+                    header(HttpHeaders.XRequestId, XRequestId)
+                    contentType(ContentType.Application.Json)
+                }.body()
         } catch (e: ClientRequestException) {
             when (e.response.status) {
                 HttpStatusCode.NotFound -> null
@@ -82,5 +83,7 @@ data class PåbegyntSøknadDto(
 )
 
 private val exchangeToOboToken = { token: String, audience: String ->
-    no.nav.dagpenger.innsyn.Configuration.tokenXClient.tokenExchange(token, audience).accessToken
+    no.nav.dagpenger.innsyn.Configuration.tokenXClient
+        .tokenExchange(token, audience)
+        .accessToken
 }

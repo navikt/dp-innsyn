@@ -25,26 +25,27 @@ internal class SøknadMottak(
     private val personMediator: PersonMediator,
 ) : River.PacketListener {
     init {
-        River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "innsending_mottatt") }
-            validate {
-                it.requireKey(
-                    "fødselsnummer",
-                    "journalpostId",
-                    "datoRegistrert",
-                    "skjemaKode",
-                    "tittel",
-                )
-            }
-            validate { it.requireAny("type", listOf("NySøknad", "Gjenopptak")) }
-            validate {
-                it.interestedIn(
-                    "søknadsData.vedlegg",
-                    QuizSøknadMelding.SØKNAD_ID_NØKKEL,
-                    LegacySøknadsmelding.SØKNAD_ID_NØKKEL,
-                )
-            }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                validate { it.demandValue("@event_name", "innsending_mottatt") }
+                validate {
+                    it.requireKey(
+                        "fødselsnummer",
+                        "journalpostId",
+                        "datoRegistrert",
+                        "skjemaKode",
+                        "tittel",
+                    )
+                }
+                validate { it.requireAny("type", listOf("NySøknad", "Gjenopptak")) }
+                validate {
+                    it.interestedIn(
+                        "søknadsData.vedlegg",
+                        QuizSøknadMelding.SØKNAD_ID_NØKKEL,
+                        LegacySøknadsmelding.SØKNAD_ID_NØKKEL,
+                    )
+                }
+            }.register(this)
     }
 
     override fun onPacket(
@@ -83,15 +84,14 @@ internal class SøknadMottak(
     }
 }
 
-private fun JsonMessage.tilSøknadMelding(): SøknadMelding {
-    return if (this.harSøknadIdFraQuiz()) {
+private fun JsonMessage.tilSøknadMelding(): SøknadMelding =
+    if (this.harSøknadIdFraQuiz()) {
         QuizSøknadMelding(this)
     } else if (this.harSøknadIdFraLegacy()) {
         LegacySøknadsmelding(this)
     } else {
         PapirSøknadsMelding(this)
     }
-}
 
 private fun JsonMessage.harSøknadIdFraQuiz() = !this[QuizSøknadMelding.SØKNAD_ID_NØKKEL].isMissingNode
 

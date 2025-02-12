@@ -80,7 +80,9 @@ internal class PersonTest {
         emptyList(),
     )
 
-    private class PersonInspektør(person: Person) : PersonVisitor {
+    private class PersonInspektør(
+        person: Person,
+    ) : PersonVisitor {
         var antallVedtak = 0
         var antallEttersendinger = 0
         var antallSøknader = 0

@@ -42,7 +42,8 @@ internal object PostgresDataSourceBuilder {
     }
 
     private val flyWayBuilder: FluentConfiguration =
-        Flyway.configure()
+        Flyway
+            .configure()
             .cleanDisabled(Configuration.properties[Key("FLYWAY_CLEAN_DISABLED", booleanType)])
             .connectRetries(5)
 

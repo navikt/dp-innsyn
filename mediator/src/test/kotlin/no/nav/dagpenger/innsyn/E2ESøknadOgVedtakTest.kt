@@ -79,7 +79,9 @@ internal class E2ESøknadOgVedtakTest {
 
     private val person get() = personRepository.person("10108099999")
 
-    private class PersonInspektør(person: Person) : PersonVisitor {
+    private class PersonInspektør(
+        person: Person,
+    ) : PersonVisitor {
         var søknader = 0
         var ferdigeVedlegg = 0
         var uferdigeVedlegg = 0

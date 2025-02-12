@@ -43,18 +43,20 @@ class SøknadMottakTest {
         assertTrue(søknadMeldingSlot.isCaptured)
         assertEquals(søknadMeldingSlot.captured.javaClass.name, LegacySøknadsmelding::class.java.name)
 
-        defaultRegistry.getSampleValue(
-            "dagpenger_mottak_forsinkelse_sum",
-            "type" to "soknad",
-        ).also {
-            assertTrue(SYNTHETIC_DELAY_SECONDS <= it)
-        }
-        defaultRegistry.getSampleValue(
-            "dagpenger_mottak_forsinkelse_count",
-            "type" to "soknad",
-        ).also {
-            assertTrue(1.0 <= it)
-        }
+        defaultRegistry
+            .getSampleValue(
+                "dagpenger_mottak_forsinkelse_sum",
+                "type" to "soknad",
+            ).also {
+                assertTrue(SYNTHETIC_DELAY_SECONDS <= it)
+            }
+        defaultRegistry
+            .getSampleValue(
+                "dagpenger_mottak_forsinkelse_count",
+                "type" to "soknad",
+            ).also {
+                assertTrue(1.0 <= it)
+            }
     }
 
     @Test

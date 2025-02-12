@@ -23,8 +23,7 @@ internal object Metrikker {
                 30.0,
                 60.0,
                 120.0,
-            )
-            .help("Tid fra innsendingen ble journalført til vi tar i mot")
+            ).help("Tid fra innsendingen ble journalført til vi tar i mot")
             .register()
 
     fun søknadForsinkelse(forsinkelse: LocalDateTime) =

@@ -7,7 +7,11 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import java.time.LocalDateTime
 
-interface PersonVisitor : SøknadVisitor, EttersendingVisitor, VedtakVisitor, SakstilknytningVisitor {
+interface PersonVisitor :
+    SøknadVisitor,
+    EttersendingVisitor,
+    VedtakVisitor,
+    SakstilknytningVisitor {
     fun preVisit(
         person: Person,
         fnr: String,

@@ -11,7 +11,9 @@ import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidApplication.RapidApplicationConfig.Companion.fromEnv
 import no.nav.helse.rapids_rivers.RapidsConnection
 
-internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.StatusListener {
+internal class ApplicationBuilder(
+    env: Map<String, String>,
+) : RapidsConnection.StatusListener {
     private val personRepository = PostgresPersonRepository()
     private val påbegyntOppslag =
         PåbegyntOppslag(
@@ -20,7 +22,8 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
         )
     private val personMediator = PersonMediator(personRepository)
     private val rapidsConnection =
-        RapidApplication.Builder(fromEnv(env))
+        RapidApplication
+            .Builder(fromEnv(env))
             .withKtorModule {
                 innsynApi(
                     AuthFactory.jwkProvider,
@@ -29,7 +32,8 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
                     personRepository,
                     påbegyntOppslag,
                 )
-            }.build().apply {
+            }.build()
+            .apply {
                 SøknadMottak(this, personMediator)
                 JournalførtMottak(this, personMediator)
                 EttersendingMottak(this, personMediator)

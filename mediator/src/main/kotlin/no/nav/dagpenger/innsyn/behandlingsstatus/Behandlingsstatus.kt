@@ -4,7 +4,10 @@ import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.Ferdig
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.Ukjent
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.UnderBehandling
 
-class Behandlingsstatus(antallSøknader: Int, antallVedtak: Int) {
+class Behandlingsstatus(
+    antallSøknader: Int,
+    antallVedtak: Int,
+) {
     internal var antattStatus: Status?
 
     init {
@@ -29,4 +32,6 @@ class Behandlingsstatus(antallSøknader: Int, antallVedtak: Int) {
     }
 }
 
-data class BehandlingsstatusDTO(val behandlingsstatus: Behandlingsstatus.Status?)
+data class BehandlingsstatusDTO(
+    val behandlingsstatus: Behandlingsstatus.Status?,
+)

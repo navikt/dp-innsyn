@@ -4,7 +4,10 @@ import no.nav.dagpenger.innsyn.api.models.PaabegyntSoknadResponse
 import no.nav.dagpenger.innsyn.tjenester.Lenker
 import no.nav.dagpenger.innsyn.tjenester.PåbegyntSøknadDto
 
-class PåbegyntSøknadMapper(val dto: PåbegyntSøknadDto, val erNySøknadsdialog: Boolean) {
+class PåbegyntSøknadMapper(
+    val dto: PåbegyntSøknadDto,
+    val erNySøknadsdialog: Boolean,
+) {
     val response: PaabegyntSoknadResponse get() =
         PaabegyntSoknadResponse(
             søknadId = dto.uuid.toString(),

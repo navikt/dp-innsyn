@@ -28,9 +28,10 @@ class PostgresPersonRepository : PersonRepository {
 
         return using(sessionOf(dataSource)) { session ->
             session.transaction { tx ->
-                visitor.queries.map {
-                    tx.run(it.asUpdate)
-                }.all { it >= 1 }
+                visitor.queries
+                    .map {
+                        tx.run(it.asUpdate)
+                    }.all { it >= 1 }
             }
         }
     }
@@ -73,7 +74,9 @@ class PostgresPersonRepository : PersonRepository {
             fnr,
         ).map { it.int(1) }.asSingle
 
-    private class PersonLagrer(person: Person) : PersonVisitor {
+    private class PersonLagrer(
+        person: Person,
+    ) : PersonVisitor {
         private var aktivSøknadId: String? = null
         val queries = mutableListOf<Query>()
         private lateinit var fnr: String
@@ -203,9 +206,11 @@ class PostgresPersonRepository : PersonRepository {
 
     private fun mapSøknadsRad(row: Row): Søknad {
         val vedlegg =
-            row.stringOrNull("søknad_id")?.let {
-                hentVedleggFor(row.string("søknad_id"))
-            }.orEmpty()
+            row
+                .stringOrNull("søknad_id")
+                ?.let {
+                    hentVedleggFor(row.string("søknad_id"))
+                }.orEmpty()
         return row.toSøknad(vedlegg)
     }
 

@@ -19,23 +19,24 @@ internal class VedtakMottak(
     private val personMediator: PersonMediator,
 ) : River.PacketListener {
     init {
-        River(rapidsConnection).apply {
-            validate { it.demandValue("table", "SIAMO.VEDTAK") }
-            validate {
-                it.requireKey(
-                    "op_ts",
-                    "after.VEDTAK_ID",
-                    "after.SAK_ID",
-                    "after.FRA_DATO",
-                )
-            }
-            validate { it.requireAny("after.VEDTAKTYPEKODE", listOf("O", "G")) }
-            validate { it.requireAny("after.UTFALLKODE", listOf("JA", "NEI")) }
-            validate { it.interestedIn("after", "tokens") }
-            validate { it.interestedIn("after.TIL_DATO") }
-            validate { it.interestedIn("tokens.FODSELSNR") }
-            validate { it.interestedIn("FODSELSNR") }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                validate { it.demandValue("table", "SIAMO.VEDTAK") }
+                validate {
+                    it.requireKey(
+                        "op_ts",
+                        "after.VEDTAK_ID",
+                        "after.SAK_ID",
+                        "after.FRA_DATO",
+                    )
+                }
+                validate { it.requireAny("after.VEDTAKTYPEKODE", listOf("O", "G")) }
+                validate { it.requireAny("after.UTFALLKODE", listOf("JA", "NEI")) }
+                validate { it.interestedIn("after", "tokens") }
+                validate { it.interestedIn("after.TIL_DATO") }
+                validate { it.interestedIn("tokens.FODSELSNR") }
+                validate { it.interestedIn("FODSELSNR") }
+            }.register(this)
     }
 
     override fun onPacket(

@@ -115,7 +115,12 @@ internal class InnsynApiTest {
                     assertEquals(HttpStatusCode.OK, response.status)
                     response.bodyAsText().let { content ->
                         assertTrue(content.contains(NySøknad.toString()))
-                        assertTrue(content.contains(Innsending.Vedlegg.Status.LastetOpp.toString()))
+                        assertTrue(
+                            content.contains(
+                                Innsending.Vedlegg.Status.LastetOpp
+                                    .toString(),
+                            ),
+                        )
                         assertTrue(content.contains("Søknad om"))
                     }
                 }
@@ -392,8 +397,8 @@ internal class InnsynApiTest {
         token: String = jwtStub.createTokenFor("test@nav.no", "id"),
         httpMethod: HttpMethod = HttpMethod.Get,
         body: String? = null,
-    ): HttpResponse {
-        return this.request {
+    ): HttpResponse =
+        this.request {
             this.url(endepunkt)
             this.method = httpMethod
             headers {
@@ -405,7 +410,6 @@ internal class InnsynApiTest {
             }
             body?.let { this.setBody(it) }
         }
-    }
 
     private fun søknad(
         søknadId: String = "1",

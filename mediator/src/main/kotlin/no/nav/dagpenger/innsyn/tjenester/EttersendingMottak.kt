@@ -20,22 +20,23 @@ internal class EttersendingMottak(
     private val personMediator: PersonMediator,
 ) : River.PacketListener {
     init {
-        River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "innsending_mottatt") }
-            validate {
-                it.requireKey(
-                    "fødselsnummer",
-                    "journalpostId",
-                    "datoRegistrert",
-                    "skjemaKode",
-                    "søknadsData.brukerBehandlingId",
-                    "søknadsData.behandlingskjedeId",
-                    "tittel",
-                )
-            }
-            validate { it.requireAny("type", listOf("Ettersending")) }
-            validate { it.interestedIn("søknadsData.vedlegg") }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                validate { it.demandValue("@event_name", "innsending_mottatt") }
+                validate {
+                    it.requireKey(
+                        "fødselsnummer",
+                        "journalpostId",
+                        "datoRegistrert",
+                        "skjemaKode",
+                        "søknadsData.brukerBehandlingId",
+                        "søknadsData.behandlingskjedeId",
+                        "tittel",
+                    )
+                }
+                validate { it.requireAny("type", listOf("Ettersending")) }
+                validate { it.interestedIn("søknadsData.vedlegg") }
+            }.register(this)
     }
 
     override fun onPacket(

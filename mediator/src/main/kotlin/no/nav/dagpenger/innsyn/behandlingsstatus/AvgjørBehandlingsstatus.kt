@@ -3,7 +3,9 @@ package no.nav.dagpenger.innsyn.behandlingsstatus
 import no.nav.dagpenger.innsyn.db.PersonRepository
 import java.time.LocalDate
 
-internal class AvgjørBehandlingsstatus(private val personRepository: PersonRepository) {
+internal class AvgjørBehandlingsstatus(
+    private val personRepository: PersonRepository,
+) {
     internal fun hentStatus(
         fnr: String,
         fom: LocalDate?,

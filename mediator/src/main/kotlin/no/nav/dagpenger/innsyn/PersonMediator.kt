@@ -12,7 +12,9 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Sakstilknytning
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 
-internal class PersonMediator(private val personRepository: PersonRepository) {
+internal class PersonMediator(
+    private val personRepository: PersonRepository,
+) {
     fun håndter(
         søknad: Søknad,
         melding: SøknadMelding,

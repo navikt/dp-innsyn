@@ -8,14 +8,18 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-internal class Vedtaksmelding(private val packet: JsonMessage) : Hendelsemelding(packet) {
+internal class Vedtaksmelding(
+    private val packet: JsonMessage,
+) : Hendelsemelding(packet) {
     companion object {
         private var formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss[.SSSSSS]")
 
         private fun JsonNode.asArenaDato() = asText().let { LocalDateTime.parse(it, formatter) }
 
         private fun JsonNode.asOptionalArenaDato() =
-            takeIf(JsonNode::isTextual)?.asText()?.takeIf(String::isNotEmpty)
+            takeIf(JsonNode::isTextual)
+                ?.asText()
+                ?.takeIf(String::isNotEmpty)
                 ?.let { LocalDateTime.parse(it, formatter) }
     }
 

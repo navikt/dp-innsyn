@@ -186,7 +186,10 @@ internal fun Application.innsynApi(
 private fun String.asOptionalLocalDate(): LocalDate? = takeIf(String::isNotEmpty)?.let { LocalDate.parse(it) }
 
 private val JWTPrincipal.fnr: String
-    get() = this.payload.claims.pid().asString()
+    get() =
+        this.payload.claims
+            .pid()
+            .asString()
 
 internal fun ApplicationRequest.jwt(): String =
     this.parseAuthorizationHeader().let { authHeader ->

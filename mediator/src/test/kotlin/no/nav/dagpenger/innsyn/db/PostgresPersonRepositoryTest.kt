@@ -55,13 +55,14 @@ internal class PostgresPersonRepositoryTest {
             repository.hentSøknaderFor(fnr = person.fnr, fom = LocalDate.now().minusDays(30)).also {
                 assertEquals(1, it.size)
             }
-            repository.hentSøknaderFor(
-                fnr = person.fnr,
-                fom = LocalDate.now().minusDays(30),
-                tom = LocalDate.now().plusDays(0),
-            ).also {
-                assertEquals(1, it.size)
-            }
+            repository
+                .hentSøknaderFor(
+                    fnr = person.fnr,
+                    fom = LocalDate.now().minusDays(30),
+                    tom = LocalDate.now().plusDays(0),
+                ).also {
+                    assertEquals(1, it.size)
+                }
             repository.hentSøknaderFor(fnr = person.fnr, tom = LocalDate.now().plusDays(2)).also {
                 assertEquals(1, it.size)
             }
@@ -126,34 +127,38 @@ internal class PostgresPersonRepositoryTest {
                 }
             }
             assertDoesNotThrow {
-                repository.hentVedtakFor(
-                    fnr = "123",
-                    fattetFom = null,
-                    fattetTom = null,
-                ).also {
-                    assertEquals(1, it.size)
-                }
-                repository.hentVedtakFor(
-                    fnr = "123",
-                    fattetFom = LocalDate.now().minusDays(2),
-                    fattetTom = null,
-                ).also {
-                    assertEquals(1, it.size)
-                }
-                repository.hentVedtakFor(
-                    fnr = "123",
-                    fattetFom = LocalDate.of(2021, 4, 30),
-                    fattetTom = LocalDate.of(2021, 5, 30),
-                ).also {
-                    assertEquals(0, it.size)
-                }
-                repository.hentVedtakFor(
-                    fnr = "123",
-                    fattetFom = null,
-                    fattetTom = LocalDate.now().plusDays(2),
-                ).also {
-                    assertEquals(1, it.size)
-                }
+                repository
+                    .hentVedtakFor(
+                        fnr = "123",
+                        fattetFom = null,
+                        fattetTom = null,
+                    ).also {
+                        assertEquals(1, it.size)
+                    }
+                repository
+                    .hentVedtakFor(
+                        fnr = "123",
+                        fattetFom = LocalDate.now().minusDays(2),
+                        fattetTom = null,
+                    ).also {
+                        assertEquals(1, it.size)
+                    }
+                repository
+                    .hentVedtakFor(
+                        fnr = "123",
+                        fattetFom = LocalDate.of(2021, 4, 30),
+                        fattetTom = LocalDate.of(2021, 5, 30),
+                    ).also {
+                        assertEquals(0, it.size)
+                    }
+                repository
+                    .hentVedtakFor(
+                        fnr = "123",
+                        fattetFom = null,
+                        fattetTom = LocalDate.now().plusDays(2),
+                    ).also {
+                        assertEquals(1, it.size)
+                    }
             }
         }
     }
@@ -230,7 +235,9 @@ internal class PostgresPersonRepositoryTest {
         assertEquals(expInspektør.antallVedlegg, resultInspektør.antallVedlegg)
     }
 
-    private class PersonInspektør(person: Person) : PersonVisitor {
+    private class PersonInspektør(
+        person: Person,
+    ) : PersonVisitor {
         var søknader = 0
         var vedlegg = 0
         var vedtak = 0
@@ -271,7 +278,9 @@ internal class PostgresPersonRepositoryTest {
         }
     }
 
-    private class SøknadInspektør(søknad: Søknad) : SøknadVisitor {
+    private class SøknadInspektør(
+        søknad: Søknad,
+    ) : SøknadVisitor {
         var søknadId: String? = null
         var skjemaKode: String? = null
         var tittel: String? = null

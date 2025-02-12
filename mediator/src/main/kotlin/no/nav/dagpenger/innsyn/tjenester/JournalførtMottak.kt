@@ -18,12 +18,13 @@ internal class JournalførtMottak(
     private val personMediator: PersonMediator,
 ) : River.PacketListener {
     init {
-        River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "innsending_ferdigstilt") }
-            validate { it.requireKey("fagsakId") }
-            validate { it.requireKey("journalpostId") }
-            validate { it.requireKey("fødselsnummer") }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                validate { it.demandValue("@event_name", "innsending_ferdigstilt") }
+                validate { it.requireKey("fagsakId") }
+                validate { it.requireKey("journalpostId") }
+                validate { it.requireKey("fødselsnummer") }
+            }.register(this)
     }
 
     override fun onPacket(

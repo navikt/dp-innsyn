@@ -10,7 +10,9 @@ import no.nav.dagpenger.innsyn.tjenester.Lenker
 import java.time.LocalDateTime
 import java.util.UUID
 
-class SøknadMapper(val søknad: Søknad) : SøknadVisitor {
+class SøknadMapper(
+    val søknad: Søknad,
+) : SøknadVisitor {
     private var søknadId: String? = null
     private var tittel: String? = null
     private var erNySøknadsdialog: Boolean? = null
@@ -28,9 +30,10 @@ class SøknadMapper(val søknad: Søknad) : SøknadVisitor {
     }
 
     private fun String.erFraNySøknadsdialog(): Boolean =
-        this.runCatching {
-            UUID.fromString(this)
-        }.isSuccess
+        this
+            .runCatching {
+                UUID.fromString(this)
+            }.isSuccess
 
     val response: SoknadResponse get() =
         SoknadResponse(

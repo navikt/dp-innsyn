@@ -4,7 +4,9 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.helse.rapids_rivers.JsonMessage
 
-internal class QuizSøknadMelding(packet: JsonMessage) : SøknadMelding(packet) {
+internal class QuizSøknadMelding(
+    packet: JsonMessage,
+) : SøknadMelding(packet) {
     companion object {
         const val SØKNAD_ID_NØKKEL = "søknadsData.søknad_uuid"
     }
