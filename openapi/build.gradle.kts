@@ -15,7 +15,7 @@ tasks.named("spotlessKotlin").configure {
 sourceSets {
     main {
         java {
-            setSrcDirs(listOf("src/main/kotlin", "$buildDir/generated/src/main/kotlin"))
+            setSrcDirs(listOf("src/main/kotlin", "${layout.buildDirectory.get()}/generated/src/main/kotlin"))
         }
     }
 }
@@ -33,7 +33,7 @@ dependencies {
 openApiGenerate {
     generatorName.set("kotlin")
     inputSpec.set("$projectDir/src/main/resources/innsyn-api.yaml")
-    outputDir.set("$buildDir/generated/")
+    outputDir.set("${layout.buildDirectory.get()}/generated/")
     packageName.set("no.nav.dagpenger.innsyn.api")
     globalProperties.set(
         mapOf(
