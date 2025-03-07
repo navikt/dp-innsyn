@@ -23,7 +23,7 @@ internal class VedtakMottak(
     init {
         River(rapidsConnection)
             .apply {
-                validate { it.demandValue("table", "SIAMO.VEDTAK") }
+                precondition { it.requireValue("table", "SIAMO.VEDTAK") }
                 validate {
                     it.requireKey(
                         "op_ts",
@@ -31,13 +31,13 @@ internal class VedtakMottak(
                         "after.SAK_ID",
                         "after.FRA_DATO",
                     )
+                    it.requireAny("after.VEDTAKTYPEKODE", listOf("O", "G"))
+                    it.requireAny("after.UTFALLKODE", listOf("JA", "NEI"))
+                    it.interestedIn("after", "tokens")
+                    it.interestedIn("after.TIL_DATO")
+                    it.interestedIn("tokens.FODSELSNR")
+                    it.interestedIn("FODSELSNR")
                 }
-                validate { it.requireAny("after.VEDTAKTYPEKODE", listOf("O", "G")) }
-                validate { it.requireAny("after.UTFALLKODE", listOf("JA", "NEI")) }
-                validate { it.interestedIn("after", "tokens") }
-                validate { it.interestedIn("after.TIL_DATO") }
-                validate { it.interestedIn("tokens.FODSELSNR") }
-                validate { it.interestedIn("FODSELSNR") }
             }.register(this)
     }
 

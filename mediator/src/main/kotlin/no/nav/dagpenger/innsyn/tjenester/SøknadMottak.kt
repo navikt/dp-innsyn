@@ -29,7 +29,7 @@ internal class SøknadMottak(
     init {
         River(rapidsConnection)
             .apply {
-                validate { it.demandValue("@event_name", "innsending_mottatt") }
+                precondition { it.requireValue("@event_name", "innsending_mottatt") }
                 validate {
                     it.requireKey(
                         "fødselsnummer",
@@ -38,9 +38,7 @@ internal class SøknadMottak(
                         "skjemaKode",
                         "tittel",
                     )
-                }
-                validate { it.requireAny("type", listOf("NySøknad", "Gjenopptak")) }
-                validate {
+                    it.requireAny("type", listOf("NySøknad", "Gjenopptak"))
                     it.interestedIn(
                         "søknadsData.vedlegg",
                         QuizSøknadMelding.SØKNAD_ID_NØKKEL,

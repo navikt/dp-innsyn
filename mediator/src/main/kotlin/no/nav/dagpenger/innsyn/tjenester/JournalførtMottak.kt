@@ -22,10 +22,14 @@ internal class JournalførtMottak(
     init {
         River(rapidsConnection)
             .apply {
-                validate { it.demandValue("@event_name", "innsending_ferdigstilt") }
-                validate { it.requireKey("fagsakId") }
-                validate { it.requireKey("journalpostId") }
-                validate { it.requireKey("fødselsnummer") }
+                precondition {
+                    it.requireValue("@event_name", "innsending_ferdigstilt")
+                }
+                validate {
+                    it.requireKey("fagsakId")
+                    it.requireKey("journalpostId")
+                    it.requireKey("fødselsnummer")
+                }
             }.register(this)
     }
 
