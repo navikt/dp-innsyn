@@ -1,7 +1,7 @@
 package no.nav.dagpenger.innsyn.melding
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import no.nav.dagpenger.innsyn.modell.hendelser.Sakstilknytning
-import no.nav.helse.rapids_rivers.JsonMessage
 
 internal class Journalførtmelding(
     packet: JsonMessage,
