@@ -1,6 +1,6 @@
 package no.nav.dagpenger.innsyn.melding
 
-import no.nav.helse.rapids_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 
 internal sealed class Hendelsemelding(
     private val packet: JsonMessage,

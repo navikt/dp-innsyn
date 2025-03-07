@@ -1,17 +1,17 @@
 package no.nav.dagpenger.innsyn.tjenester
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.confirmVerified
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import io.prometheus.client.CollectorRegistry
-import io.prometheus.client.CollectorRegistry.defaultRegistry
 import no.nav.dagpenger.innsyn.PersonMediator
 import no.nav.dagpenger.innsyn.melding.LegacySøknadsmelding
 import no.nav.dagpenger.innsyn.melding.PapirSøknadsMelding
 import no.nav.dagpenger.innsyn.melding.QuizSøknadMelding
 import no.nav.dagpenger.innsyn.melding.SøknadMelding
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -24,6 +24,7 @@ class SøknadMottakTest {
     private val testRapid = TestRapid()
     private val personMediator = mockk<PersonMediator>(relaxed = true)
     private val søknadMeldingSlot = slot<SøknadMelding>()
+    private val meterRegistry: MeterRegistry = SimpleMeterRegistry()
 
     init {
         SøknadMottak(testRapid, personMediator)
@@ -43,18 +44,18 @@ class SøknadMottakTest {
         assertTrue(søknadMeldingSlot.isCaptured)
         assertEquals(søknadMeldingSlot.captured.javaClass.name, LegacySøknadsmelding::class.java.name)
 
-        defaultRegistry
+        meterRegistry
             .getSampleValue(
                 "dagpenger_mottak_forsinkelse_sum",
                 "type" to "soknad",
-            ).also {
+            )?.let {
                 assertTrue(SYNTHETIC_DELAY_SECONDS <= it)
             }
-        defaultRegistry
+        meterRegistry
             .getSampleValue(
                 "dagpenger_mottak_forsinkelse_count",
                 "type" to "soknad",
-            ).also {
+            )?.let {
                 assertTrue(1.0 <= it)
             }
     }
@@ -78,16 +79,14 @@ class SøknadMottakTest {
     }
 }
 
-private fun CollectorRegistry.getSampleValue(
+private fun MeterRegistry.getSampleValue(
     name: String,
     vararg labels: Pair<String, String>,
-) = labels.unzip().let { (labelNames, labelValues) ->
-    getSampleValue(
-        name,
-        labelNames.toTypedArray(),
-        labelValues.toTypedArray(),
-    )
-}
+): Double? =
+    find(name)
+        .tags(*labels.flatMap { listOf(it.first, it.second) }.toTypedArray())
+        .timer()
+        ?.totalTime(java.util.concurrent.TimeUnit.SECONDS)
 
 private const val SYNTHETIC_DELAY_SECONDS: Long = 5
 

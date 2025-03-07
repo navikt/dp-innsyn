@@ -25,7 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 internal class PåbegyntOppslag(
     private val baseUrl: String,
     private val soknadAudience: String,
-    private val tokenProvider: (token: String, audience: String) -> String = exchangeToOboToken,
+    private val tokenProvider: (token: String, audience: String) -> String? = exchangeToOboToken,
     engine: HttpClientEngine =
         CIO.create {
             requestTimeout = 0
@@ -85,5 +85,5 @@ data class PåbegyntSøknadDto(
 private val exchangeToOboToken = { token: String, audience: String ->
     no.nav.dagpenger.innsyn.Configuration.tokenXClient
         .tokenExchange(token, audience)
-        .accessToken
+        .access_token
 }

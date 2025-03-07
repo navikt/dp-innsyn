@@ -1,9 +1,9 @@
 package no.nav.dagpenger.innsyn.melding
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
 import no.nav.dagpenger.innsyn.modell.hendelser.Innsending.Vedlegg
 import no.nav.dagpenger.innsyn.modell.hendelser.Innsending.Vedlegg.Status
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.asLocalDateTime
 import java.time.LocalDateTime
 
 internal abstract class Innsendingsmelding(
