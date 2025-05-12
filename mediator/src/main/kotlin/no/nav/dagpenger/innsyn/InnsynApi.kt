@@ -1,6 +1,5 @@
 package no.nav.dagpenger.innsyn
 
-import com.auth0.jwk.JwkProvider
 import com.auth0.jwt.interfaces.Claim
 import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
@@ -30,17 +29,22 @@ import io.ktor.server.request.ApplicationRequest
 import io.ktor.server.request.document
 import io.ktor.server.request.header
 import io.ktor.server.request.path
+import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
-import no.nav.dagpenger.innsyn.Configuration.APP_NAME
+import no.nav.dagpenger.innsyn.AzureAdFactory.azure
+import no.nav.dagpenger.innsyn.TokenXFactory.tokenx
 import no.nav.dagpenger.innsyn.api.models.BehandlingsstatusResponse
 import no.nav.dagpenger.innsyn.behandlingsstatus.AvgjørBehandlingsstatus
 import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.mapper.PåbegyntSøknadMapper
+import no.nav.dagpenger.innsyn.mapper.SøknadForenkletMapper
 import no.nav.dagpenger.innsyn.mapper.SøknadMapper
 import no.nav.dagpenger.innsyn.mapper.VedtakMapper
+import no.nav.dagpenger.innsyn.modell.DataRequest
 import no.nav.dagpenger.innsyn.tjenester.PåbegyntOppslag
 import org.slf4j.event.Level
 import java.time.LocalDate
@@ -49,9 +53,6 @@ import java.util.UUID
 private val logger = KotlinLogging.logger { }
 
 internal fun Application.innsynApi(
-    jwkProvider: JwkProvider,
-    issuer: String,
-    clientId: String,
     personRepository: PersonRepository,
     påbegyntOppslag: PåbegyntOppslag,
 ) {
@@ -99,25 +100,19 @@ internal fun Application.innsynApi(
     }
 
     install(Authentication) {
-        jwt {
-            verifier(jwkProvider, issuer) {
-                withAudience(clientId)
-            }
-            realm = APP_NAME
-            validate { credentials ->
-                requireNotNull(credentials.payload.claims.pid()) {
-                    "Token må inneholde fødselsnummer for personen i enten pid claim"
-                }
-
-                JWTPrincipal(credentials.payload)
-            }
+        jwt("tokenX") {
+            tokenx()
+        }
+        jwt("azureAd") {
+            azure()
         }
     }
+
     val avgjørBehandlingsstatus = AvgjørBehandlingsstatus(personRepository)
     routing {
         swaggerUI(path = "openapi", swaggerFile = "innsyn-api.yaml")
 
-        authenticate {
+        authenticate("tokenX") {
             get("/soknad") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
                 val fnr = jwtPrincipal!!.fnr
@@ -179,6 +174,34 @@ internal fun Application.innsynApi(
                 call.respond(påbegyntSøknadFraNySøknadsdialog)
             }
         }
+
+        authenticate("azureAd") {
+            post("/soknad") {
+                val request = call.receive<DataRequest>()
+
+                val søknader =
+                    personRepository.hentSøknaderFor(
+                        fnr = request.personIdent,
+                        fom = request.fraOgMedDato,
+                        tom = request.tilOgMedDato,
+                    )
+
+                call.respond(søknader.map { SøknadForenkletMapper(it).response })
+            }
+
+            post("/vedtak") {
+                val request = call.receive<DataRequest>()
+
+                val vedtak =
+                    personRepository.hentVedtakFor(
+                        fnr = request.personIdent,
+                        fattetFom = request.fraOgMedDato,
+                        fattetTom = request.tilOgMedDato,
+                    )
+
+                call.respond(vedtak.map { VedtakMapper(it).response })
+            }
+        }
     }
 }
 
@@ -195,4 +218,4 @@ internal fun ApplicationRequest.jwt(): String =
         (authHeader as? HttpAuthHeader.Single)?.blob ?: throw IllegalArgumentException("JWT not found")
     }
 
-private fun <V : Claim> Map<String, V>.pid() = firstNotNullOf { it.takeIf { it.key == "pid" } }.value
+fun <V : Claim> Map<String, V>.pid() = firstNotNullOf { it.takeIf { it.key == "pid" } }.value

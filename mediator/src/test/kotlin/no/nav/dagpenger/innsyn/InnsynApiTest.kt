@@ -1,7 +1,11 @@
 package no.nav.dagpenger.innsyn
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.HttpClient
 import io.ktor.client.request.headers
 import io.ktor.client.request.request
@@ -16,10 +20,12 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
+import no.nav.dagpenger.innsyn.api.models.SoknadResponse
+import no.nav.dagpenger.innsyn.api.models.VedtakResponse
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.FerdigBehandlet
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
-import no.nav.dagpenger.innsyn.helpers.JwtStub
 import no.nav.dagpenger.innsyn.helpers.Postgres.withMigratedDb
+import no.nav.dagpenger.innsyn.modell.DataRequest
 import no.nav.dagpenger.innsyn.modell.hendelser.Innsending
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Sakstilknytning
@@ -28,21 +34,67 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType.NySøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.tjenester.PåbegyntOppslag
 import no.nav.dagpenger.innsyn.tjenester.PåbegyntSøknadDto
+import no.nav.security.mock.oauth2.MockOAuth2Server
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 internal class InnsynApiTest {
-    private val testIssuer = "test-issuer"
-    private val jwtStub = JwtStub(testIssuer)
-    private val clientId = "id"
-    private val jacksonObjectMapper = jacksonObjectMapper()
+    private val objectMapper =
+        jacksonObjectMapper()
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            .registerModule(JavaTimeModule())
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+    companion object {
+        private const val TOKEN_X_ISSUER_ID = "token-x-issuer"
+        private const val AZURE_ISSUER_ID = "azure-issuer"
+
+        const val IDENT = "01020312345"
+
+        private val mockOAuth2Server: MockOAuth2Server by lazy {
+            MockOAuth2Server().also { server ->
+                server.start()
+            }
+        }
+
+        fun issueTokenXToken(): String =
+            mockOAuth2Server
+                .issueToken(
+                    issuerId = TOKEN_X_ISSUER_ID,
+                    claims = mapOf("pid" to IDENT),
+                ).serialize()
+
+        fun issueAzureToken(): String = mockOAuth2Server.issueToken(AZURE_ISSUER_ID).serialize()
+
+        @JvmStatic
+        @BeforeAll
+        fun setup() {
+            System.setProperty("token-x.well-known-url", mockOAuth2Server.wellKnownUrl(TOKEN_X_ISSUER_ID).toString())
+            System.setProperty("token-x.client-id", "default")
+
+            System.setProperty("azure-app.well-known-url", mockOAuth2Server.wellKnownUrl(AZURE_ISSUER_ID).toString())
+            System.setProperty("azure-app.client-id", "default")
+        }
+
+        @JvmStatic
+        @AfterAll
+        fun teardown() {
+            System.clearProperty("token-x.well-known-url")
+            System.clearProperty("token-x.client-id")
+            System.clearProperty("azure-app.well-known-url")
+            System.clearProperty("azure-app.client-id")
+        }
+    }
 
     @Test
     fun `test at bruker ikke har søknad`() =
@@ -50,9 +102,6 @@ internal class InnsynApiTest {
             testApplication {
                 application {
                     innsynApi(
-                        jwtStub.stubbedJwkProvider(),
-                        testIssuer,
-                        clientId,
                         PostgresPersonRepository(),
                         mockk(),
                     )
@@ -69,7 +118,7 @@ internal class InnsynApiTest {
         withMigratedDb {
             val personRepository =
                 PostgresPersonRepository().also {
-                    it.person("test@nav.no").also { person ->
+                    it.person(IDENT).also { person ->
                         person.håndter(
                             søknad("1", "1", LocalDateTime.now().minusDays(90), "Søknad om"),
                         )
@@ -102,9 +151,6 @@ internal class InnsynApiTest {
             testApplication {
                 application {
                     innsynApi(
-                        jwtStub.stubbedJwkProvider(),
-                        testIssuer,
-                        clientId,
                         personRepository,
                         mockk(),
                     )
@@ -133,7 +179,7 @@ internal class InnsynApiTest {
             val søknadIdNyttFormat = UUID.randomUUID().toString()
             val personRepository =
                 PostgresPersonRepository().also {
-                    it.person("test@nav.no").also { person ->
+                    it.person(IDENT).also { person ->
                         person.håndter(
                             søknad(søknadIdNyttFormat, "11", LocalDateTime.now().minusDays(90)),
                         )
@@ -143,9 +189,6 @@ internal class InnsynApiTest {
             testApplication {
                 application {
                     innsynApi(
-                        jwtStub.stubbedJwkProvider(),
-                        testIssuer,
-                        clientId,
                         personRepository,
                         mockk(),
                     )
@@ -170,7 +213,7 @@ internal class InnsynApiTest {
         withMigratedDb {
             val personRepository =
                 PostgresPersonRepository().also {
-                    it.person("test@nav.no").also { person ->
+                    it.person(IDENT).also { person ->
                         person.håndter(
                             søknad("1", "1", LocalDateTime.now().minusDays(90)),
                         )
@@ -191,9 +234,6 @@ internal class InnsynApiTest {
             testApplication {
                 application {
                     innsynApi(
-                        jwtStub.stubbedJwkProvider(),
-                        testIssuer,
-                        clientId,
                         personRepository,
                         mockk(),
                     )
@@ -211,7 +251,7 @@ internal class InnsynApiTest {
         withMigratedDb {
             val personRepository =
                 PostgresPersonRepository().also {
-                    it.person("test@nav.no").also { person ->
+                    it.person(IDENT).also { person ->
                         person.håndter(
                             søknad(),
                         )
@@ -232,9 +272,6 @@ internal class InnsynApiTest {
             testApplication {
                 application {
                     innsynApi(
-                        jwtStub.stubbedJwkProvider(),
-                        testIssuer,
-                        clientId,
                         personRepository,
                         mockk(),
                     )
@@ -252,7 +289,7 @@ internal class InnsynApiTest {
         withMigratedDb {
             val personRepository =
                 PostgresPersonRepository().also {
-                    it.person("test@nav.no").also { person ->
+                    it.person(IDENT).also { person ->
                         person.håndter(
                             søknad(),
                         )
@@ -273,9 +310,6 @@ internal class InnsynApiTest {
             testApplication {
                 application {
                     innsynApi(
-                        jwtStub.stubbedJwkProvider(),
-                        testIssuer,
-                        clientId,
                         personRepository,
                         mockk(),
                     )
@@ -304,16 +338,13 @@ internal class InnsynApiTest {
         testApplication {
             application {
                 innsynApi(
-                    jwtStub.stubbedJwkProvider(),
-                    testIssuer,
-                    clientId,
                     mockk<PostgresPersonRepository>(),
                     påbegyntOppslagMock,
                 )
             }
             val response = client.autentisert("/paabegynte")
             assertEquals(HttpStatusCode.OK, response.status)
-            val json = response.bodyAsText().let { jacksonObjectMapper.readTree(it) }
+            val json = response.bodyAsText().let { objectMapper.readTree(it) }
 
             val fraNySøknadsdialog = json[0]
             assertEquals("Søknad om dagpenger", fraNySøknadsdialog["tittel"].asText())
@@ -332,7 +363,7 @@ internal class InnsynApiTest {
         withMigratedDb {
             val personRepository =
                 PostgresPersonRepository().also {
-                    it.person("test@nav.no").also { person ->
+                    it.person(IDENT).also { person ->
                         person.håndter(
                             søknad(),
                         )
@@ -353,9 +384,6 @@ internal class InnsynApiTest {
             testApplication {
                 application {
                     innsynApi(
-                        jwtStub.stubbedJwkProvider(),
-                        testIssuer,
-                        clientId,
                         personRepository,
                         mockk(),
                     )
@@ -374,9 +402,6 @@ internal class InnsynApiTest {
             testApplication {
                 application {
                     innsynApi(
-                        jwtStub.stubbedJwkProvider(),
-                        testIssuer,
-                        clientId,
                         PostgresPersonRepository(),
                         mockk(),
                     )
@@ -392,9 +417,134 @@ internal class InnsynApiTest {
             }
         }
 
+    @Test
+    fun `test at det er mulig å hente søknader med Azure`() =
+        withMigratedDb {
+            val søknadId = "1"
+            val journalpostId = "2"
+            val datoInnsendt = LocalDateTime.now().minusDays(90).truncatedTo(ChronoUnit.MICROS)
+
+            val søknad = søknad(søknadId, journalpostId, datoInnsendt, "Søknad om")
+
+            val personRepository =
+                PostgresPersonRepository().also {
+                    it.person(IDENT).also { person ->
+                        person.håndter(
+                            søknad,
+                        )
+                        it.lagre(person)
+                    }
+                }
+
+            testApplication {
+                application {
+                    innsynApi(
+                        personRepository,
+                        mockk(),
+                    )
+                }
+                val fom = LocalDate.now().minusDays(100)
+                val dagensDato = LocalDate.now()
+
+                val dataRequest =
+                    DataRequest(
+                        IDENT,
+                        fom,
+                        dagensDato,
+                    )
+
+                client
+                    .autentisert(
+                        "/soknad",
+                        issueAzureToken(),
+                        HttpMethod.Post,
+                        objectMapper.writeValueAsString(dataRequest),
+                    ).let { response ->
+                        assertEquals(HttpStatusCode.OK, response.status)
+
+                        val list = objectMapper.readValue<List<SoknadResponse>>(response.bodyAsText())
+                        assertEquals(1, list.size)
+                        assertEquals(søknadId, list[0].søknadId)
+                        assertEquals(journalpostId, list[0].journalpostId)
+                        assertEquals(datoInnsendt, list[0].datoInnsendt)
+                        assertEquals(SoknadResponse.SøknadsType.NySøknad, list[0].søknadsType)
+                        assertEquals(SoknadResponse.Kanal.Digital, list[0].kanal)
+                        assertEquals("NAV 04-01.03", list[0].skjemaKode)
+                        assertEquals(null, list[0].tittel)
+                        assertEquals(null, list[0].endreLenke)
+                        assertEquals(null, list[0].erNySøknadsdialog)
+                        assertEquals(null, list[0].vedlegg)
+                    }
+            }
+        }
+
+    @Test
+    fun `test at det er mulig å hente vedtak med Azure`() =
+        withMigratedDb {
+            val vedtakId = "1"
+            val fagsakId = "arenaId"
+            val datoFattet = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)
+            val fraDato = LocalDateTime.now().minusDays(1).truncatedTo(ChronoUnit.MICROS)
+            val tilDato = LocalDateTime.now().plusDays(100).truncatedTo(ChronoUnit.MICROS)
+
+            val personRepository =
+                PostgresPersonRepository().also {
+                    it.person(IDENT).also { person ->
+                        person.håndter(
+                            Vedtak(
+                                vedtakId,
+                                fagsakId,
+                                Vedtak.Status.INNVILGET,
+                                datoFattet,
+                                fraDato,
+                                tilDato,
+                            ),
+                        )
+                        it.lagre(person)
+                    }
+                }
+
+            testApplication {
+                application {
+                    innsynApi(
+                        personRepository,
+                        mockk(),
+                    )
+                }
+                val fom = LocalDate.now().minusDays(100)
+                val dagensDato = LocalDate.now()
+
+                val dataRequest =
+                    DataRequest(
+                        IDENT,
+                        fom,
+                        dagensDato,
+                    )
+
+                client
+                    .autentisert(
+                        "/vedtak",
+                        issueAzureToken(),
+                        HttpMethod.Post,
+                        objectMapper.writeValueAsString(dataRequest),
+                    ).let { response ->
+                        assertEquals(HttpStatusCode.OK, response.status)
+
+                        val list = objectMapper.readValue<List<VedtakResponse>>(response.bodyAsText())
+                        assertEquals(1, list.size)
+                        assertEquals(vedtakId, list[0].vedtakId)
+                        assertEquals(fagsakId, list[0].fagsakId)
+                        assertEquals(VedtakResponse.Status.INNVILGET, list[0].status)
+                        assertEquals(datoFattet, list[0].datoFattet)
+                        assertEquals(fraDato, list[0].fraDato)
+                        assertEquals(tilDato, list[0].tilDato)
+                    }
+            }
+        }
+
     private suspend fun HttpClient.autentisert(
         endepunkt: String,
-        token: String = jwtStub.createTokenFor("test@nav.no", "id"),
+        token: String = issueTokenXToken(),
         httpMethod: HttpMethod = HttpMethod.Get,
         body: String? = null,
     ): HttpResponse =

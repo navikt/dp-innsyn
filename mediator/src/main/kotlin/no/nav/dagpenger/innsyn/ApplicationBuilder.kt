@@ -27,9 +27,6 @@ internal class ApplicationBuilder(
                 builder = {
                     withKtorModule {
                         innsynApi(
-                            AuthFactory.jwkProvider,
-                            AuthFactory.issuer,
-                            AuthFactory.clientId,
                             personRepository,
                             påbegyntOppslag,
                         )

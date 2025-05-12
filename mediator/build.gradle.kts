@@ -32,4 +32,5 @@ dependencies {
     testImplementation(libs.bundles.postgres.test)
     testImplementation(libs.mockk)
     testImplementation(libs.rapids.and.rivers.test)
+    testImplementation("no.nav.security:mock-oauth2-server:2.1.11")
 }
