@@ -47,6 +47,7 @@ spec:
         - application: dp-dagpenger
         - application: dp-mine-dagpenger-frontend
         - application: dp-soknad
+        - application: dp-datadeling
         - application: aia-backend
           namespace: paw
         - application: tokenx-token-generator
