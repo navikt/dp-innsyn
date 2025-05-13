@@ -418,7 +418,39 @@ internal class InnsynApiTest {
         }
 
     @Test
-    fun `test at det er mulig å hente søknader med Azure`() =
+    fun `test at det ikke er mulig å hente søknader med POST uten Azure-token`() =
+        withMigratedDb {
+            testApplication {
+                application {
+                    innsynApi(
+                        PostgresPersonRepository(),
+                        mockk(),
+                    )
+                }
+                val fom = LocalDate.now().minusDays(100)
+                val dagensDato = LocalDate.now()
+
+                val dataRequest =
+                    DataRequest(
+                        IDENT,
+                        fom,
+                        dagensDato,
+                    )
+
+                client
+                    .autentisert(
+                        "/soknad",
+                        "",
+                        HttpMethod.Post,
+                        objectMapper.writeValueAsString(dataRequest),
+                    ).let { response ->
+                        assertEquals(HttpStatusCode.Unauthorized, response.status)
+                    }
+            }
+        }
+
+    @Test
+    fun `test at det er mulig å hente søknader med POST med Azure-token`() =
         withMigratedDb {
             val søknadId = "1"
             val journalpostId = "2"
@@ -479,7 +511,39 @@ internal class InnsynApiTest {
         }
 
     @Test
-    fun `test at det er mulig å hente vedtak med Azure`() =
+    fun `test at det ikke er mulig å hente vedtak med POST uten Azure-token`() =
+        withMigratedDb {
+            testApplication {
+                application {
+                    innsynApi(
+                        PostgresPersonRepository(),
+                        mockk(),
+                    )
+                }
+                val fom = LocalDate.now().minusDays(100)
+                val dagensDato = LocalDate.now()
+
+                val dataRequest =
+                    DataRequest(
+                        IDENT,
+                        fom,
+                        dagensDato,
+                    )
+
+                client
+                    .autentisert(
+                        "/vedtak",
+                        "",
+                        HttpMethod.Post,
+                        objectMapper.writeValueAsString(dataRequest),
+                    ).let { response ->
+                        assertEquals(HttpStatusCode.Unauthorized, response.status)
+                    }
+            }
+        }
+
+    @Test
+    fun `test at det er mulig å hente vedtak med POST med Azure-token`() =
         withMigratedDb {
             val vedtakId = "1"
             val fagsakId = "arenaId"
