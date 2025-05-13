@@ -47,12 +47,15 @@ spec:
         - application: dp-dagpenger
         - application: dp-mine-dagpenger-frontend
         - application: dp-soknad
+        - application: dp-datadeling
         - application: aia-backend
           namespace: paw
-        {{#if wonderwalled}}
         - application: tokenx-token-generator
           namespace: nais
-        {{/if}}
+          cluster: dev-gcp
+        - application: azure-token-generator
+          namespace: nais
+          cluster: dev-gcp
     outbound:
       rules:
         - application: dp-soknad
@@ -61,6 +64,7 @@ spec:
   azure:
     application:
       enabled: true
+      allowAllUsers: true
   gcp:
     sqlInstances:
       - name: dp-innsyn

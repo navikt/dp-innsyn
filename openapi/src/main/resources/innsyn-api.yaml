@@ -27,6 +27,27 @@ paths:
       operationId: get-soknad
       security:
         - tokenX: [ ]
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Soknad'
+          description: OK
+      summary: Hent alle søknader
+      description: Viser en liste over alle innsendt søknader som er tilknyttet til en spesifikk bruker.
+      operationId: post-soknad
+      security:
+        - azure: [ ]
 
 
   /vedtak:
@@ -45,6 +66,27 @@ paths:
       operationId: get-vedtak
       security:
         - tokenX: [ ]
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vedtak'
+          description: OK
+      summary: Hent alle vedtak
+      description: Viser en liste over alle vedtak som er tilknyttet til en spesifikk bruker.
+      operationId: post-vedtak
+      security:
+        - azure: [ ]
 
   /paabegynte:
     get:
@@ -203,6 +245,24 @@ components:
       required:
         - behandlingsstatus
 
+    DataRequest:
+      type: object
+      required:
+        - personIdent
+        - fraOgMedDato
+      properties:
+        personIdent:
+          type: string
+          description: Personens fødselsnummer eller D-nummer
+        fraOgMedDato:
+          type: string
+          format: date
+          description: Tidligste dato man trenger informasjon. Vedtak som er gyldige på denne dato vil bli med i responsen, selv om de starter tidligere. Vedtak som starter senere enn denne dato vil bli med i responsen hvis de ikke begrenses av tilOgMedDato (se beskrivelse under).
+        tilOgMedDato:
+          type: string
+          format: date
+          description: Seneste dato man trenger informasjon. Vedtak som er gyldige på denne dato vil bli med i responsen, selv om de slutter senere. Vedtak med åpen til-dato vil bli med i responsen hvis de er gyldige på gitt tilOgMedDato.
+
   securitySchemes:
     tokenX:
       type: http
@@ -214,6 +274,16 @@ components:
         
         For å teste APIet kan du lage et gyldig OBO-token ved å bruke wonderwalled:
         - [dev-gcp](https://wonderwalled-idporten.intern.dev.nav.no/api/obo?aud=dev-gcp:teamdagpenger:dp-innsyn)
+
+    azure:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Bruker [Azure AD](https://docs.nais.io/auth/entra-id/) til autentisering.
+
+        For å teste APIet kan du lage et gyldig OBO-token ved å bruke wonderwalled:
+        - [dev-gcp](https://azure-token-generator.intern.dev.nav.no/api/obo?aud=dev-gcp:teamdagpenger:dp-innsyn)
   headers: { }
   responses: { }
 
