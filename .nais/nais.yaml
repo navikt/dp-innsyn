@@ -63,6 +63,7 @@ spec:
   azure:
     application:
       enabled: true
+      allowAllUsers: true
   gcp:
     sqlInstances:
       - name: dp-innsyn
