@@ -68,7 +68,7 @@ spec:
         tier: "{{db_tier}}"
         diskType: SSD
         highAvailability: {{db_ha}}
-        diskSize: "{{db_size}}"
+        diskSize: {{db_size}}
         diskAutoresize: true
         autoBackupHour: 3
         maintenance:
