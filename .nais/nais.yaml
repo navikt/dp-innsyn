@@ -67,7 +67,7 @@ spec:
         type: POSTGRES_16
         tier: "{{db_tier}}"
         diskType: SSD
-        highAvailability: "{{db_ha}}"
+        highAvailability: {{db_ha}}
         diskSize: "{{db_size}}"
         diskAutoresize: true
         autoBackupHour: 3
