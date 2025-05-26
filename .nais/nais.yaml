@@ -6,7 +6,7 @@ metadata:
   labels:
     "team": "teamdagpenger"
 spec:
-  image: {{image}}
+  image: "{{image}}"
   port: 8080
   liveness:
     path: "/isalive"
@@ -36,7 +36,7 @@ spec:
   secureLogs:
     enabled: true
   kafka:
-    pool: {{kafka_pool}}
+    pool: "{{kafka_pool}}"
   ingresses:
     {{#each ingresses as |url|}}
      - {{url}}
@@ -65,10 +65,10 @@ spec:
     sqlInstances:
       - name: dp-innsyn
         type: POSTGRES_16
-        tier: {{db_tier}}
+        tier: "{{db_tier}}"
         diskType: SSD
-        highAvailability: {{db_ha}}
-        diskSize: {{db_size}}
+        highAvailability: "{{db_ha}}"
+        diskSize: "{{db_size}}"
         diskAutoresize: true
         autoBackupHour: 3
         maintenance:
@@ -80,10 +80,10 @@ spec:
         cascadingDelete: false
   env:
     - name: DP_SOKNAD_URL
-      value:  {{dp_soknad.url}}
+      value:  "{{dp_soknad.url}}"
     - name: DP_SOKNAD_AUDIENCE
-      value: {{dp_soknad.audience}}
+      value: "{{dp_soknad.audience}}"
     - name: NY_SOKNADSDIALOG_INGRESS
-      value: {{ny_soknadsdialog.ingress}}
+      value: "{{ny_soknadsdialog.ingress}}"
     - name: GAMMEL_SOKNADSDIALOG_INGRESS
-      value: {{gammel_soknadsdialog.ingress}}
+      value: "{{gammel_soknadsdialog.ingress}}"
