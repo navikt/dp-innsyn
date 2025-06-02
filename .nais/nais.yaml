@@ -87,3 +87,11 @@ spec:
       value: "{{ny_soknadsdialog.ingress}}"
     - name: GAMMEL_SOKNADSDIALOG_INGRESS
       value: "{{gammel_soknadsdialog.ingress}}"
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+    autoInstrumentation:
+      enabled: true
+      runtime: java
