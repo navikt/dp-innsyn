@@ -1,7 +1,7 @@
 plugins {
     `kotlin-dsl`
     kotlin("jvm") version "2.2.0"
-    id("com.diffplug.spotless") version "7.0.4"
+    id("com.diffplug.spotless") version "7.1.0"
 }
 
 repositories {
@@ -11,5 +11,5 @@ repositories {
 
 dependencies {
     implementation(kotlin("gradle-plugin"))
-    implementation("com.diffplug.spotless:spotless-plugin-gradle:7.0.4")
+    implementation("com.diffplug.spotless:spotless-plugin-gradle:7.1.0")
 }
