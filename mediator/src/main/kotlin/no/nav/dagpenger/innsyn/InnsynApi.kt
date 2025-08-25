@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.auth.HttpAuthHeader
@@ -33,7 +34,6 @@ import io.ktor.server.request.path
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
-import mu.KotlinLogging
 import no.nav.dagpenger.innsyn.Configuration.APP_NAME
 import no.nav.dagpenger.innsyn.api.models.BehandlingsstatusResponse
 import no.nav.dagpenger.innsyn.behandlingsstatus.AvgjørBehandlingsstatus
