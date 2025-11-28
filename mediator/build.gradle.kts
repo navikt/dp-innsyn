@@ -8,7 +8,7 @@ application {
 }
 
 dependencies {
-    val dpBibliotekerVersion = "2025.11.26-12.17.c9d3d417cb54"
+    val dpBibliotekerVersion = "2025.11.27-14.20.4aa9aa3d3d14"
 
     implementation(project(":modell"))
     implementation(project(path = ":openapi"))
