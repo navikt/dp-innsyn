@@ -13,7 +13,7 @@ import no.nav.dagpenger.innsyn.PersonMediator
 import no.nav.dagpenger.innsyn.melding.Journalførtmelding
 
 private val logg = KotlinLogging.logger {}
-private val sikkerlogg = KotlinLogging.logger("tjenestekall.JournalførtMottak")
+private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 internal class JournalførtMottak(
     rapidsConnection: RapidsConnection,

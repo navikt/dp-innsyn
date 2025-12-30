@@ -20,7 +20,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 private val logg = KotlinLogging.logger {}
-private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadMottak")
+private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 internal class SøknadMottak(
     rapidsConnection: RapidsConnection,

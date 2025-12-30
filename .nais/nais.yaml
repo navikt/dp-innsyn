@@ -33,8 +33,6 @@ spec:
     requests:
       cpu: 60m
       memory: 256Mi
-  secureLogs:
-    enabled: true
   kafka:
     pool: "{{kafka_pool}}"
   ingresses:
@@ -44,6 +42,8 @@ spec:
   accessPolicy:
     inbound:
       rules:
+        - application: logging
+          namespace: nais-system
         - application: dp-dagpenger
         - application: dp-mine-dagpenger-frontend
         - application: dp-soknad

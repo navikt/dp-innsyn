@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions: # Sjekk https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
       contents: "read"
-      packages: "write"
+      checks: "write"
+      pull-requests: "write"
       id-token: "write"
     steps:
       - uses: actions/checkout@v6
@@ -19,15 +20,16 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: gradle/wrapper-validation-action@v3.5.0
-      - uses: gradle/gradle-build-action@v3.5.0
+      - uses: gradle/actions/wrapper-validation@v5
+      - uses: gradle/actions/setup-gradle@v5
         env:
           # Eksluder test dependencies
           DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: compileClasspath|runtimeClasspath
         with:
           gradle-version: wrapper
           dependency-graph: generate-and-submit
-          arguments: --configuration-cache build installDist
+      - name: Build
+        run: ./gradlew --configuration-cache build installDist
 
       - name: docker-build-push
         uses: nais/docker-build-push@v0
@@ -48,12 +50,14 @@ jobs:
     needs: [build]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     environment: dev-gcp
     steps:
       - uses: actions/checkout@v6
       - uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .nais/nais.yaml
           VAR: image=${{ needs.build.outputs.image }}
@@ -65,12 +69,14 @@ jobs:
     needs: [build]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     environment: prod-gcp
     steps:
       - uses: actions/checkout@v6
       - uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
           VAR: image=${{ needs.build.outputs.image }}
           RESOURCE: .nais/nais.yaml
