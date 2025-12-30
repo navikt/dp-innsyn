@@ -14,7 +14,7 @@ import no.nav.dagpenger.innsyn.PersonMediator
 import no.nav.dagpenger.innsyn.melding.Vedtaksmelding
 
 private val logg = KotlinLogging.logger {}
-private val sikkerlogg = KotlinLogging.logger("tjenestekall.VedtakMottak")
+private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 internal class VedtakMottak(
     rapidsConnection: RapidsConnection,

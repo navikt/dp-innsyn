@@ -15,7 +15,7 @@ import no.nav.dagpenger.innsyn.PersonMediator
 import no.nav.dagpenger.innsyn.melding.Ettersendingsmelding
 
 private val logg = KotlinLogging.logger {}
-private val sikkerlogg = KotlinLogging.logger("tjenestekall.EttersendingMottak")
+private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 internal class EttersendingMottak(
     rapidsConnection: RapidsConnection,
