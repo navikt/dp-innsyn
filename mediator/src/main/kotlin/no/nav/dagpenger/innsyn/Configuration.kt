@@ -32,7 +32,7 @@ internal object Configuration {
                 "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
                 "KAFKA_RESET_POLICY" to "latest",
                 "KAFKA_EXTRA_TOPIC" to "teamdagpenger.journalforing.v1,teamdagpenger.arena.oppgave.v1," +
-                    "teamarenanais.gg-arena-vedtak-dagpenger-v2-q1",
+                    "teamarenanais.gg-arena-vedtak-dagpenger-v2-q2",
                 "HTTP_PORT" to "8080",
                 "FLYWAY_CLEAN_DISABLED" to "true",
             ),
