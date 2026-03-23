@@ -1,6 +1,6 @@
 plugins {
     `kotlin-dsl`
-    kotlin("jvm") version "2.3.10"
+    kotlin("jvm") version "2.3.20"
     id("com.diffplug.spotless") version "8.3.0"
 }
 
