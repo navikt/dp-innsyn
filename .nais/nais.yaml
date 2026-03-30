@@ -29,10 +29,10 @@ spec:
     enabled: true
   resources:
     limits:
-      memory: 512Mi
+      memory: 1Gi
     requests:
       cpu: 60m
-      memory: 256Mi
+      memory: 512Mi
   kafka:
     pool: "{{kafka_pool}}"
   ingresses:
@@ -79,6 +79,8 @@ spec:
             envVarPrefix: DB
         cascadingDelete: false
   env:
+    - name: JAVA_TOOL_OPTIONS
+      value: "-XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0"
     - name: DP_SOKNAD_URL
       value:  "{{dp_soknad.url}}"
     - name: DP_SOKNAD_AUDIENCE
