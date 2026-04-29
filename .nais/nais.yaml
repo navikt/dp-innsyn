@@ -31,8 +31,8 @@ spec:
     limits:
       memory: 1Gi
     requests:
-      cpu: 60m
-      memory: 512Mi
+      cpu: 133m
+      memory: 1Gi
   kafka:
     pool: "{{kafka_pool}}"
   ingresses:
