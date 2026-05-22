@@ -29,9 +29,9 @@ spec:
     enabled: true
   resources:
     limits:
-      memory: 1Gi
+      memory: 1280Mi
     requests:
-      cpu: 133m
+      cpu: 100m
       memory: 1Gi
   kafka:
     pool: "{{kafka_pool}}"
@@ -56,6 +56,8 @@ spec:
     outbound:
       rules:
         - application: dp-soknad
+        - application: logging
+          namespace: nais-system
   tokenx:
     enabled: true
   azure:
@@ -79,8 +81,8 @@ spec:
             envVarPrefix: DB
         cascadingDelete: false
   env:
-    - name: JAVA_TOOL_OPTIONS
-      value: "-XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0"
+    - name: JDK_JAVA_OPTIONS
+      value: -XX:+UseParallelGC -XX:MaxRAMPercentage=50.0 -XX:ActiveProcessorCount=4
     - name: DP_SOKNAD_URL
       value:  "{{dp_soknad.url}}"
     - name: DP_SOKNAD_AUDIENCE
