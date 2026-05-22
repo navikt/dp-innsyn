@@ -12,6 +12,8 @@ import com.zaxxer.hikari.HikariDataSource
 import no.nav.dagpenger.innsyn.Configuration
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.FluentConfiguration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 private val config = ConfigurationProperties.systemProperties() overriding EnvironmentVariables()
 
@@ -34,10 +36,15 @@ internal object PostgresDataSourceBuilder {
             addDataSourceProperty("user", config[db.username])
             addDataSourceProperty("password", config[db.password])
             maximumPoolSize = 10
-            minimumIdle = 1
-            idleTimeout = 10001
-            connectionTimeout = 1000
-            maxLifetime = 30001
+            // Default 30 sekund
+            connectionTimeout = 10.seconds.inWholeMilliseconds
+            // Default 10 minutter
+            idleTimeout = 10.minutes.inWholeMilliseconds
+            // Default 2 minutter
+            keepaliveTime = 2.minutes.inWholeMilliseconds
+            // Default 30 minutter
+            maxLifetime = 30.minutes.inWholeMilliseconds
+            leakDetectionThreshold = 30.seconds.inWholeMilliseconds
         }
     }
 
