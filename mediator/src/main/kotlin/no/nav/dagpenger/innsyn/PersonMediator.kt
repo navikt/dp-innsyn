@@ -37,9 +37,7 @@ internal class PersonMediator(
         vedtak: Vedtak,
         melding: Vedtaksmelding,
     ) {
-        håndter(melding) { person ->
-            person.håndter(vedtak)
-        }
+        personRepository.lagreVedtak(melding.fødselsnummer, vedtak)
     }
 
     fun håndter(
