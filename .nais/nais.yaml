@@ -82,7 +82,7 @@ spec:
         cascadingDelete: false
   env:
     - name: JDK_JAVA_OPTIONS
-      value: -XX:+UseParallelGC -XX:MaxRAMPercentage=50.0 -XX:ActiveProcessorCount=4
+      value: -XX:+UseParallelGC -XX:MaxRAMPercentage=75.0 -XX:ActiveProcessorCount=4
     - name: DP_SOKNAD_URL
       value:  "{{dp_soknad.url}}"
     - name: DP_SOKNAD_AUDIENCE
