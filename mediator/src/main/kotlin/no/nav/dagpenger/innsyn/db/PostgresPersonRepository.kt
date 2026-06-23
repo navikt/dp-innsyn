@@ -16,6 +16,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.PersonData
 import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
+import no.nav.dagpenger.innsyn.modell.serde.VedtakVisitor
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -31,6 +32,56 @@ class PostgresPersonRepository : PersonRepository {
                     .map {
                         tx.run(it.asUpdate)
                     }.all { it >= 1 }
+            }
+        }
+    }
+
+    override fun lagreVedtak(
+        fnr: String,
+        vedtak: Vedtak,
+    ) {
+        var vedtakQuery: Query? = null
+        vedtak.accept(
+            object : VedtakVisitor {
+                override fun visitVedtak(
+                    vedtakId: String,
+                    fagsakId: String,
+                    status: Vedtak.Status,
+                    datoFattet: LocalDateTime,
+                    fraDato: LocalDateTime,
+                    tilDato: LocalDateTime?,
+                ) {
+                    vedtakQuery =
+                        queryOf(
+                            //language=PostgreSQL
+                            """
+                            INSERT INTO vedtak(person_id, vedtak_id, fagsak_id, status, fattet, fra_dato, til_dato)
+                            VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :vedtakId, :fagsakId, :status, :fattet, :fraDato, :tilDato)
+                            ON CONFLICT DO NOTHING
+                            """.trimIndent(),
+                            mapOf(
+                                "fnr" to fnr,
+                                "vedtakId" to vedtakId,
+                                "fagsakId" to fagsakId,
+                                "status" to status.toString(),
+                                "fattet" to datoFattet,
+                                "fraDato" to fraDato,
+                                "tilDato" to tilDato,
+                            ),
+                        )
+                }
+            },
+        )
+        using(sessionOf(dataSource)) { session ->
+            session.transaction { tx ->
+                tx.run(
+                    queryOf(
+                        //language=PostgreSQL
+                        "INSERT INTO person (fnr) VALUES (:fnr) ON CONFLICT DO NOTHING",
+                        mapOf("fnr" to fnr),
+                    ).asUpdate,
+                )
+                tx.run(requireNotNull(vedtakQuery) { "vedtakQuery ble ikke satt av VedtakVisitor" }.asUpdate)
             }
         }
     }
