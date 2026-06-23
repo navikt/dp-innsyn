@@ -3,8 +3,11 @@ package no.nav.dagpenger.innsyn.modell.hendelser
 import no.nav.dagpenger.innsyn.modell.serde.SøknadVisitor
 
 abstract class Innsending(
-    var vedlegg: List<Vedlegg>,
+    vedlegg: List<Vedlegg>,
 ) {
+    var vedlegg: List<Vedlegg> = vedlegg
+        internal set
+
     class Vedlegg(
         val skjemaNummer: String,
         val navn: String,
