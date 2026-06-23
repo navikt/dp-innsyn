@@ -216,6 +216,72 @@ internal class PostgresPersonRepositoryTest {
         }
     }
 
+    @Test
+    fun `hentSøknaderFor med paginering inkluderer vedlegg`() {
+        withMigratedDb {
+            val fnr = "1234567892"
+            val person = repository.person(fnr)
+            val søknad1 =
+                Søknad(
+                    UUID.randomUUID().toString(),
+                    "journalpostId-vedlegg-test-1",
+                    "NAV01",
+                    Søknad.SøknadsType.NySøknad,
+                    Kanal.Digital,
+                    LocalDateTime.now().minusDays(1),
+                    listOf(
+                        Vedlegg("V1", "Vedlegg én", LastetOpp),
+                        Vedlegg("V2", "Vedlegg to", LastetOpp),
+                    ),
+                    "tittel 1",
+                )
+            val søknad2 =
+                Søknad(
+                    UUID.randomUUID().toString(),
+                    "journalpostId-vedlegg-test-2",
+                    "NAV01",
+                    Søknad.SøknadsType.NySøknad,
+                    Kanal.Digital,
+                    LocalDateTime.now(),
+                    listOf(
+                        Vedlegg("V3", "Vedlegg tre", LastetOpp),
+                    ),
+                    "tittel 2",
+                )
+            person.håndter(søknad1)
+            person.håndter(søknad2)
+            repository.lagre(person)
+
+            // limit=1 skal returnere nøyaktig én søknad med alle sine vedlegg —
+            // ikke bli avkortet av at JOIN gir flere rader enn limit
+            val førsteSide =
+                repository.hentSøknaderFor(
+                    fnr = fnr,
+                    fom = LocalDate.now().minusDays(2),
+                    tom = LocalDate.now().plusDays(1),
+                    limit = 1,
+                    offset = 0,
+                )
+            assertEquals(1, førsteSide.size)
+            assertEquals(1, SøknadInspektør(førsteSide.first()).antallVedlegg)
+
+            val andreSide =
+                repository.hentSøknaderFor(
+                    fnr = fnr,
+                    fom = LocalDate.now().minusDays(2),
+                    tom = LocalDate.now().plusDays(1),
+                    limit = 1,
+                    offset = 1,
+                )
+            assertEquals(1, andreSide.size)
+            assertEquals(2, SøknadInspektør(andreSide.first()).antallVedlegg)
+
+            // Ingen overlapp mellom sider
+            val alleIds = (førsteSide + andreSide).map { SøknadInspektør(it).journalpostId }.toSet()
+            assertEquals(2, alleIds.size)
+        }
+    }
+
     private fun assertSøknadEquals(
         expected: Søknad,
         result: Søknad,
