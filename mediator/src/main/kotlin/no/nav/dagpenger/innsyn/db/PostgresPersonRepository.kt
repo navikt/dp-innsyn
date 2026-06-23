@@ -72,7 +72,7 @@ class PostgresPersonRepository : PersonRepository {
                 }
             },
         )
-        using(sessionOf(dataSource)) { session ->
+        sessionOf(dataSource).use { session ->
             session.transaction { tx ->
                 tx.run(
                     queryOf(
