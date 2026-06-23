@@ -4,6 +4,7 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Ettersending
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
+import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -25,8 +26,7 @@ internal class PersonTest {
         Person("ident").also { person ->
             person.håndter(ettersending("12", "34"))
             person.håndter(ettersending("33", "44"))
-            // ettersendinger er ikke eksponert direkte — verifiserer indirekte via søknad
-            assertEquals(0, person.søknader.size)
+            assertEquals(2, person.ettersendinger.size)
         }
     }
 
