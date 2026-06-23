@@ -216,6 +216,39 @@ internal class PostgresPersonRepositoryTest {
         }
     }
 
+    @Test
+    fun `hentSøknaderFor med paginering inkluderer vedlegg`() {
+        withMigratedDb {
+            val fnr = "1234567892"
+            val person = repository.person(fnr)
+            val søknad =
+                Søknad(
+                    UUID.randomUUID().toString(),
+                    "journalpostId-vedlegg-test",
+                    "NAV01",
+                    Søknad.SøknadsType.NySøknad,
+                    Kanal.Digital,
+                    LocalDateTime.now(),
+                    listOf(
+                        Vedlegg("V1", "Vedlegg én", LastetOpp),
+                        Vedlegg("V2", "Vedlegg to", LastetOpp),
+                    ),
+                    "tittel",
+                )
+            person.håndter(søknad)
+            repository.lagre(person)
+
+            val resultat =
+                repository.hentSøknaderFor(
+                    fnr = fnr,
+                    fom = LocalDate.now().minusDays(1),
+                    tom = LocalDate.now().plusDays(1),
+                )
+            assertEquals(1, resultat.size)
+            assertEquals(2, SøknadInspektør(resultat.first()).antallVedlegg)
+        }
+    }
+
     private fun assertSøknadEquals(
         expected: Søknad,
         result: Søknad,

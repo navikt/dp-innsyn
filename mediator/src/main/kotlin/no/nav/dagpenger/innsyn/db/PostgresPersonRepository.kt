@@ -6,7 +6,6 @@ import kotliquery.Session
 import kotliquery.param
 import kotliquery.queryOf
 import kotliquery.sessionOf
-import kotliquery.using
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.innsyn.modell.Person
 import no.nav.dagpenger.innsyn.modell.hendelser.Innsending.Vedlegg
@@ -26,7 +25,7 @@ class PostgresPersonRepository : PersonRepository {
     override fun lagre(person: Person): Boolean {
         val visitor = PersonLagrer(person)
 
-        return using(sessionOf(dataSource)) { session ->
+        return sessionOf(dataSource).use { session ->
             session.transaction { tx ->
                 visitor.queries
                     .map {
@@ -39,7 +38,7 @@ class PostgresPersonRepository : PersonRepository {
     private fun lagPerson(fnr: String): Person = Person(fnr).also { lagre(it) }
 
     private fun getPerson(fnr: String) =
-        using(sessionOf(dataSource)) { session ->
+        sessionOf(dataSource).use { session ->
             session.run(selectPerson(fnr))?.let {
                 val søknader = hentSøknaderFor(fnr)
                 val vedtak = hentVedtakFor(session, it)
@@ -188,50 +187,86 @@ class PostgresPersonRepository : PersonRepository {
         }
     }
 
+    private data class SøknadRad(
+        val id: Long,
+        val søknadId: String?,
+        val journalpostId: String,
+        val skjemaKode: String,
+        val søknadsType: SøknadsType,
+        val kanal: Kanal,
+        val datoInnsendt: LocalDateTime,
+        val tittel: String?,
+        val vedleggSkjemaNummer: String?,
+        val vedleggNavn: String?,
+        val vedleggStatus: String?,
+    )
+
+    private fun Row.toSøknadRad() =
+        SøknadRad(
+            id = long("id"),
+            søknadId = stringOrNull("søknad_id"),
+            journalpostId = string("journalpost_id"),
+            skjemaKode = string("skjema_kode"),
+            søknadsType = SøknadsType.valueOf(string("søknads_type")),
+            kanal = Kanal.valueOf(string("kanal")),
+            datoInnsendt = localDateTime("dato_innsendt"),
+            tittel = stringOrNull("tittel"),
+            vedleggSkjemaNummer = stringOrNull("skjema_nummer"),
+            vedleggNavn = stringOrNull("vedlegg_navn"),
+            vedleggStatus = stringOrNull("vedlegg_status"),
+        )
+
+    private fun List<SøknadRad>.groupSøknadRader(): List<Søknad> =
+        this
+            .groupBy { it.id }
+            .values
+            .map { rader ->
+                val first = rader.first()
+                val vedlegg =
+                    rader.mapNotNull { rad ->
+                        if (rad.vedleggStatus != null && rad.vedleggNavn != null && rad.vedleggSkjemaNummer != null) {
+                            Vedlegg(
+                                skjemaNummer = rad.vedleggSkjemaNummer,
+                                navn = rad.vedleggNavn,
+                                status = Status.valueOf(rad.vedleggStatus),
+                            )
+                        } else {
+                            null
+                        }
+                    }
+                Søknad(
+                    søknadId = first.søknadId,
+                    journalpostId = first.journalpostId,
+                    skjemaKode = first.skjemaKode,
+                    søknadsType = first.søknadsType,
+                    kanal = first.kanal,
+                    datoInnsendt = first.datoInnsendt,
+                    vedlegg = vedlegg,
+                    tittel = first.tittel,
+                )
+            }
+
     override fun hentSøknaderFor(fnr: String) =
-        using(sessionOf(dataSource)) { session ->
-            session.run(
-                queryOf(
-                    //language=PostgreSQL
-                    """SELECT *
-                        FROM søknad
-                        WHERE person_id = (SELECT person_id FROM person WHERE fnr = ?)
-                    """.trimMargin(),
-                    fnr,
-                ).map { row ->
-                    mapSøknadsRad(row)
-                }.asList,
-            )
-        }
-
-    private fun mapSøknadsRad(row: Row): Søknad {
-        val vedlegg =
-            row
-                .stringOrNull("søknad_id")
-                ?.let {
-                    hentVedleggFor(row.string("søknad_id"))
-                }.orEmpty()
-        return row.toSøknad(vedlegg)
-    }
-
-    override fun hentVedleggFor(søknadsId: String) =
-        using(sessionOf(dataSource)) { session ->
-            session.run(
-                queryOf(
-                    //language=PostgreSQL
-                    """SELECT *
-                        FROM vedlegg 
-                        WHERE søknad_id = ? 
-                    """.trimMargin(),
-                    søknadsId,
-                ).map { row ->
-                    row.toVedlegg()
-                }.asList,
-            )
+        sessionOf(dataSource).use { session ->
+            session
+                .run(
+                    queryOf(
+                        //language=PostgreSQL
+                        """
+                        SELECT s.*, v.skjema_nummer, v.navn AS vedlegg_navn, v.status AS vedlegg_status
+                        FROM søknad s
+                        JOIN person p ON p.person_id = s.person_id
+                        LEFT JOIN vedlegg v ON v.søknad_id = s.søknad_id
+                        WHERE p.fnr = ?
+                        ORDER BY s.dato_innsendt DESC, s.id
+                        """.trimIndent(),
+                        fnr,
+                    ).map { row -> row.toSøknadRad() }.asList,
+                ).groupSøknadRader()
         }
 
     override fun hentVedtakFor(fnr: String) =
-        using(sessionOf(dataSource)) { session ->
+        sessionOf(dataSource).use { session ->
             session.run(
                 queryOf(
                     //language=PostgreSQL
@@ -253,7 +288,7 @@ class PostgresPersonRepository : PersonRepository {
         offset: Int,
         limit: Int,
     ): List<Vedtak> =
-        using(sessionOf(dataSource)) { session ->
+        sessionOf(dataSource).use { session ->
             session.run(
                 queryOf(
                     //language=PostgreSQL
@@ -286,49 +321,31 @@ class PostgresPersonRepository : PersonRepository {
         kanal: List<Kanal>,
         offset: Int,
         limit: Int,
-    ) = using(sessionOf(dataSource)) { session ->
-        session.run(
-            queryOf(
-                //language=PostgreSQL
-                """
-                SELECT *
-                FROM søknad s,
-                     person p
-                WHERE p.person_id = s.person_id
-                  AND p.fnr = :fnr
-                  AND s.dato_innsendt <@ TSRANGE(:fom, :tom) 
-                ORDER BY s.dato_innsendt DESC
-                LIMIT :limit OFFSET :offset
-                """.trimIndent(),
-                mapOf(
-                    "fnr" to fnr.param(),
-                    "fom" to fom,
-                    "tom" to tom?.plusDays(1),
-                    "limit" to limit,
-                    "offset" to offset,
-                ),
-            ).map { row -> mapSøknadsRad(row) }.asList,
-        )
+    ) = sessionOf(dataSource).use { session ->
+        session
+            .run(
+                queryOf(
+                    //language=PostgreSQL
+                    """
+                    SELECT s.*, v.skjema_nummer, v.navn AS vedlegg_navn, v.status AS vedlegg_status
+                    FROM søknad s
+                    JOIN person p ON p.person_id = s.person_id
+                    LEFT JOIN vedlegg v ON v.søknad_id = s.søknad_id
+                    WHERE p.fnr = :fnr
+                      AND s.dato_innsendt <@ TSRANGE(:fom, :tom)
+                    ORDER BY s.dato_innsendt DESC, s.id
+                    LIMIT :limit OFFSET :offset
+                    """.trimIndent(),
+                    mapOf(
+                        "fnr" to fnr.param(),
+                        "fom" to fom,
+                        "tom" to tom?.plusDays(1),
+                        "limit" to limit,
+                        "offset" to offset,
+                    ),
+                ).map { row -> row.toSøknadRad() }.asList,
+            ).groupSøknadRader()
     }
-
-    private fun Row.toSøknad(vedlegg: List<Vedlegg>) =
-        Søknad(
-            søknadId = stringOrNull("søknad_id"),
-            journalpostId = string("journalpost_id"),
-            skjemaKode = string("skjema_kode"),
-            søknadsType = SøknadsType.valueOf(string("søknads_type")),
-            kanal = Kanal.valueOf(string("kanal")),
-            datoInnsendt = localDateTime("dato_innsendt"),
-            vedlegg = vedlegg,
-            tittel = stringOrNull("tittel"),
-        )
-
-    private fun Row.toVedlegg() =
-        Vedlegg(
-            skjemaNummer = string("skjema_nummer"),
-            navn = string("navn"),
-            status = Status.valueOf(string("status")),
-        )
 
     private fun Row.toVedtak() =
         Vedtak(

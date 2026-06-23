@@ -37,7 +37,7 @@ internal object PostgresDataSourceBuilder {
             addDataSourceProperty("password", config[db.password])
             maximumPoolSize = 10
             // Default 30 sekund
-            connectionTimeout = 10.seconds.inWholeMilliseconds
+            connectionTimeout = 5.seconds.inWholeMilliseconds
             // Default 10 minutter
             idleTimeout = 10.minutes.inWholeMilliseconds
             // Default 2 minutter
