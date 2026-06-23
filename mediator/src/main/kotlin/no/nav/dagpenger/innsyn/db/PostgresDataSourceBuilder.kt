@@ -40,7 +40,7 @@ internal object PostgresDataSourceBuilder {
             connectionTimeout = 5.seconds.inWholeMilliseconds
             // Default 10 minutter
             idleTimeout = 10.minutes.inWholeMilliseconds
-            // Default 2 minutter
+            // Default 2 minutter.
             keepaliveTime = 2.minutes.inWholeMilliseconds
             // Default 30 minutter
             maxLifetime = 30.minutes.inWholeMilliseconds

@@ -327,14 +327,19 @@ class PostgresPersonRepository : PersonRepository {
                 queryOf(
                     //language=PostgreSQL
                     """
-                    SELECT s.*, v.skjema_nummer, v.navn AS vedlegg_navn, v.status AS vedlegg_status
-                    FROM søknad s
-                    JOIN person p ON p.person_id = s.person_id
-                    LEFT JOIN vedlegg v ON v.søknad_id = s.søknad_id
-                    WHERE p.fnr = :fnr
-                      AND s.dato_innsendt <@ TSRANGE(:fom, :tom)
-                    ORDER BY s.dato_innsendt DESC, s.id
-                    LIMIT :limit OFFSET :offset
+                    WITH paged_søknad AS (
+                        SELECT s.*
+                        FROM søknad s
+                        JOIN person p ON p.person_id = s.person_id
+                        WHERE p.fnr = :fnr
+                          AND s.dato_innsendt <@ TSRANGE(:fom, :tom)
+                        ORDER BY s.dato_innsendt DESC, s.id
+                        LIMIT :limit OFFSET :offset
+                    )
+                    SELECT ps.*, v.skjema_nummer, v.navn AS vedlegg_navn, v.status AS vedlegg_status
+                    FROM paged_søknad ps
+                    LEFT JOIN vedlegg v ON v.søknad_id = ps.søknad_id
+                    ORDER BY ps.dato_innsendt DESC, ps.id
                     """.trimIndent(),
                     mapOf(
                         "fnr" to fnr.param(),
