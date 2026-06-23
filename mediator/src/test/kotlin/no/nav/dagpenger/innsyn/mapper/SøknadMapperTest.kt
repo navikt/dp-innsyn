@@ -2,6 +2,7 @@ package no.nav.dagpenger.innsyn.mapper
 
 import no.nav.dagpenger.innsyn.api.models.SoknadResponse
 import no.nav.dagpenger.innsyn.api.models.VedleggResponse
+import no.nav.dagpenger.innsyn.mapper.SøknadMapper.toResponse
 import no.nav.dagpenger.innsyn.modell.hendelser.Innsending
 import no.nav.dagpenger.innsyn.modell.hendelser.Kanal
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
@@ -21,25 +22,23 @@ class SøknadMapperTest {
         val datoInnsendt = LocalDateTime.now()
 
         val søknad =
-            SøknadMapper(
-                Søknad(
-                    søknadId = søknadId,
-                    journalpostId = "456",
-                    skjemaKode = "789",
-                    søknadsType = Søknad.SøknadsType.NySøknad,
-                    kanal = Kanal.Digital,
-                    datoInnsendt = datoInnsendt,
-                    tittel = "tittel",
-                    vedlegg =
-                        listOf(
-                            Innsending.Vedlegg(
-                                skjemaNummer = "skjemaNummer",
-                                navn = "navn",
-                                status = Innsending.Vedlegg.Status.LastetOpp,
-                            ),
+            Søknad(
+                søknadId = søknadId,
+                journalpostId = "456",
+                skjemaKode = "789",
+                søknadsType = Søknad.SøknadsType.NySøknad,
+                kanal = Kanal.Digital,
+                datoInnsendt = datoInnsendt,
+                tittel = "tittel",
+                vedlegg =
+                    listOf(
+                        Innsending.Vedlegg(
+                            skjemaNummer = "skjemaNummer",
+                            navn = "navn",
+                            status = Innsending.Vedlegg.Status.LastetOpp,
                         ),
-                ),
-            ).response
+                    ),
+            ).toResponse()
 
         with(søknad) {
             assertEquals(søknadId, søknadId)
@@ -66,18 +65,16 @@ class SøknadMapperTest {
         val datoInnsendt = LocalDateTime.now()
 
         val søknad =
-            SøknadMapper(
-                Søknad(
-                    søknadId = null,
-                    journalpostId = "journalpostId",
-                    skjemaKode = "skjemaKode",
-                    søknadsType = Søknad.SøknadsType.NySøknad,
-                    kanal = Kanal.Digital,
-                    datoInnsendt = datoInnsendt,
-                    tittel = "tittel",
-                    vedlegg = emptyList(),
-                ),
-            ).response
+            Søknad(
+                søknadId = null,
+                journalpostId = "journalpostId",
+                skjemaKode = "skjemaKode",
+                søknadsType = Søknad.SøknadsType.NySøknad,
+                kanal = Kanal.Digital,
+                datoInnsendt = datoInnsendt,
+                tittel = "tittel",
+                vedlegg = emptyList(),
+            ).toResponse()
 
         with(søknad) {
             assertNull(søknadId)

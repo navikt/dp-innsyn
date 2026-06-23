@@ -1,6 +1,5 @@
 package no.nav.dagpenger.innsyn.db
 
-import kotliquery.Query
 import kotliquery.Row
 import kotliquery.Session
 import kotliquery.param
@@ -15,8 +14,6 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.serde.PersonData
-import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
-import no.nav.dagpenger.innsyn.modell.serde.VedtakVisitor
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -24,54 +21,107 @@ class PostgresPersonRepository : PersonRepository {
     override fun person(fnr: String): Person = getPerson(fnr) ?: lagPerson(fnr)
 
     override fun lagre(person: Person): Boolean {
-        val visitor = PersonLagrer(person)
-
-        return sessionOf(dataSource).use { session ->
+        sessionOf(dataSource).use { session ->
             session.transaction { tx ->
-                visitor.queries
-                    .map {
-                        tx.run(it.asUpdate)
-                    }.all { it >= 1 }
+                tx.run(
+                    queryOf(
+                        //language=PostgreSQL
+                        "INSERT INTO person (fnr) VALUES (:fnr) ON CONFLICT DO NOTHING",
+                        mapOf("fnr" to person.fnr),
+                    ).asUpdate,
+                )
+
+                val personId =
+                    tx.run(
+                        queryOf(
+                            //language=PostgreSQL
+                            "SELECT person_id FROM person WHERE fnr = ?",
+                            person.fnr,
+                        ).map { it.int(1) }.asSingle,
+                    ) ?: error("person_id ikke funnet for fnr etter INSERT")
+
+                if (person.søknader.isNotEmpty()) {
+                    val søknadIder = person.søknader.mapNotNull { it.søknadId }
+                    if (søknadIder.isNotEmpty()) {
+                        tx.batchPreparedStatement(
+                            //language=PostgreSQL
+                            "DELETE FROM vedlegg WHERE søknad_id = ?",
+                            søknadIder.map { listOf(it) },
+                        )
+                    }
+
+                    tx.batchPreparedNamedStatement(
+                        //language=PostgreSQL
+                        """INSERT INTO søknad(person_id, søknad_id, journalpost_id, skjema_kode, søknads_type, kanal, dato_innsendt, tittel)
+                            VALUES (:personId, :soknadId, :journalpostId, :skjemaKode, :soknadsType, :kanal, :datoInnsendt, :tittel)
+                            ON CONFLICT DO NOTHING
+                        """.trimMargin(),
+                        person.søknader.map { s ->
+                            mapOf(
+                                "personId" to personId,
+                                "soknadId" to s.søknadId,
+                                "journalpostId" to s.journalpostId,
+                                "skjemaKode" to s.skjemaKode,
+                                "soknadsType" to s.søknadsType.toString(),
+                                "kanal" to s.kanal.toString(),
+                                "datoInnsendt" to s.datoInnsendt,
+                                "tittel" to s.tittel,
+                            )
+                        },
+                    )
+
+                    val alleVedlegg =
+                        person.søknader.flatMap { s ->
+                            s.vedlegg.map { v ->
+                                mapOf(
+                                    "soknadId" to s.søknadId,
+                                    "skjemaNummer" to v.skjemaNummer,
+                                    "navn" to v.navn,
+                                    "status" to v.status.toString(),
+                                )
+                            }
+                        }
+                    if (alleVedlegg.isNotEmpty()) {
+                        tx.batchPreparedNamedStatement(
+                            //language=PostgreSQL
+                            """INSERT INTO vedlegg(søknad_id, skjema_nummer, navn, status)
+                                VALUES (:soknadId, :skjemaNummer, :navn, :status)
+                                ON CONFLICT DO NOTHING
+                            """.trimMargin(),
+                            alleVedlegg,
+                        )
+                    }
+                }
+
+                if (person.vedtak.isNotEmpty()) {
+                    tx.batchPreparedNamedStatement(
+                        //language=PostgreSQL
+                        """INSERT INTO vedtak(person_id, vedtak_id, fagsak_id, status, fattet, fra_dato, til_dato)
+                            VALUES (:personId, :vedtakId, :fagsakId, :status, :fattet, :fraDato, :tilDato)
+                            ON CONFLICT DO NOTHING
+                        """.trimMargin(),
+                        person.vedtak.map { v ->
+                            mapOf(
+                                "personId" to personId,
+                                "vedtakId" to v.vedtakId,
+                                "fagsakId" to v.fagsakId,
+                                "status" to v.status.toString(),
+                                "fattet" to v.datoFattet,
+                                "fraDato" to v.fraDato,
+                                "tilDato" to v.tilDato,
+                            )
+                        },
+                    )
+                }
             }
         }
+        return true
     }
 
     override fun lagreVedtak(
         fnr: String,
         vedtak: Vedtak,
     ) {
-        var vedtakQuery: Query? = null
-        vedtak.accept(
-            object : VedtakVisitor {
-                override fun visitVedtak(
-                    vedtakId: String,
-                    fagsakId: String,
-                    status: Vedtak.Status,
-                    datoFattet: LocalDateTime,
-                    fraDato: LocalDateTime,
-                    tilDato: LocalDateTime?,
-                ) {
-                    vedtakQuery =
-                        queryOf(
-                            //language=PostgreSQL
-                            """
-                            INSERT INTO vedtak(person_id, vedtak_id, fagsak_id, status, fattet, fra_dato, til_dato)
-                            VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :vedtakId, :fagsakId, :status, :fattet, :fraDato, :tilDato)
-                            ON CONFLICT DO NOTHING
-                            """.trimIndent(),
-                            mapOf(
-                                "fnr" to fnr,
-                                "vedtakId" to vedtakId,
-                                "fagsakId" to fagsakId,
-                                "status" to status.toString(),
-                                "fattet" to datoFattet,
-                                "fraDato" to fraDato,
-                                "tilDato" to tilDato,
-                            ),
-                        )
-                }
-            },
-        )
         sessionOf(dataSource).use { session ->
             session.transaction { tx ->
                 tx.run(
@@ -81,7 +131,24 @@ class PostgresPersonRepository : PersonRepository {
                         mapOf("fnr" to fnr),
                     ).asUpdate,
                 )
-                tx.run(requireNotNull(vedtakQuery) { "vedtakQuery ble ikke satt av VedtakVisitor" }.asUpdate)
+                tx.run(
+                    queryOf(
+                        //language=PostgreSQL
+                        """INSERT INTO vedtak(person_id, vedtak_id, fagsak_id, status, fattet, fra_dato, til_dato)
+                            VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :vedtakId, :fagsakId, :status, :fattet, :fraDato, :tilDato)
+                            ON CONFLICT DO NOTHING
+                        """.trimMargin(),
+                        mapOf(
+                            "fnr" to fnr,
+                            "vedtakId" to vedtak.vedtakId,
+                            "fagsakId" to vedtak.fagsakId,
+                            "status" to vedtak.status.toString(),
+                            "fattet" to vedtak.datoFattet,
+                            "fraDato" to vedtak.fraDato,
+                            "tilDato" to vedtak.tilDato,
+                        ),
+                    ).asUpdate,
+                )
             }
         }
     }
@@ -123,120 +190,6 @@ class PostgresPersonRepository : PersonRepository {
             "SELECT person_id FROM person WHERE fnr = ?",
             fnr,
         ).map { it.int(1) }.asSingle
-
-    private class PersonLagrer(
-        person: Person,
-    ) : PersonVisitor {
-        private var aktivSøknadId: String? = null
-        val queries = mutableListOf<Query>()
-        private lateinit var fnr: String
-
-        init {
-            person.accept(this)
-        }
-
-        override fun preVisit(
-            person: Person,
-            fnr: String,
-        ) {
-            this.fnr = fnr
-            queries.add(
-                queryOf(
-                    //language=PostgreSQL
-                    "INSERT INTO person (fnr) VALUES (:fnr) ON CONFLICT DO NOTHING",
-                    mapOf("fnr" to fnr),
-                ),
-            )
-        }
-
-        override fun visitSøknad(
-            søknadId: String?,
-            journalpostId: String,
-            skjemaKode: String?,
-            søknadsType: SøknadsType,
-            kanal: Kanal,
-            datoInnsendt: LocalDateTime,
-            tittel: String?,
-        ) {
-            aktivSøknadId = søknadId
-            queries.add(
-                queryOf(
-                    //language=PostgreSQL
-                    """INSERT INTO søknad(person_id, søknad_id, journalpost_id, skjema_kode, søknads_type, kanal, dato_innsendt, tittel)
-                        VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :soknadId, :journalpostId, :skjemaKode, :soknadsType, :kanal, :datoInnsendt, :tittel)
-                        ON CONFLICT DO NOTHING
-                    """.trimMargin(),
-                    mapOf(
-                        "fnr" to fnr,
-                        "soknadId" to søknadId,
-                        "journalpostId" to journalpostId,
-                        "skjemaKode" to skjemaKode,
-                        "soknadsType" to søknadsType.toString(),
-                        "kanal" to kanal.toString(),
-                        "datoInnsendt" to datoInnsendt,
-                        "tittel" to tittel,
-                    ),
-                ),
-            )
-            queries.add(
-                queryOf(
-                    //language=PostgreSQL
-                    """DELETE FROM vedlegg WHERE søknad_id = ?""",
-                    aktivSøknadId,
-                ),
-            )
-        }
-
-        override fun visitVedlegg(
-            skjemaNummer: String,
-            navn: String,
-            status: Status,
-        ) {
-            queries.add(
-                queryOf(
-                    //language=PostgreSQL
-                    """INSERT INTO vedlegg(søknad_id, skjema_nummer, navn, status)
-                        VALUES (:soknadId, :skjemaNummer, :navn, :status)
-                        ON CONFLICT DO NOTHING
-                    """.trimMargin(),
-                    mapOf(
-                        "soknadId" to aktivSøknadId,
-                        "skjemaNummer" to skjemaNummer,
-                        "navn" to navn,
-                        "status" to status.toString(),
-                    ),
-                ),
-            )
-        }
-
-        override fun visitVedtak(
-            vedtakId: String,
-            fagsakId: String,
-            status: Vedtak.Status,
-            datoFattet: LocalDateTime,
-            fraDato: LocalDateTime,
-            tilDato: LocalDateTime?,
-        ) {
-            queries.add(
-                queryOf(
-                    //language=PostgreSQL
-                    """INSERT INTO vedtak(person_id, vedtak_id, fagsak_id, status, fattet, fra_dato, til_dato)
-                        VALUES ((SELECT person_id FROM person WHERE fnr = :fnr), :vedtakId, :fagsakId, :status, :fattet, :fraDato, :tilDato)
-                        ON CONFLICT DO NOTHING
-                    """.trimMargin(),
-                    mapOf(
-                        "fnr" to fnr,
-                        "vedtakId" to vedtakId,
-                        "fagsakId" to fagsakId,
-                        "status" to status.toString(),
-                        "fattet" to datoFattet,
-                        "fraDato" to fraDato,
-                        "tilDato" to tilDato,
-                    ),
-                ),
-            )
-        }
-    }
 
     private data class SøknadRad(
         val id: Long,
