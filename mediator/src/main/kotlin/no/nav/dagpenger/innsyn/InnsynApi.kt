@@ -39,8 +39,8 @@ import no.nav.dagpenger.innsyn.api.models.BehandlingsstatusResponse
 import no.nav.dagpenger.innsyn.behandlingsstatus.AvgjørBehandlingsstatus
 import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.mapper.PåbegyntSøknadMapper
-import no.nav.dagpenger.innsyn.mapper.SøknadMapper
-import no.nav.dagpenger.innsyn.mapper.VedtakMapper
+import no.nav.dagpenger.innsyn.mapper.SøknadMapper.toResponse
+import no.nav.dagpenger.innsyn.mapper.VedtakMapper.toResponse
 import no.nav.dagpenger.innsyn.tjenester.PåbegyntOppslag
 import org.slf4j.event.Level
 import java.time.LocalDate
@@ -130,7 +130,7 @@ internal fun Application.innsynApi(
                         tom = tom,
                     )
 
-                call.respond(søknader.map { SøknadMapper(it).response })
+                call.respond(søknader.map { it.toResponse() })
             }
             get("/vedtak") {
                 val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
@@ -144,7 +144,7 @@ internal fun Application.innsynApi(
                         fattetTom = fattetTom,
                     )
 
-                call.respond(vedtak.map { VedtakMapper(it).response })
+                call.respond(vedtak.map { it.toResponse() })
             }
 
             get("/behandlingsstatus") {

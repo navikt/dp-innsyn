@@ -11,19 +11,8 @@ class PersonData(
 ) {
     val person: Person
         get() =
-            Person(fnr).also {
-                it.setPrivatListe("vedtak", vedtak)
-                it.setPrivatListe("søknader", søknader)
+            Person(fnr).also { p ->
+                søknader.forEach { p.håndter(it) }
+                vedtak.forEach { p.håndter(it) }
             }
-
-    private fun Person.setPrivatListe(
-        navn: String,
-        list: List<Any>,
-    ) {
-        this.javaClass
-            .getDeclaredField(navn)
-            .apply {
-                isAccessible = true
-            }.set(this, list.toMutableList())
-    }
 }

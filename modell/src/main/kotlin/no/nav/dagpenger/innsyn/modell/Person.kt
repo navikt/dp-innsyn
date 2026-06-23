@@ -9,9 +9,9 @@ import no.nav.dagpenger.innsyn.modell.serde.PersonVisitor
 
 class Person private constructor(
     val fnr: String,
-    private val søknader: MutableList<Søknad>,
+    val søknader: MutableList<Søknad>,
     private val ettersendinger: MutableList<Ettersending>,
-    private val vedtak: MutableList<Vedtak>,
+    val vedtak: MutableList<Vedtak>,
     private val sakstilknytninger: MutableList<Sakstilknytning>,
 ) {
     constructor(fnr: String) : this(fnr, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf())

@@ -4,14 +4,14 @@ import no.nav.dagpenger.innsyn.modell.serde.SøknadVisitor
 import java.time.LocalDateTime
 
 class Søknad(
-    private val søknadId: String?,
-    private val journalpostId: String,
-    private val skjemaKode: String?,
-    private val søknadsType: SøknadsType,
-    private val kanal: Kanal,
-    private val datoInnsendt: LocalDateTime,
+    val søknadId: String?,
+    val journalpostId: String,
+    val skjemaKode: String?,
+    val søknadsType: SøknadsType,
+    val kanal: Kanal,
+    val datoInnsendt: LocalDateTime,
     vedlegg: List<Vedlegg>,
-    private val tittel: String?,
+    val tittel: String?,
 ) : Innsending(vedlegg) {
     init {
         check(papirKanIkkeHaVedlegg) { "Søknader uten søknadId (papir) kan ikke ha vedlegg" }
