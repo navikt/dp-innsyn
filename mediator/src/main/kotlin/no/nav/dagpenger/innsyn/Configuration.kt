@@ -20,7 +20,6 @@ internal object Configuration {
                 "HTTP_PORT" to "8080",
                 "KAFKA_BROKERS" to "localhost:9092",
                 "NY_SOKNADSDIALOG_INGRESS" to "https://arbeid.intern.dev.nav.no/dagpenger/dialog/soknad",
-                "GAMMEL_SOKNADSDIALOG_INGRESS" to "https://tjenester.nav.no/soknaddagpenger-innsending",
                 "FLYWAY_CLEAN_DISABLED" to "false",
             ),
         )
@@ -54,7 +53,6 @@ internal object Configuration {
     }
 
     val nySøknadsdialogIngress by lazy { properties[Key("NY_SOKNADSDIALOG_INGRESS", stringType)] }
-    val gammelSøknadsdialogIngress by lazy { properties[Key("GAMMEL_SOKNADSDIALOG_INGRESS", stringType)] }
 
     fun asMap(): Map<String, String> =
         properties.list().reversed().fold(emptyMap()) { map, pair ->

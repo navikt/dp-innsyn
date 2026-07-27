@@ -1,7 +1,6 @@
 package no.nav.dagpenger.innsyn
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.request.headers
 import io.ktor.client.request.request

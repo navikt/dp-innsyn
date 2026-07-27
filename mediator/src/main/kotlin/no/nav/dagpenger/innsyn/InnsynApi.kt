@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.serialization.jackson.jackson
@@ -29,7 +28,6 @@ import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.request.ApplicationRequest
 import io.ktor.server.request.document
-import io.ktor.server.request.header
 import io.ktor.server.request.path
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
