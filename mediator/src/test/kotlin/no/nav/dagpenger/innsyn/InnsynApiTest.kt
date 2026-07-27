@@ -14,8 +14,6 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
-import io.mockk.coEvery
-import io.mockk.mockk
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.FerdigBehandlet
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.JwtStub
@@ -26,23 +24,18 @@ import no.nav.dagpenger.innsyn.modell.hendelser.Sakstilknytning
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Søknad.SøknadsType.NySøknad
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
-import no.nav.dagpenger.innsyn.tjenester.PåbegyntOppslag
-import no.nav.dagpenger.innsyn.tjenester.PåbegyntSøknadDto
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.util.UUID
 
 internal class InnsynApiTest {
     private val testIssuer = "test-issuer"
     private val jwtStub = JwtStub(testIssuer)
     private val clientId = "id"
-    private val jacksonObjectMapper = jacksonObjectMapper()
 
     @Test
     fun `test at bruker ikke har søknad`() =
@@ -54,7 +47,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         PostgresPersonRepository(),
-                        mockk(),
                     )
                 }
                 client.autentisert("/soknad").let { response ->
@@ -106,7 +98,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         personRepository,
-                        mockk(),
                     )
                 }
                 val fom = LocalDate.now().minusDays(100)
@@ -147,7 +138,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         personRepository,
-                        mockk(),
                     )
                 }
                 val fom = LocalDate.now().minusDays(100)
@@ -195,7 +185,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         personRepository,
-                        mockk(),
                     )
                 }
                 val dagensDato = LocalDate.now()
@@ -236,7 +225,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         personRepository,
-                        mockk(),
                     )
                 }
                 val dagensDato = LocalDate.now()
@@ -277,7 +265,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         personRepository,
-                        mockk(),
                     )
                 }
                 val dagensDato = LocalDate.now()
@@ -287,45 +274,6 @@ internal class InnsynApiTest {
                 }
             }
         }
-
-    @Test
-    fun `test at bruker kan hente ut påbegynte søknader`() {
-        val påbegyntOppslagMock = mockk<PåbegyntOppslag>()
-        val nå = ZonedDateTime.now()
-        val uuid = UUID.randomUUID()
-        val påbegyntNySøknadsdialog =
-            PåbegyntSøknadDto(
-                uuid = uuid,
-                opprettet = ZonedDateTime.of(LocalDateTime.MAX, ZoneId.of("Europe/Oslo")),
-                sistEndret = nå,
-            )
-        coEvery { påbegyntOppslagMock.hentPåbegyntSøknad(any(), any()) } returns påbegyntNySøknadsdialog
-
-        testApplication {
-            application {
-                innsynApi(
-                    jwtStub.stubbedJwkProvider(),
-                    testIssuer,
-                    clientId,
-                    mockk<PostgresPersonRepository>(),
-                    påbegyntOppslagMock,
-                )
-            }
-            val response = client.autentisert("/paabegynte")
-            assertEquals(HttpStatusCode.OK, response.status)
-            val json = response.bodyAsText().let { jacksonObjectMapper.readTree(it) }
-
-            val fraNySøknadsdialog = json[0]
-            assertEquals("Søknad om dagpenger", fraNySøknadsdialog["tittel"].asText())
-            assertEquals(uuid.toString(), fraNySøknadsdialog["søknadId"].asText())
-            assertTrue(fraNySøknadsdialog["erNySøknadsdialog"].asBoolean())
-            assertEquals(
-                nå.toLocalDateTime(),
-                fraNySøknadsdialog["sistEndret"].asText().let { LocalDateTime.parse(it) },
-            )
-            assertEquals("https://arbeid.intern.dev.nav.no/dagpenger/dialog/soknad/$uuid", fraNySøknadsdialog["endreLenke"].asText())
-        }
-    }
 
     @Test
     fun `får behandlingsstatus FerdigBehandlet når det er 1 søknad og 1 vedtak`() =
@@ -357,7 +305,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         personRepository,
-                        mockk(),
                     )
                 }
                 val dagensDato = LocalDate.now()
@@ -378,7 +325,6 @@ internal class InnsynApiTest {
                         testIssuer,
                         clientId,
                         PostgresPersonRepository(),
-                        mockk(),
                     )
                 }
                 assertEquals(

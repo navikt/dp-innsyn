@@ -38,10 +38,8 @@ import no.nav.dagpenger.innsyn.Configuration.APP_NAME
 import no.nav.dagpenger.innsyn.api.models.BehandlingsstatusResponse
 import no.nav.dagpenger.innsyn.behandlingsstatus.AvgjørBehandlingsstatus
 import no.nav.dagpenger.innsyn.db.PersonRepository
-import no.nav.dagpenger.innsyn.mapper.PåbegyntSøknadMapper
 import no.nav.dagpenger.innsyn.mapper.SøknadMapper.toResponse
 import no.nav.dagpenger.innsyn.mapper.VedtakMapper.toResponse
-import no.nav.dagpenger.innsyn.tjenester.PåbegyntOppslag
 import org.slf4j.event.Level
 import java.time.LocalDate
 import java.util.UUID
@@ -53,7 +51,6 @@ internal fun Application.innsynApi(
     issuer: String,
     clientId: String,
     personRepository: PersonRepository,
-    påbegyntOppslag: PåbegyntOppslag,
 ) {
     install(CallId) {
         header("Nav-Call-Id")
@@ -159,24 +156,6 @@ internal fun Application.innsynApi(
                         BehandlingsstatusResponse.Behandlingsstatus.valueOf(it.name)
                     } ?: BehandlingsstatusResponse.Behandlingsstatus.Ukjent
                 call.respond(HttpStatusCode.OK, BehandlingsstatusResponse(status))
-            }
-
-            get("/paabegynte") {
-                val requestId: String? =
-                    call.request.header("Nav-Consumer-Id") ?: call.request.header(HttpHeaders.XRequestId)
-                val token = call.request.jwt()
-                val påbegyntSøknadFraNySøknadsdialog =
-                    try {
-                        påbegyntOppslag.hentPåbegyntSøknad(token, requestId)?.let {
-                            listOf(
-                                PåbegyntSøknadMapper(dto = it, erNySøknadsdialog = true).response,
-                            )
-                        } ?: emptyList()
-                    } catch (e: Exception) {
-                        logger.error(e) { "Klarte ikke å hente påbegynt søknad fra dp-soknad " }
-                        emptyList()
-                    }
-                call.respond(påbegyntSøknadFraNySøknadsdialog)
             }
         }
     }

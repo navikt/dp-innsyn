@@ -53,19 +53,8 @@ internal object Configuration {
         }
     }
 
-    val dpSoknadUrl by lazy { properties[Key("DP_SOKNAD_URL", stringType)] }
-    val dpSoknadAudience by lazy { properties[Key("DP_SOKNAD_AUDIENCE", stringType)] }
-
     val nySøknadsdialogIngress by lazy { properties[Key("NY_SOKNADSDIALOG_INGRESS", stringType)] }
     val gammelSøknadsdialogIngress by lazy { properties[Key("GAMMEL_SOKNADSDIALOG_INGRESS", stringType)] }
-
-    val tokenXClient by lazy {
-        val tokenX = OAuth2Config.TokenX(properties)
-        CachedOauth2Client(
-            tokenEndpointUrl = tokenX.tokenEndpointUrl,
-            authType = tokenX.privateKey(),
-        )
-    }
 
     fun asMap(): Map<String, String> =
         properties.list().reversed().fold(emptyMap()) { map, pair ->

@@ -46,23 +46,6 @@ paths:
       security:
         - tokenX: [ ]
 
-  /paabegynte:
-    get:
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PaabegyntSoknad'
-          description: OK
-      summary: Hent alle påbegynte søknader
-      description: Viser en oversikt over alle søknader som er startet av en bruker.
-      operationId: get-paabegynte
-      security:
-        - tokenX: [ ]
-
   /behandlingsstatus:
     get:
       responses:

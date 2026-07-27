@@ -46,7 +46,6 @@ spec:
           namespace: nais-system
         - application: dp-dagpenger
         - application: dp-mine-dagpenger-frontend
-        - application: dp-soknad
         - application: aia-backend
           namespace: paw
         {{#if wonderwalled}}
@@ -55,7 +54,6 @@ spec:
         {{/if}}
     outbound:
       rules:
-        - application: dp-soknad
         - application: logging
           namespace: nais-system
   tokenx:
@@ -83,10 +81,6 @@ spec:
   env:
     - name: JDK_JAVA_OPTIONS
       value: -XX:+UseParallelGC -XX:MaxRAMPercentage=75.0 -XX:ActiveProcessorCount=4
-    - name: DP_SOKNAD_URL
-      value:  "{{dp_soknad.url}}"
-    - name: DP_SOKNAD_AUDIENCE
-      value: "{{dp_soknad.audience}}"
     - name: NY_SOKNADSDIALOG_INGRESS
       value: "{{ny_soknadsdialog.ingress}}"
     - name: GAMMEL_SOKNADSDIALOG_INGRESS
