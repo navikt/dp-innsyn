@@ -4,9 +4,6 @@ kafka_pool: nav-dev
 db_tier: db-f1-micro
 db_size: 10
 db_ha: false
-dp_soknad:
-  url: "http://dp-soknad"
-  audience: "dev-gcp:teamdagpenger:dp-soknad"
 ny_soknadsdialog:
   ingress: "https://arbeid.intern.dev.nav.no/dagpenger/dialog/soknad"
 gammel_soknadsdialog:

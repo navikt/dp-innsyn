@@ -4,9 +4,6 @@ kafka_pool: nav-prod
 db_tier: db-custom-2-7680
 db_size: 20
 db_ha: true
-dp_soknad:
-  url: "http://dp-soknad"
-  audience: "prod-gcp:teamdagpenger:dp-soknad"
 ny_soknadsdialog:
   ingress: "https://www.nav.no/dagpenger/dialog/soknad"
 gammel_soknadsdialog:
