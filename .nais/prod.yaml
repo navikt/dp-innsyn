@@ -8,3 +8,6 @@ ny_soknadsdialog:
   ingress: "https://www.nav.no/dagpenger/dialog/soknad"
 gammel_soknadsdialog:
   ingress: "https://tjenester.nav.no/soknaddagpenger-innsending"
+dp_datadeling:
+  perioder_url: "http://dp-datadeling/dagpenger/datadeling/v1/perioder"
+  scope: "api://prod-gcp.teamdagpenger.dp-datadeling/.default"

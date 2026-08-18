@@ -48,18 +48,39 @@ paths:
 
   /behandlingsstatus:
     get:
+      parameters:
+        - name: fom
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Fra-og-med-dato søknaden skal vurderes fra.
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Behandlingsstatus'
+                $ref: '#/components/schemas/Behandlingsstatus'
           description: OK
       summary: Henter behandlingsstatusen til en søknad.
       description: Viser behandlingsstatusen til en søknad.
       operationId: get-behandlingsstatus
+      security:
+        - tokenX: [ ]
+
+  /aktiv-dagpenger:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AktivDagpengerett'
+          description: OK
+      summary: Henter om bruker har aktiv dagpengerett nå.
+      description: Oppslag mot dp-datadeling perioder (rettighetsperioder), returnerer et enkelt boolean-felt.
+      operationId: get-aktiv-dagpenger
       security:
         - tokenX: [ ]
 components:
@@ -186,6 +207,14 @@ components:
       required:
         - behandlingsstatus
 
+    AktivDagpengerett:
+      type: object
+      properties:
+        harAktivDagpengerett:
+          type: boolean
+      required:
+        - harAktivDagpengerett
+
   securitySchemes:
     tokenX:
       type: http
@@ -199,5 +228,3 @@ components:
         - [dev-gcp](https://wonderwalled-idporten.intern.dev.nav.no/api/obo?aud=dev-gcp:teamdagpenger:dp-innsyn)
   headers: { }
   responses: { }
-
-
