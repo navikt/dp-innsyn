@@ -2,6 +2,11 @@
 
 Gir deg svar på alt du lurer på
 
+## API-notat
+
+- `/aktiv-dagpenger` gjør on-demand oppslag mot `POST /dagpenger/datadeling/v1/perioder`.
+- Responsen inneholder `harAktivDagpengerett: boolean`.
+
 ## Komme i gang
 
 Gradle brukes som byggverktøy og er bundlet inn.

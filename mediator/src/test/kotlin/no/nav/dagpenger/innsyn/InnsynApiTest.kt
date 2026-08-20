@@ -13,6 +13,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
+import no.nav.dagpenger.innsyn.aktivdagpenger.AktivDagpengerTjeneste
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.FerdigBehandlet
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.JwtStub
@@ -337,6 +338,48 @@ internal class InnsynApiTest {
             }
         }
 
+    @Test
+    fun `aktiv dagpenger-endepunkt returnerer true fra dp-datadeling`() =
+        withMigratedDb {
+            testApplication {
+                application {
+                    innsynApi(
+                        jwtStub.stubbedJwkProvider(),
+                        testIssuer,
+                        clientId,
+                        PostgresPersonRepository(),
+                        FakeAktivDagpengerTjeneste(true),
+                    )
+                }
+                client.autentisert("/aktiv-dagpenger").let { response ->
+                    assertEquals(HttpStatusCode.OK, response.status)
+                    val jsonNode = ObjectMapper().readTree(response.bodyAsText())
+                    assertTrue(jsonNode["harAktivDagpengerett"].asBoolean())
+                }
+            }
+        }
+
+    @Test
+    fun `aktiv dagpenger-endepunkt returnerer false ved fail-closed`() =
+        withMigratedDb {
+            testApplication {
+                application {
+                    innsynApi(
+                        jwtStub.stubbedJwkProvider(),
+                        testIssuer,
+                        clientId,
+                        PostgresPersonRepository(),
+                        FakeAktivDagpengerTjeneste(false),
+                    )
+                }
+                client.autentisert("/aktiv-dagpenger").let { response ->
+                    assertEquals(HttpStatusCode.OK, response.status)
+                    val jsonNode = ObjectMapper().readTree(response.bodyAsText())
+                    assertFalse(jsonNode["harAktivDagpengerett"].asBoolean())
+                }
+            }
+        }
+
     private suspend fun HttpClient.autentisert(
         endepunkt: String,
         token: String = jwtStub.createTokenFor("test@nav.no", "id"),
@@ -371,4 +414,10 @@ internal class InnsynApiTest {
         vedlegg = listOf(Innsending.Vedlegg("123", "navn", Innsending.Vedlegg.Status.LastetOpp)),
         tittel = tittel,
     )
+
+    private class FakeAktivDagpengerTjeneste(
+        private val harAktivDagpengerett: Boolean,
+    ) : AktivDagpengerTjeneste {
+        override suspend fun harAktivDagpengerett(personIdent: String): Boolean = harAktivDagpengerett
+    }
 }

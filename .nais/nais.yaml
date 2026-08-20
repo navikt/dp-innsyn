@@ -56,6 +56,8 @@ spec:
       rules:
         - application: logging
           namespace: nais-system
+        - application: dp-datadeling
+          namespace: teamdagpenger
   tokenx:
     enabled: true
   azure:
@@ -83,6 +85,10 @@ spec:
       value: -XX:+UseParallelGC -XX:MaxRAMPercentage=75.0 -XX:ActiveProcessorCount=4
     - name: NY_SOKNADSDIALOG_INGRESS
       value: "{{ny_soknadsdialog.ingress}}"
+    - name: DP_DATADELING_PERIODER_URL
+      value: "{{dp_datadeling.perioder_url}}"
+    - name: DP_DATADELING_SCOPE
+      value: "{{dp_datadeling.scope}}"
   observability:
     logging:
       destinations:
