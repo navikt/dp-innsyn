@@ -1,10 +1,10 @@
 package no.nav.dagpenger.innsyn.melding
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak
 import no.nav.dagpenger.innsyn.modell.hendelser.Vedtak.Status
 import no.nav.dagpenger.innsyn.tjenester.fødselsnummer
+import tools.jackson.databind.JsonNode
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

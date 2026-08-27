@@ -16,7 +16,7 @@ internal abstract class Innsendingsmelding(
     internal val tittel = packet["tittel"].asText()
 
     internal val vedlegg =
-        packet["søknadsData.vedlegg"].map {
+        packet["søknadsData.vedlegg"].toList().map {
             Vedlegg(
                 it["skjemaNummer"].asText(),
                 it["navn"].asText(),

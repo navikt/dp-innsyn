@@ -1,13 +1,11 @@
 package no.nav.dagpenger.innsyn
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.serialization.jackson.jackson
+import io.ktor.serialization.jackson3.jackson
 import no.nav.dagpenger.innsyn.aktivdagpenger.DpDatadelingAktivDagpengerTjeneste
 import no.nav.dagpenger.innsyn.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
@@ -28,10 +26,7 @@ internal class ApplicationBuilder(
                 socketTimeoutMillis = 3_000
             }
             install(ContentNegotiation) {
-                jackson {
-                    disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                    registerModule(JavaTimeModule())
-                }
+                jackson()
             }
         }
     private val personRepository = PostgresPersonRepository()

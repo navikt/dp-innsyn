@@ -2,13 +2,9 @@ package no.nav.dagpenger.innsyn
 
 import com.auth0.jwk.JwkProvider
 import com.auth0.jwt.interfaces.Claim
-import com.fasterxml.jackson.core.util.DefaultIndenter
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.jackson.jackson
+import io.ktor.serialization.jackson3.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
@@ -39,6 +35,9 @@ import no.nav.dagpenger.innsyn.db.PersonRepository
 import no.nav.dagpenger.innsyn.mapper.SøknadMapper.toResponse
 import no.nav.dagpenger.innsyn.mapper.VedtakMapper.toResponse
 import org.slf4j.event.Level
+import tools.jackson.core.util.DefaultIndenter
+import tools.jackson.core.util.DefaultPrettyPrinter
+import tools.jackson.databind.SerializationFeature
 import java.time.LocalDate
 import java.util.UUID
 
@@ -83,14 +82,12 @@ internal fun Application.innsynApi(
     install(ContentNegotiation) {
         jackson {
             configure(SerializationFeature.INDENT_OUTPUT, true)
-            setDefaultPrettyPrinter(
+            defaultPrettyPrinter(
                 DefaultPrettyPrinter().apply {
-                    indentArraysWith(DefaultPrettyPrinter.FixedSpaceIndenter.instance)
+                    indentArraysWith(DefaultPrettyPrinter.FixedSpaceIndenter.instance())
                     indentObjectsWith(DefaultIndenter("  ", "\n"))
                 },
             )
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            registerModule(JavaTimeModule())
         }
     }
 
