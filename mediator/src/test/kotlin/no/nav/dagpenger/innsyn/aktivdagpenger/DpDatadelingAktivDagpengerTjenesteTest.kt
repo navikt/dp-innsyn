@@ -94,7 +94,7 @@ internal class DpDatadelingAktivDagpengerTjenesteTest {
         return DpDatadelingAktivDagpengerTjeneste(
             httpClient = client,
             oauth2Client = mockk<CachedOauth2Client>(relaxed = true),
-            perioderUrl = "https://dp-datadeling.ekstern.dev.nav.no/dagpenger/datadeling/v1/perioder",
+            baseUrl = "https://dp-datadeling.ekstern.dev.nav.no/dagpenger/datadeling/v1",
             scope = "api://dev-gcp.teamdagpenger.dp-datadeling/.default",
             clock = clock,
             tokenUtsteder = { "utstedt-token" },

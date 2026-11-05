@@ -50,7 +50,7 @@ jobs:
   deploy-dev:
     name: Deploy to dev
     needs: [build]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/beregning-dp-datadelig-kall'
     runs-on: ubuntu-latest
     permissions:
       contents: read

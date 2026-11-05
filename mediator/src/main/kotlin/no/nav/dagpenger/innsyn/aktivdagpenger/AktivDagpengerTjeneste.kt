@@ -22,16 +22,20 @@ import java.time.LocalDate
 
 internal interface AktivDagpengerTjeneste {
     suspend fun harAktivDagpengerett(personIdent: String): Boolean
+
+    suspend fun hentBeregninger(personIdent: String): List<BeregningerResponse>
 }
 
 internal object AlltidInaktivDagpengerTjeneste : AktivDagpengerTjeneste {
     override suspend fun harAktivDagpengerett(personIdent: String): Boolean = false
+
+    override suspend fun hentBeregninger(personIdent: String): List<BeregningerResponse> = emptyList()
 }
 
 internal class DpDatadelingAktivDagpengerTjeneste(
     private val httpClient: HttpClient,
     private val oauth2Client: CachedOauth2Client,
-    private val perioderUrl: String,
+    private val baseUrl: String,
     private val scope: String,
     private val clock: Clock = Clock.systemDefaultZone(),
     private val tokenUtsteder: (() -> String)? = null,
@@ -53,7 +57,7 @@ internal class DpDatadelingAktivDagpengerTjeneste(
                 )
 
             val httpResponse: HttpResponse =
-                httpClient.post(perioderUrl) {
+                httpClient.post("$baseUrl/perioder") {
                     header(HttpHeaders.Authorization, "Bearer $token")
                     contentType(ContentType.Application.Json)
                     setBody(request)
@@ -81,12 +85,71 @@ internal class DpDatadelingAktivDagpengerTjeneste(
         }
     }
 
+    override suspend fun hentBeregninger(personIdent: String): List<BeregningerResponse> {
+        val iDag = LocalDate.now(clock)
+        logger.info { "Henter beregninger for aktiv dagpengerett for $personIdent på dag: $iDag" }
+
+        return try {
+            val token = hentToken() ?: return emptyList()
+
+            val request =
+                BeregningerRequest(
+                    personIdent = personIdent,
+                    fraOgMedDato = iDag,
+                    tilOgMedDato = iDag,
+                )
+
+            val httpResponse: HttpResponse =
+                httpClient.post("$baseUrl/beregninger") {
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                    contentType(ContentType.Application.Json)
+                    setBody(request)
+                }
+
+            if (!httpResponse.status.isSuccess()) {
+                sikkerlogg.warn { "Uventet HTTP-status fra dp-datadeling: ${httpResponse.status}" }
+                return emptyList()
+            }
+
+            val response = httpResponse.body<List<BeregningerResponse>>()
+            response.forEach {
+                logger.info {
+                    "Beregning fra ${it.fraOgMed} til ${it.tilOgMed} med sats ${it.sats} og utbetalt beløp ${it.utbetaltBeløp} med " +
+                        "gjenstående dager ${it.gjenståendeDager} og kilde ${it.kilde}"
+                }
+            }
+
+            response
+        } catch (e: HttpRequestTimeoutException) {
+            logger.warn { "Timeout mot dp-datadeling" }
+            emptyList()
+        } catch (e: SocketTimeoutException) {
+            logger.warn { "Socket-timeout mot dp-datadeling" }
+            emptyList()
+        } catch (e: ResponseException) {
+            sikkerlogg.warn(e) { "HTTP-feil fra dp-datadeling: ${e.response.status}" }
+            emptyList()
+        } catch (e: Exception) {
+            logger.warn(e) { "Uventet feil mot dp-datadeling: ${e.message}" }
+            emptyList()
+        }
+    }
+
     private fun hentToken(): String? =
         tokenUtsteder?.invoke()
             ?: oauth2Client.clientCredentials(scope).access_token
 }
 
 private data class PerioderRequest(
+    @JsonProperty("personIdent")
+    val personIdent: String,
+    @JsonProperty("fraOgMedDato")
+    val fraOgMedDato: LocalDate,
+    @JsonProperty("tilOgMedDato")
+    val tilOgMedDato: LocalDate?,
+)
+
+private data class BeregningerRequest(
     @JsonProperty("personIdent")
     val personIdent: String,
     @JsonProperty("fraOgMedDato")
@@ -110,3 +173,19 @@ private data class Periode(
 ) {
     fun overlapper(dato: LocalDate): Boolean = fraOgMedDato <= dato && (tilOgMedDato == null || tilOgMedDato >= dato)
 }
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class BeregningerResponse(
+    @JsonProperty("fraOgMed")
+    val fraOgMed: LocalDate,
+    @JsonProperty("tilOgMed")
+    val tilOgMed: LocalDate,
+    @JsonProperty("sats")
+    val sats: Int,
+    @JsonProperty("utbetaltBeløp")
+    val utbetaltBeløp: Int,
+    @JsonProperty("gjenståendeDager")
+    val gjenståendeDager: Int,
+    @JsonProperty("kilde")
+    val kilde: String,
+)

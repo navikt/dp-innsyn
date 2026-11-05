@@ -13,6 +13,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import no.nav.dagpenger.innsyn.aktivdagpenger.AktivDagpengerTjeneste
+import no.nav.dagpenger.innsyn.aktivdagpenger.BeregningerResponse
 import no.nav.dagpenger.innsyn.behandlingsstatus.Behandlingsstatus.Status.FerdigBehandlet
 import no.nav.dagpenger.innsyn.db.PostgresPersonRepository
 import no.nav.dagpenger.innsyn.helpers.JwtStub
@@ -419,5 +420,7 @@ internal class InnsynApiTest {
         private val harAktivDagpengerett: Boolean,
     ) : AktivDagpengerTjeneste {
         override suspend fun harAktivDagpengerett(personIdent: String): Boolean = harAktivDagpengerett
+
+        override suspend fun hentBeregninger(personIdent: String) = emptyList<BeregningerResponse>()
     }
 }

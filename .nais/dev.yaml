@@ -10,5 +10,5 @@ gammel_soknadsdialog:
   ingress: "https://arbeid.intern.dev.nav.no/soknaddagpenger-innsending"
 wonderwalled: true
 dp_datadeling:
-  perioder_url: "http://dp-datadeling/dagpenger/datadeling/v1/perioder"
+  base_url: "http://dp-datadeling/dagpenger/datadeling/v1"
   scope: "api://dev-gcp.teamdagpenger.dp-datadeling/.default"
