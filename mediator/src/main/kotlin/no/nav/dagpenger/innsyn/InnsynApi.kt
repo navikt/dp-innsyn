@@ -161,6 +161,14 @@ internal fun Application.innsynApi(
                 val harAktivDagpengerett = aktivDagpengerTjeneste.harAktivDagpengerett(personIdent)
                 call.respond(HttpStatusCode.OK, AktivDagpengerettResponse(harAktivDagpengerett = harAktivDagpengerett))
             }
+
+            get("/beregninger") {
+                val jwtPrincipal = call.authentication.principal<JWTPrincipal>()
+                val personIdent = jwtPrincipal!!.fnr
+                logger.info { "Henter beregninger for aktiv dagpengerett for $personIdent" }
+                val beregninger = aktivDagpengerTjeneste.hentBeregninger(personIdent)
+                call.respond(HttpStatusCode.OK, beregninger)
+            }
         }
     }
 }

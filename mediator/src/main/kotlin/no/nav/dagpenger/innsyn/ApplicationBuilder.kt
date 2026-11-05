@@ -34,7 +34,7 @@ internal class ApplicationBuilder(
         DpDatadelingAktivDagpengerTjeneste(
             httpClient = httpClient,
             oauth2Client = Configuration.azureAdOauth2Client,
-            perioderUrl = Configuration.dpDatadelingPerioderUrl,
+            baseUrl = Configuration.dpDatadelingUrl,
             scope = Configuration.dpDatadelingScope,
         )
 
